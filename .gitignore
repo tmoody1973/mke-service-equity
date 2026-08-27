@@ -1,0 +1,45 @@
+# Operating system and editor files
+.DS_Store
+*.swp
+
+# Local configuration and secrets
+.env*
+!.env.example
+.neon
+.vercel/
+
+# Isolated agent and planning workspaces
+.worktrees/
+.superpowers/
+
+# Node.js, Next.js, tests, and build output
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+artifacts/
+*.tsbuildinfo
+
+# Python and uv
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.uv-cache/
+
+# Generated local data. Source data is never committed in Plan 1.
+data/raw/
+data/interim/
+data/processed/
+data/generated/
+data/downloads/
+data/cache/
+data/artifacts/
+!data/README.md
