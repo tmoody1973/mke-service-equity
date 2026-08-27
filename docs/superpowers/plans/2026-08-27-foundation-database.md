@@ -289,11 +289,14 @@ Create the root manifest exactly as follows:
     "eslint-config-next": "16.3.3",
     "heroui-pro": "1.0.0-beta.12",
     "jsdom": "30.0.1",
+    "next": "16.3.3",
     "tar": "7.5.22",
     "typescript": "6.0.3"
   }
 }
 ```
+
+`next` is also declared at the repository root so the root-hoisted `eslint-config-next` can resolve its bundled parser consistently after a fresh npm install on Linux CI; the web workspace keeps the same exact runtime version.
 
 Create workspace manifests with version `0.0.0`, `private: true`, `type: "module"`, and these exact boundaries:
 
