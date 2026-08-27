@@ -273,6 +273,14 @@ Create the root manifest exactly as follows:
     "test:e2e": "playwright test",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build"
   },
+  "dependencies": {
+    "@heroui/react": "3.2.4",
+    "@heroui/styles": "3.2.4",
+    "@react-aria/utils": "3.34.1",
+    "motion": "13.1.1",
+    "react-aria-components": "1.20.0",
+    "tailwind-variants": "3.3.1"
+  },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
@@ -280,6 +288,7 @@ Create the root manifest exactly as follows:
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.3",
     "heroui-pro": "1.0.0-beta.12",
+    "jsdom": "30.0.1",
     "tar": "7.5.22",
     "typescript": "6.0.3"
   }
@@ -481,7 +490,7 @@ npm ls --workspaces --depth=0
 
 Expected: npm creates one root `package-lock.json`, resolves every workspace, and reports no invalid or extraneous workspace dependency.
 
-- [ ] **Step 4: Verify the workspace graph**
+- [x] **Step 4: Verify the workspace graph**
 
 Run:
 
@@ -847,13 +856,14 @@ Run `status` at repository root, then run `install` with `apps/web` as the comma
 
 ```bash
 npx heroui-pro@latest status
-npx heroui-pro@latest install --yes
+npx heroui-pro@latest install react --yes
+npm rebuild @heroui-pro/react
 npm ls @heroui-pro/react --workspace @mke/web
 ```
 
 Expected: the CLI confirms an authorized React Pro entitlement, installs artifacts into the web workspace, and npm reports `@heroui-pro/react@1.0.0-beta.8` under `@mke/web`. If authorization is absent, stop and ask the user to run `npx heroui-pro@latest login`; do not substitute imitation Pro components.
 
-Keep the licensed React package pinned exactly at `1.0.0-beta.8`. If the CLI also adds `heroui-native-pro` while the empty web scaffold is not yet detectable, remove that unrelated native package. Pin the CLI itself at the root so npm 11 does not drop the transitive override across the web workspace link. The root `tar` development dependency and npm `$tar` override then keep the CLI's archive utility on patched `tar@7.5.22`; do not remove them until the licensed CLI itself depends on a non-vulnerable release.
+Keep the licensed React package pinned exactly at `1.0.0-beta.8`. The explicit `react` product argument prevents the current CLI from attempting both React and Native. If an earlier bare install added `heroui-native-pro`, remove that unrelated native package. npm workspaces hoist the package away from the CLI's app-local detector, so run the official package postinstall through `npm rebuild @heroui-pro/react` and verify real `Sidebar`/`Sheet` exports plus `dist/css/index.css`. The hydrated root package imports runtime peers from its own resolution level, so pin the Sidebar/Sheet peer set in the root `dependencies` block as well as the web workspace; this keeps local, CI, and Vercel production builds deterministic. The same layout hoists Vitest, so root `jsdom` keeps its browser environment resolvable while the web workspace retains the direct test dependency. Pin the CLI itself at the root so npm 11 does not drop the transitive override across the web workspace link. The root `tar` development dependency and npm `$tar` override then keep the CLI's archive utility on patched `tar@7.5.22`; do not remove them until the licensed CLI itself depends on a non-vulnerable release.
 
 Planning evidence captured on 2026-08-27: the live unified HeroUI MCP lists `sheet` and `sidebar` as root exports from `@heroui-pro/react`; `get_component_docs` confirms the compound APIs and built-in `Sidebar.Mobile` Sheet; `get_css` confirms the shipped `max-width: 768px` switch, 240px desktop width, 80vw/500px mobile width, and reduced-motion behavior; `get_theme_variables({theme: "default"})` confirms the semantic tokens used below; and the installation guide confirms React 19+, Tailwind v4, CLI-managed peer installation, no provider, and CSS import order. Direct Sheet anatomy is `Sheet.Trigger`, `Sheet.Backdrop`, `Sheet.Content`, `Sheet.Dialog`, optional `Sheet.CloseTrigger`, `Sheet.Header`/`Sheet.Heading`, and `Sheet.Body`, but Plan 1 navigation uses `Sidebar.Mobile` rather than composing those parts independently. After the licensed package install, repeat `list_components` and the focused `get_component_docs` calls as a drift check. Stop if live interfaces no longer match this finalized plan.
 
@@ -897,7 +907,7 @@ npm run typecheck --workspace @mke/design-system
 
 Expected: token-contract test passes; no TypeScript errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add PRODUCT.md packages/design-system apps/web/package.json package.json package-lock.json
@@ -929,11 +939,11 @@ git commit -m "feat(design-system): establish HeroUI Pro foundation (MOO-750)"
 - Consumes: HeroUI/Pro, design tokens, `checkDatabaseHealth()`, shared health contract.
 - Produces: a Server Component page and `ApplicationShell`, one client-only responsive Pro `Sidebar` boundary that owns its built-in mobile Sheet, and `GET /api/health/database`.
 
-- [ ] **Step 1: Load the Impeccable craft floor before UI edits**
+- [x] **Step 1: Load the Impeccable craft floor before UI edits**
 
 Read `/Users/tarikmoody/.agents/skills/impeccable/reference/craft-floor.md` completely. Use Operate mode and the approved HeroUI Pro visual authority. Do not run a new visual-world tournament because the project explicitly pins HeroUI/Pro as the primary component system.
 
-- [ ] **Step 2: Write failing shell tests**
+- [x] **Step 2: Write failing shell tests**
 
 Testing Library must assert:
 
@@ -949,7 +959,7 @@ The shell test also verifies the documented Tree/Menu semantics and that the cur
 
 The route test mocks `checkDatabaseHealth()` and expects `GET()` to return status 200 with the exact parsed health contract. A second case expects status 503 for `{status: "error", database: "unreachable", postgisVersion: null}`.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 Run:
 
@@ -959,7 +969,7 @@ npm test --workspace @mke/web -- application-shell.test.tsx route.test.ts
 
 Expected: FAIL because the shell and route do not exist.
 
-- [ ] **Step 4: Configure Next.js and CSS imports**
+- [x] **Step 4: Configure Next.js and CSS imports**
 
 `next.config.ts` transpiles `@mke/contracts`, `@mke/database`, and `@mke/design-system`. `globals.css` imports in this exact order:
 
@@ -973,7 +983,7 @@ Expected: FAIL because the shell and route do not exist.
 
 Add global focus-visible styles, full-height layout, and no horizontal overflow. Do not hide focus outlines.
 
-- [ ] **Step 5: Implement server-first shell structure**
+- [x] **Step 5: Implement server-first shell structure**
 
 Run `npm run typecheck --workspace @mke/web` once after the App Router files exist; its `next typegen` prefix deterministically creates `next-env.d.ts` and `.next/types` before `tsc`. Commit the generated `next-env.d.ts` so a clean checkout has Next's reference file, while every typecheck refreshes route types. `layout.tsx`, `page.tsx`, and `ApplicationShell` remain Server Components. `responsive-sidebar.tsx` is the only shell client boundary and imports `{Sidebar}` from `@heroui-pro/react`; Server Component content crosses that boundary only as `children`.
 
@@ -994,11 +1004,11 @@ Responsive layout contract:
 - 1024/1440: the desktop Sidebar is persistently 240px and `Sidebar.Main` is flexible; the mobile Sheet renders nothing and no second desktop brand/header is introduced.
 - The skip link enters `#map-workspace` at every width.
 
-- [ ] **Step 6: Implement the health route**
+- [x] **Step 6: Implement the health route**
 
 The route runs on the Node.js runtime, imports the database package only in server code, validates the returned object with `databaseHealthResponseSchema`, and maps `ok` to HTTP 200, `unconfigured` to 503, and `error` to 503. It never returns a URL, role, host, stack trace, or raw SQL error.
 
-- [ ] **Step 7: Run GREEN**
+- [x] **Step 7: Run GREEN**
 
 Run:
 

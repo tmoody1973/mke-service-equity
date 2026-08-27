@@ -1,0 +1,15 @@
+{
+  "extends": "@mke/config/typescript/nextjs",
+  "compilerOptions": {
+    "incremental": true,
+    "jsx": "preserve",
+    "plugins": [{"name": "next"}]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": ["node_modules"]
+}
