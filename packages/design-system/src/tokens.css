@@ -1,0 +1,10 @@
+:root {
+  --mke-canvas: var(--background);
+  --mke-panel: var(--surface);
+  --mke-text: var(--foreground);
+  --mke-muted: var(--muted);
+  --mke-accent: var(--accent);
+  --mke-focus: var(--focus);
+  --mke-radius-panel: 1rem;
+  --mke-touch-target: 44px;
+}

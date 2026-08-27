@@ -261,6 +261,9 @@ Create the root manifest exactly as follows:
   "packageManager": "npm@11.12.1",
   "engines": {"node": ">=24 <27"},
   "workspaces": ["apps/*", "packages/*"],
+  "overrides": {
+    "tar": "$tar"
+  },
   "scripts": {
     "build": "npm run build --workspace @mke/web",
     "dev": "npm run dev --workspace @mke/web",
@@ -276,6 +279,8 @@ Create the root manifest exactly as follows:
     "drizzle-orm": "0.45.2",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.3",
+    "heroui-pro": "1.0.0-beta.12",
+    "tar": "7.5.22",
     "typescript": "6.0.3"
   }
 }
@@ -808,7 +813,7 @@ uv run ruff check pipelines tests/data
 
 Expected: one test passes and Ruff reports no violations.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add pyproject.toml uv.lock pipelines tests/data
@@ -832,11 +837,11 @@ git commit -m "chore(python): establish data workspace (MOO-750)"
 - Consumes: Approved product/UX documents, HeroUI v3 styles, licensed HeroUI Pro artifacts.
 - Produces: stable semantic aliases `--mke-canvas`, `--mke-panel`, `--mke-text`, `--mke-muted`, `--mke-accent`, `--mke-focus`, `--mke-radius-panel`, and `--mke-touch-target`.
 
-- [ ] **Step 1: Capture confirmed product truth**
+- [x] **Step 1: Capture confirmed product truth**
 
 Create `PRODUCT.md` using the Impeccable schema comment and only confirmed facts: platform `web`; primary Milwaukee public-sector decision-makers; public/community secondary users; evidence-before-recommendation position; Food Equity Atlas MVP; responsive widths; WCAG 2.2 AA target; locked stack; no authentication/AI/fake data; and absence of approved brand imagery. Do not add aesthetic claims, metrics, testimonials, or unapproved product behavior.
 
-- [ ] **Step 2: Verify HeroUI Pro authorization before modifying UI**
+- [x] **Step 2: Verify HeroUI Pro authorization before modifying UI**
 
 Run `status` at repository root, then run `install` with `apps/web` as the command working directory:
 
@@ -848,19 +853,21 @@ npm ls @heroui-pro/react --workspace @mke/web
 
 Expected: the CLI confirms an authorized React Pro entitlement, installs artifacts into the web workspace, and npm reports `@heroui-pro/react@1.0.0-beta.8` under `@mke/web`. If authorization is absent, stop and ask the user to run `npx heroui-pro@latest login`; do not substitute imitation Pro components.
 
+Keep the licensed React package pinned exactly at `1.0.0-beta.8`. If the CLI also adds `heroui-native-pro` while the empty web scaffold is not yet detectable, remove that unrelated native package. Pin the CLI itself at the root so npm 11 does not drop the transitive override across the web workspace link. The root `tar` development dependency and npm `$tar` override then keep the CLI's archive utility on patched `tar@7.5.22`; do not remove them until the licensed CLI itself depends on a non-vulnerable release.
+
 Planning evidence captured on 2026-08-27: the live unified HeroUI MCP lists `sheet` and `sidebar` as root exports from `@heroui-pro/react`; `get_component_docs` confirms the compound APIs and built-in `Sidebar.Mobile` Sheet; `get_css` confirms the shipped `max-width: 768px` switch, 240px desktop width, 80vw/500px mobile width, and reduced-motion behavior; `get_theme_variables({theme: "default"})` confirms the semantic tokens used below; and the installation guide confirms React 19+, Tailwind v4, CLI-managed peer installation, no provider, and CSS import order. Direct Sheet anatomy is `Sheet.Trigger`, `Sheet.Backdrop`, `Sheet.Content`, `Sheet.Dialog`, optional `Sheet.CloseTrigger`, `Sheet.Header`/`Sheet.Heading`, and `Sheet.Body`, but Plan 1 navigation uses `Sidebar.Mobile` rather than composing those parts independently. After the licensed package install, repeat `list_components` and the focused `get_component_docs` calls as a drift check. Stop if live interfaces no longer match this finalized plan.
 
-- [ ] **Step 3: Write the failing token-contract test**
+- [x] **Step 3: Write the failing token-contract test**
 
 The Vitest test reads `src/tokens.css` and asserts that each semantic variable listed in Interfaces appears exactly once and that `--mke-touch-target` equals `44px`.
 
-- [ ] **Step 4: Run RED**
+- [x] **Step 4: Run RED**
 
 Run: `npm test --workspace @mke/design-system`
 
 Expected: FAIL because `src/tokens.css` does not exist.
 
-- [ ] **Step 5: Implement semantic token aliases**
+- [x] **Step 5: Implement semantic token aliases**
 
 Map project variables to HeroUI semantic tokens rather than numbered colors:
 
@@ -879,7 +886,7 @@ Map project variables to HeroUI semantic tokens rather than numbered colors:
 
 Do not add a universal motion override. The live Sidebar and Sheet CSS already honors `prefers-reduced-motion`; any future project-owned motion must opt into the same preference without rewriting third-party component behavior.
 
-- [ ] **Step 6: Run GREEN and design-system checks**
+- [x] **Step 6: Run GREEN and design-system checks**
 
 Run:
 

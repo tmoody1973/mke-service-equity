@@ -6,6 +6,9 @@
   "packageManager": "npm@11.12.1",
   "engines": {"node": ">=24 <27"},
   "workspaces": ["apps/*", "packages/*"],
+  "overrides": {
+    "tar": "$tar"
+  },
   "scripts": {
     "build": "npm run build --workspace @mke/web",
     "dev": "npm run dev --workspace @mke/web",
@@ -21,6 +24,8 @@
     "drizzle-orm": "0.45.2",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.3",
+    "heroui-pro": "1.0.0-beta.12",
+    "tar": "7.5.22",
     "typescript": "6.0.3"
   }
 }
