@@ -1070,7 +1070,7 @@ Expected: FAIL because `MapCanvas` does not exist.
 
 - [x] **Step 4: Implement the isolated client lifecycle**
 
-`map-canvas.tsx` begins with `"use client"`, owns a `ref`, creates the map inside `useEffect`, adds `NavigationControl` and visible `AttributionControl`, and returns `map.remove`. It does not import database, contracts, or analytical modules. It renders a textual status explaining that analytical layers are intentionally absent from Plan 1.
+`map-canvas.tsx` begins with `"use client"`, owns a `ref`, creates the map inside `useEffect`, adds `NavigationControl` and visible `AttributionControl`, and returns `map.remove`. It does not import database, contracts, or analytical modules. The map shell renders the public-facing status `No published Food Equity data is available yet.`
 
 - [x] **Step 5: Run GREEN**
 

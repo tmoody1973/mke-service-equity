@@ -35,4 +35,4 @@ Force the preview target so a newly created project cannot be promoted implicitl
 vercel deploy --cwd apps/web --target preview
 ```
 
-Verify the returned HTTPS URL at 375 and 1440 px, including keyboard focus, the responsive Sidebar, MapLibre controls and attribution, the explicit no-analytical-layers status, and the absence of secrets in browser source and network responses.
+Verify the returned HTTPS URL at 375 and 1440 px, including keyboard focus, the responsive Sidebar, MapLibre controls and attribution, the explicit no-published-data status, and the absence of secrets in browser source and network responses.
