@@ -1177,7 +1177,7 @@ git commit -m "test(web): verify responsive accessible shell (MOO-750)"
 - Consumes: all Plan 1 packages, `HEROUI_AUTH_TOKEN`, optional isolated-development database secrets, and Vercel project access.
 - Produces: deterministic CI, a Vercel preview URL, and the permanent verification record used to close MOO-750.
 
-- [ ] **Step 1: Write delivery configuration and operational documentation**
+- [x] **Step 1: Write delivery configuration and operational documentation**
 
 Create `.github/workflows/ci.yml` with the current action versions confirmed from official Context7 sources:
 
@@ -1228,7 +1228,7 @@ jobs:
 
 Do not add a database URL or run migrations in CI. `apps/web/vercel.json` contains only `{"$schema":"https://openapi.vercel.sh/vercel.json","framework":"nextjs"}`. The setup/deployment docs record exact local commands, Project Root Directory `apps/web`, Node 24, secret/public variable boundaries, isolated preview database rules, and that code deployment never publishes a score run. Update the repository tree document to match files that actually exist.
 
-- [ ] **Step 2: Commit delivery configuration before asking CI to run**
+- [x] **Step 2: Commit delivery configuration before asking CI to run**
 
 ```bash
 git add .github/workflows/ci.yml apps/web/vercel.json README.md docs/development docs/deployment docs/architecture/repository.md docs/verification/plan-1-pr.md
