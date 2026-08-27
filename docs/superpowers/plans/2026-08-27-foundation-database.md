@@ -12,7 +12,7 @@
 
 **Tracking:** Linear `MOO-750` — Plan 1 — Foundation + Database.
 
-**Plan status:** Finalized and self-reviewed with live HeroUI Pro MCP documentation on 2026-08-27. Execution is paused at the approval gates below.
+**Plan status:** Local implementation and final review completed on 2026-08-27. External verification awaits GitHub CLI authentication, the GitHub Actions HeroUI token, and Vercel Preview environment variables.
 
 ## Approved Execution Decisions
 
@@ -377,7 +377,7 @@ For `apps/web/package.json`:
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
@@ -978,6 +978,8 @@ Expected: FAIL because the shell and route do not exist.
 
 `next.config.ts` transpiles `@mke/contracts`, `@mke/database`, and `@mke/design-system`. `globals.css` imports in this exact order:
 
+The web build script uses Next's supported `--webpack` builder so PostCSS compilation does not depend on Turbopack's local worker-port capability in restricted development and verification environments. CI and Vercel run the same deterministic script.
+
 ```css
 @import "tailwindcss";
 @import "@heroui/styles";
@@ -1237,7 +1239,7 @@ git commit -m "ci(plan-1): add foundation delivery gates (MOO-750)"
 
 Expected: the workflow and Vercel/setup documentation are present in the commit that will be pushed and verified.
 
-- [ ] **Step 3: Run the full fresh local verification gate**
+- [x] **Step 3: Run the full fresh local verification gate**
 
 Run in this order:
 
@@ -1258,7 +1260,7 @@ git status --short
 
 Expected: every command exits 0; all five widths pass; the production build completes; real isolated Neon/PostGIS integration passes; and client chunks contain no database environment names, PostgreSQL URLs, Neon driver, or database workspace import.
 
-- [ ] **Step 4: Run final code and design review before external verification**
+- [x] **Step 4: Run final code and design review before external verification**
 
 Use the Superpowers final reviewer on the full branch and the Impeccable finish reviewer with the 375 and 1440 screenshots, original request, HeroUI Pro direction contract, detector findings, and craft-floor path. Address material findings in one bounded batch. Rerun every affected command from Step 3 and commit all source/test/documentation fixes:
 

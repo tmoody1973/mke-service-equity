@@ -25,7 +25,7 @@ export function MapCanvas({styleUrl}: MapCanvasProps) {
 
     map.addControl(new NavigationControl({showCompass: false}), "top-right");
     map.addControl(
-      new AttributionControl({compact: true, customAttribution: "MapLibre GL JS"}),
+      new AttributionControl({compact: false, customAttribution: "MapLibre GL JS"}),
       "bottom-right",
     );
     map.resize();

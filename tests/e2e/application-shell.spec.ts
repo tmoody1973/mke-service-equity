@@ -32,12 +32,21 @@ test("renders and operates the shell at the configured width", async ({page}, te
   await page.keyboard.press("Enter");
   await expect(page.getByRole("main")).toBeFocused();
 
+  const mapWorkspace = page.getByRole("region", {name: "Map workspace"});
+  const mapContainer = page.locator("[data-map-container]");
   const canvas = page.locator(".maplibregl-canvas");
   await expect(canvas).toBeVisible();
   const originalCanvas = await canvas.elementHandle();
   await expect(page.locator(".maplibregl-ctrl-zoom-in")).toBeVisible();
-  await expect(page.locator(".maplibregl-ctrl-attrib")).toBeVisible();
-  await expect(page.getByRole("status")).toContainText("intentionally absent");
+  const attribution = page.locator(".maplibregl-ctrl-attrib");
+  await expect(attribution).toBeVisible();
+  await expect(attribution).toBeInViewport();
+  await expect(attribution).toContainText("MapLibre GL JS");
+  await expect(page.getByRole("status")).toContainText("No published Food Equity data");
+
+  const mapWorkspaceBox = await mapWorkspace.boundingBox();
+  const mapContainerBox = await mapContainer.boundingBox();
+  expect(mapContainerBox?.height).toBeGreaterThanOrEqual((mapWorkspaceBox?.height ?? 0) - 1);
 
   const desktopSidebar = page.getByRole("complementary", {name: "Application navigation"});
   const openNavigation = page.getByRole("button", {name: "Open navigation"});
@@ -45,6 +54,7 @@ test("renders and operates the shell at the configured width", async ({page}, te
   if (isMobile) {
     await expect(desktopSidebar).toBeHidden();
     await expect(openNavigation).toBeVisible();
+    await expect(page.getByRole("main").locator("header").getByText("Food Equity Atlas")).toBeVisible();
 
     await openNavigation.click();
     const sheet = page.locator(".sidebar__mobile-sheet");
@@ -84,6 +94,7 @@ test("renders and operates the shell at the configured width", async ({page}, te
   } else {
     await expect(desktopSidebar).toBeVisible();
     await expect(openNavigation).toBeHidden();
+    await expect(page.getByRole("main").locator("header").getByText("Food Equity Atlas")).toBeHidden();
     await expect(page.locator(".sidebar__mobile-sheet")).toHaveCount(0);
 
     const sidebarBox = await desktopSidebar.boundingBox();

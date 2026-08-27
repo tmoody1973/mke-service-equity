@@ -37,3 +37,31 @@ body {
 .mke-skip-link:focus-visible {
   translate: 0;
 }
+
+[data-map-container] .maplibregl-ctrl-group button {
+  width: var(--mke-touch-target);
+  height: var(--mke-touch-target);
+}
+
+[data-map-container].maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+[data-map-container] .maplibregl-ctrl-top-right {
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+}
+
+[data-map-container] .maplibregl-ctrl-bottom-right {
+  inset-block-end: 4.5rem;
+  inset-inline-end: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  [data-map-container] .maplibregl-ctrl-bottom-right {
+    inset-block-end: 0.75rem;
+  }
+}
