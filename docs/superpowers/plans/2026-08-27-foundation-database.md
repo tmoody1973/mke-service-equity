@@ -273,6 +273,7 @@ Create the root manifest exactly as follows:
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
+    "drizzle-orm": "0.45.2",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.3",
     "typescript": "6.0.3"
@@ -421,6 +422,8 @@ export default defineConfig([
 ```
 
 This single root command lints application and TypeScript package source; packages do not duplicate ESLint configs.
+
+The root repeats the exact `drizzle-orm` pin as a development-only CLI companion because npm hoists `drizzle-kit` from `@mke/database` while retaining the ORM under that workspace. Without the root companion, Drizzle Kit cannot resolve its version module and stops before migration SQL runs. Runtime database ownership remains in `@mke/database`.
 
 - [x] **Step 2: Write shared TypeScript configuration**
 
@@ -577,7 +580,7 @@ HEROUI_AUTH_TOKEN=
 
 Document that `DATABASE_URL` is pooled runtime access, `DATABASE_URL_UNPOOLED` is preferred for migrations, `NEXT_PUBLIC_MAP_STYLE_URL` is intentionally public, and `HEROUI_AUTH_TOKEN` is installation-only and belongs in local secure storage, GitHub Actions secrets, and Vercel encrypted environment variables. Explicitly forbid committing `.env.local` or logging values.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add .env.example packages/contracts docs/development/environment.md
@@ -609,7 +612,7 @@ git commit -m "feat(contracts): define foundation health contract (MOO-750)"
 - Consumes: pooled `DATABASE_URL`, preferred migration `DATABASE_URL_UNPOOLED`, and `DatabaseHealthResponse`.
 - Produces: public subpath `@mke/database/server` with `checkDatabaseHealth(): Promise<DatabaseHealthResponse>`; URL readers and the Drizzle client remain private package internals.
 
-- [ ] **Step 1: Write the failing environment and migration-scope tests**
+- [x] **Step 1: Write the failing environment and migration-scope tests**
 
 ```ts
 import {describe, expect, it} from "vitest";
@@ -636,13 +639,13 @@ describe("database URL selection", () => {
 
 The health unit test injects a client factory and asserts that missing `DATABASE_URL` returns `unconfigured` without invoking the factory, client initialization or the first query failing returns `error`/`unreachable`, the PostGIS query failing after `current_database()` succeeds returns `error`/`reachable`, and a non-empty PostGIS version returns `ok`/`reachable`. The migration-scope test reads `drizzle/0000_enable_postgis.sql`, expects `CREATE EXTENSION IF NOT EXISTS postgis`, and rejects `CREATE TABLE`, `INSERT INTO`, and any score/resource/geography domain identifier.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `npm test --workspace @mke/database`
 
 Expected: FAIL because `src/env.ts` and the migration do not exist.
 
-- [ ] **Step 3: Implement the server-only database package**
+- [x] **Step 3: Implement the server-only database package**
 
 `src/env.ts` exports the two readers exercised above; neither logs its input. `drizzle.config.ts` calls `readMigrationDatabaseUrl(process.env)`. `src/client.ts` exports a lazy factory that accepts a validated runtime URL, constructs `neon(url)`, and passes it to `drizzle({client})`; it must not read the environment or create a client at module evaluation time. `src/health.ts` first returns `{status: "unconfigured", database: "unconfigured", postgisVersion: null}` when `DATABASE_URL` is absent. Otherwise it validates the URL and creates the client inside the health-call boundary. It first runs a parameter-free `current_database()` reachability query: initialization or reachability failures return `{status: "error", database: "unreachable", postgisVersion: null}`. It then runs `postgis_lib_version()`: a failure after reachability succeeds returns `{status: "error", database: "reachable", postgisVersion: null}`. A non-empty PostGIS version returns `ok`. No branch logs the URL or raw server error.
 
@@ -656,7 +659,7 @@ export {checkDatabaseHealth} from "./health";
 
 `package.json` exposes only `"./server": "./src/server.ts"`; it does not expose `env.ts` or `client.ts`. Both database and web Vitest configs alias `server-only` to the empty `tests/server-only-stub.ts`, while Next's real build resolves the poison package normally. The integration test imports `@mke/database/server`; the post-build client-chunk scan in Task 10 proves the server package never enters the browser graph.
 
-- [ ] **Step 4: Generate and narrow the custom migration**
+- [x] **Step 4: Generate and narrow the custom migration**
 
 Run from `packages/database`:
 
@@ -672,7 +675,7 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 
 Expected: Drizzle creates migration metadata and the only application SQL change enables PostGIS.
 
-- [ ] **Step 5: Run unit GREEN**
+- [x] **Step 5: Run unit GREEN**
 
 Run:
 
@@ -683,11 +686,13 @@ npm run typecheck --workspace @mke/database
 
 Expected: environment, health-state, and scope tests pass; TypeScript emits no errors.
 
-- [ ] **Step 6: Provision or select the isolated Neon development target**
+- [x] **Step 6: Provision or select the isolated Neon development target**
 
-Use the Neon CLI link already stored locally for the personal `mke-service-equity` project; do not use the loaded Neon connector, which is authenticated to an unrelated organization. Before changing branch context, inspect only the non-secret `.neon` metadata and confirm the linked branch is `production`. After the user approves the branch name and lifetime, run the current Neon CLI checkout flow for that explicit non-default name. The checked-in `neon.ts` applies a seven-day TTL when the approved branch does not already exist, and current Neon CLI checkout behavior repulls branch-scoped variables automatically. Immediately verify `NEON_BRANCH` is the approved name and not `production` without printing either database URL. Record the project ID, branch ID, database name, role name, approved expiration policy, and the phrase `development-only`; never record the connection string. If the CLI resolves a different project or organization, stop for direction.
+Use the Neon CLI link already stored locally for the personal `mke-service-equity` project; do not use the loaded Neon connector, which is authenticated to an unrelated organization. Before changing branch context, inspect only the non-secret `.neon` metadata and confirm the linked branch is `production`. After the user approves the branch name and lifetime, run the current Neon CLI flow for that explicit non-default name. If `checkout` does not create a missing branch, use `branches create --name <approved-name> --parent production --expires-at <resolved-seven-day-UTC-timestamp> --no-secrets`, then check it out. Checkout repulls branch-scoped variables automatically. Immediately verify that `.neon` resolves the approved branch name and that `NEON_BRANCH` matches its non-production branch ID without printing either database URL. Record the project ID, branch ID, database name, role name, approved expiration policy, and the phrase `development-only`; never record the connection string. If the CLI resolves a different project or organization, stop for direction.
 
-- [ ] **Step 7: Apply the migration to real development infrastructure**
+Execution evidence (2026-08-27): `development-only`; project `wispy-glitter-41930798`; branch `moo-750-foundation` / `br-dark-dew-a5x4dxm6`; database `neondb`; role `neondb_owner`; explicit expiry `2026-09-03T20:01:31Z` (seven-day policy). No connection string is recorded.
+
+- [x] **Step 7: Apply the migration to real development infrastructure**
 
 Set local secret variables without echoing them, then run:
 
@@ -698,7 +703,7 @@ npm run test:integration --workspace @mke/database
 
 Expected: Drizzle reports the migration applied; the integration test returns `database: "reachable"` and a non-empty PostGIS version from the isolated development database.
 
-- [ ] **Step 8: Verify real database state independently**
+- [x] **Step 8: Verify real database state independently**
 
 Load `.env.local` without shell tracing and run `psql` against `DATABASE_URL_UNPOOLED` on the same approved branch:
 
