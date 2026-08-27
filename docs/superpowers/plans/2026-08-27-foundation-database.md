@@ -1020,7 +1020,7 @@ npm run typecheck --workspace @mke/web
 
 Expected: shell and route tests pass; lint and TypeScript report zero errors.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/web package.json package-lock.json
@@ -1043,25 +1043,25 @@ git commit -m "feat(web): add responsive application shell (MOO-750)"
 - Consumes: `NEXT_PUBLIC_MAP_STYLE_URL` with `/map-style.json` fallback.
 - Produces: `MapShell` server wrapper; `MapCanvas` client component that constructs one MapLibre map, adds navigation/attribution controls, resizes, and removes it on unmount.
 
-- [ ] **Step 1: Write the failing lifecycle test**
+- [x] **Step 1: Write the failing lifecycle test**
 
 Mock only MapLibre's browser boundary. Assert that rendering creates exactly one map with the resolved style and container, that the shell exposes `role="region"` with `aria-label="Map workspace"`, and that unmount calls `map.remove()` exactly once.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `npm test --workspace @mke/web -- map-canvas.test.tsx`
 
 Expected: FAIL because `MapCanvas` does not exist.
 
-- [ ] **Step 3: Create a deterministic data-free style**
+- [x] **Step 3: Create a deterministic data-free style**
 
 `public/map-style.json` contains MapLibre style version 8, no sources, and one neutral background layer. It contains no tract geometry, resource points, coordinates, classifications, or analytical values. The environment override is the production base-style hook and must retain its provider attribution.
 
-- [ ] **Step 4: Implement the isolated client lifecycle**
+- [x] **Step 4: Implement the isolated client lifecycle**
 
 `map-canvas.tsx` begins with `"use client"`, owns a `ref`, creates the map inside `useEffect`, adds `NavigationControl` and visible `AttributionControl`, and returns `map.remove`. It does not import database, contracts, or analytical modules. It renders a textual status explaining that analytical layers are intentionally absent from Plan 1.
 
-- [ ] **Step 5: Run GREEN**
+- [x] **Step 5: Run GREEN**
 
 Run:
 
@@ -1072,7 +1072,7 @@ npm run typecheck --workspace @mke/web
 
 Expected: lifecycle test passes; TypeScript reports zero errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/features/map apps/web/public/map-style.json apps/web/app/page.tsx
