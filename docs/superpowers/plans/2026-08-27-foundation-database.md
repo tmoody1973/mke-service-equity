@@ -6,7 +6,7 @@
 
 **Architecture:** npm workspaces coordinate a server-first Next.js application and three focused TypeScript packages: contracts, database, and design system. The browser owns only presentation and MapLibre lifecycle; Neon/PostGIS remains server-only, and the only Plan 1 database change is enabling PostGIS through a custom Drizzle migration. Python is packaged independently with uv so later ingestion and scoring plans can evolve without coupling analytical code to the web application.
 
-**Tech Stack:** Node.js 24 LTS, npm 11, Next.js 16.3.3 App Router, React 19.2.8, TypeScript 7.0.2, Tailwind CSS 4.3.3, HeroUI 3.2.4, HeroUI Pro 1.0.0-beta.8, MapLibre GL JS 6.6.0, Neon serverless driver 1.1.0, Drizzle ORM 0.45.2, Drizzle Kit 0.31.10, Zod 4.4.3, Python 3.13, uv, pytest 9.0.2, Ruff 0.14.10, Vitest 4.1.11, Testing Library 16.3.2, Playwright 1.62.1, axe-core 4.13.0, GitHub Actions, and Vercel. Pandas and GeoPandas remain approved stack items but are installed in Plan 2 when ingestion begins, avoiding unused binary dependencies in Plan 1.
+**Tech Stack:** Node.js 24 LTS, npm 11, Next.js 16.3.3 App Router, React 19.2.8, TypeScript 6.0.3, Tailwind CSS 4.3.3, HeroUI 3.2.4, HeroUI Pro 1.0.0-beta.8, MapLibre GL JS 6.6.0, Neon serverless driver 1.1.0, Drizzle ORM 0.45.2, Drizzle Kit 0.31.10, Zod 4.4.3, Python 3.13, uv, pytest 9.0.2, Ruff 0.14.10, Vitest 4.1.11, Testing Library 16.3.2, Playwright 1.62.1, axe-core 4.13.0, GitHub Actions, and Vercel. Pandas and GeoPandas remain approved stack items but are installed in Plan 2 when ingestion begins, avoiding unused binary dependencies in Plan 1.
 
 **Spec:** `docs/superpowers/specs/2026-08-27-mke-service-equity-design.md`
 
@@ -273,9 +273,9 @@ Create the root manifest exactly as follows:
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
-    "eslint": "10.9.1",
+    "eslint": "9.39.5",
     "eslint-config-next": "16.3.3",
-    "typescript": "7.0.2"
+    "typescript": "6.0.3"
   }
 }
 ```
@@ -293,7 +293,7 @@ For `packages/contracts/package.json`:
   "exports": {".": "./src/index.ts"},
   "scripts": {"typecheck": "tsc --noEmit", "test": "vitest run"},
   "dependencies": {"zod": "4.4.3"},
-  "devDependencies": {"@types/node": "26.4.0", "typescript": "7.0.2", "vitest": "4.1.11"}
+  "devDependencies": {"@types/node": "26.4.0", "typescript": "6.0.3", "vitest": "4.1.11"}
 }
 ```
 
@@ -319,7 +319,7 @@ For `packages/database/package.json`:
     "drizzle-orm": "0.45.2",
     "server-only": "0.0.1"
   },
-  "devDependencies": {"@types/node": "26.4.0", "drizzle-kit": "0.31.10", "typescript": "7.0.2", "vitest": "4.1.11"}
+  "devDependencies": {"@types/node": "26.4.0", "drizzle-kit": "0.31.10", "typescript": "6.0.3", "vitest": "4.1.11"}
 }
 ```
 
@@ -333,7 +333,7 @@ For `packages/design-system/package.json`:
   "type": "module",
   "exports": {"./tokens.css": "./src/tokens.css"},
   "scripts": {"typecheck": "tsc --noEmit", "test": "vitest run"},
-  "devDependencies": {"@types/node": "26.4.0", "typescript": "7.0.2", "vitest": "4.1.11"}
+  "devDependencies": {"@types/node": "26.4.0", "typescript": "6.0.3", "vitest": "4.1.11"}
 }
 ```
 
@@ -390,7 +390,7 @@ For `apps/web/package.json`:
     "@types/react-dom": "19.2.5",
     "jsdom": "30.0.1",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.11"
   }
 }
@@ -484,9 +484,9 @@ npm run typecheck --workspaces --if-present
 
 Expected: all five package names are returned; packages with source files type-check and empty scaffolds exit cleanly.
 
-Execution note (2026-08-27): the four non-web workspaces type-check cleanly. The web command remains intentionally RED until Task 5 creates `apps/web/app`; current Next.js `typegen` rejects a project with neither an `app` nor `pages` directory. Do not add premature route files merely to make this sequencing check green.
+Execution note (2026-08-27): the four non-web workspaces type-check cleanly. The web command remains intentionally RED until Task 5 creates `apps/web/app`; current Next.js `typegen` rejects a project with neither an `app` nor `pages` directory. Do not add premature route files merely to make this sequencing check green. Live package metadata and a lint-startup check also showed that `eslint-config-next@16.3.3`'s bundled `typescript-eslint@8.68.0` rejects the TypeScript 7 API and that its bundled React/import plugins cap ESLint support at 9. The executable pins were corrected to TypeScript 6.0.3 and ESLint 9.39.5, the newest mutually supported releases.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add package.json package-lock.json tsconfig.json eslint.config.mjs apps/web/package.json packages/config packages/contracts/package.json packages/database/package.json packages/design-system/package.json
