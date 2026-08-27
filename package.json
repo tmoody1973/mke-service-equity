@@ -1,0 +1,25 @@
+{
+  "name": "mke-service-equity",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "npm@11.12.1",
+  "engines": {"node": ">=24 <27"},
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build": "npm run build --workspace @mke/web",
+    "dev": "npm run dev --workspace @mke/web",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1",
+    "eslint": "10.9.1",
+    "eslint-config-next": "16.3.3",
+    "typescript": "7.0.2"
+  }
+}

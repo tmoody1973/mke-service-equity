@@ -175,7 +175,7 @@ git check-ignore .DS_Store .neon .env.local node_modules/example .worktrees/exam
 
 Expected: both license lines are found and all five generated/private paths are ignored.
 
-- [ ] **Step 4: Commit the documentation baseline on `main`**
+- [x] **Step 4: Commit the documentation baseline on `main`**
 
 Run:
 
@@ -186,7 +186,7 @@ git commit -m "chore(repo): initialize MIT-licensed project (MOO-750)"
 
 Expected: one root commit exists on `main`; it contains approved documentation, the reviewed Plan 1 plan, repository policy, and no implementation.
 
-- [ ] **Step 5: Create the GitHub repository after the external-visibility gate**
+- [x] **Step 5: Create the GitHub repository after the external-visibility gate**
 
 The approved command target is `tmoody1973/mke-service-equity`. Before running it, confirm the owner and whether the repository is public; MIT licensing alone does not publish the repository. Then authenticate and create/push using the confirmed visibility.
 
@@ -210,7 +210,7 @@ git remote -v
 
 Expected: the authenticated owner is `tmoody1973`, `origin` points to the new GitHub repository, and `main` is pushed. The MOO-750 branch is created in Step 6 and pushed after its first implementation commit. If authentication is invalid, stop and request `gh auth login -h github.com`; do not claim GitHub setup is complete.
 
-- [ ] **Step 6: Create the isolated MOO-750 worktree**
+- [x] **Step 6: Create the isolated MOO-750 worktree**
 
 After obtaining the worktree consent required by the Superpowers `using-git-worktrees` workflow, run from the primary checkout:
 
@@ -222,7 +222,7 @@ git worktree list --porcelain
 
 Expected: `.worktrees` is ignored, the linked workspace is on the MOO-750 branch, and every later task runs with `.worktrees/moo-750` as its working directory. If the user declines a linked worktree, create the feature branch in place and record that explicit choice in the evidence document.
 
-- [ ] **Step 7: Commit checkpoint**
+- [x] **Step 7: Commit checkpoint**
 
 No additional commit is needed if Step 4 is clean. Record the root commit SHA and GitHub URL in the verification evidence file during Task 10.
 
@@ -248,7 +248,7 @@ No additional commit is needed if Step 4 is clean. Record the root commit SHA an
 - Consumes: Node 24, npm 11, repository structure in `docs/architecture/repository.md`.
 - Produces: npm workspace names `@mke/web`, `@mke/contracts`, `@mke/database`, `@mke/design-system`, and `@mke/config` with root verification scripts.
 
-- [ ] **Step 1: Write the root workspace manifest**
+- [x] **Step 1: Write the root workspace manifest**
 
 Create the root manifest exactly as follows:
 
@@ -422,7 +422,7 @@ export default defineConfig([
 
 This single root command lints application and TypeScript package source; packages do not duplicate ESLint configs.
 
-- [ ] **Step 2: Write shared TypeScript configuration**
+- [x] **Step 2: Write shared TypeScript configuration**
 
 Write `packages/config/typescript/base.json` as:
 
@@ -462,7 +462,7 @@ Write `nextjs.json` as:
 
 The root `tsconfig.json` is `{"extends":"./packages/config/typescript/base.json","files":[]}`; each source package has its own include list and runs `tsc --noEmit`, avoiding invalid build references to no-emit projects.
 
-- [ ] **Step 3: Install and lock dependencies**
+- [x] **Step 3: Install and lock dependencies**
 
 Run:
 
@@ -483,6 +483,8 @@ npm run typecheck --workspaces --if-present
 ```
 
 Expected: all five package names are returned; packages with source files type-check and empty scaffolds exit cleanly.
+
+Execution note (2026-08-27): the four non-web workspaces type-check cleanly. The web command remains intentionally RED until Task 5 creates `apps/web/app`; current Next.js `typegen` rejects a project with neither an `app` nor `pages` directory. Do not add premature route files merely to make this sequencing check green.
 
 - [ ] **Step 5: Commit**
 
