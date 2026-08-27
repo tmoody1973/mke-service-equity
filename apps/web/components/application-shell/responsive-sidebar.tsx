@@ -1,6 +1,7 @@
 "use client";
 
 import {Sidebar} from "@heroui-pro/react";
+import {useRouter} from "next/navigation";
 import type {ReactNode} from "react";
 
 import {primaryNavigation} from "./navigation";
@@ -31,7 +32,10 @@ function PrimaryNavigation() {
             key={item.id}
             textValue={item.label}
           >
-            <Sidebar.MenuLabel>{item.label}</Sidebar.MenuLabel>
+            <Sidebar.MenuLabel>
+              {item.label}
+              {item.isCurrent ? <span className="sr-only">Current page</span> : null}
+            </Sidebar.MenuLabel>
           </Sidebar.MenuItem>
         ))}
       </Sidebar.Menu>
@@ -40,10 +44,13 @@ function PrimaryNavigation() {
 }
 
 export function ResponsiveSidebar({children}: ResponsiveSidebarProps) {
+  const router = useRouter();
+
   return (
     <Sidebar.Provider
       className="min-h-dvh bg-[var(--mke-canvas)]"
-      collapsible="none"
+      collapsible="offcanvas"
+      navigate={router.push}
       toggleShortcut={false}
     >
       <Sidebar aria-label="Application navigation">

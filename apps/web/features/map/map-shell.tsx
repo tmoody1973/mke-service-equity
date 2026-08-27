@@ -11,7 +11,7 @@ export function MapShell() {
       <MapCanvas styleUrl={getMapStyleUrl()} />
       <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10 max-w-md sm:inset-x-auto sm:left-4">
         <p
-          className="rounded-[var(--mke-radius-panel)] border border-divider bg-background/95 px-4 py-3 text-sm text-muted shadow-sm backdrop-blur"
+          className="rounded-[var(--mke-radius-panel)] border border-divider bg-background px-4 py-3 text-sm text-foreground shadow-sm"
           role="status"
         >
           Analytical layers are intentionally absent from this Plan 1 foundation.

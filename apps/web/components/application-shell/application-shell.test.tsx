@@ -4,6 +4,10 @@ import {describe, expect, it, vi} from "vitest";
 
 import {ApplicationShell} from "./application-shell";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({push: vi.fn()}),
+}));
+
 function setViewport(width: number) {
   const matchMedia = vi.fn().mockImplementation((query: string) => ({
     addEventListener: vi.fn(),
@@ -38,7 +42,7 @@ describe("ApplicationShell", () => {
     expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getByRole("main")).toHaveAttribute("id", "map-workspace");
     expect(within(navigation).getByRole("tree", {name: "Atlas"})).toBeInTheDocument();
-    const atlasItem = within(navigation).getByRole("treeitem", {name: "Atlas"});
+    const atlasItem = within(navigation).getByRole("treeitem", {name: /Atlas.*Current page/i});
     expect(atlasItem).toHaveAttribute("href", "/");
     expect(atlasItem).toHaveAttribute("aria-current", "page");
   });
@@ -65,7 +69,7 @@ describe("ApplicationShell", () => {
 
     render(<ApplicationShell><p>Workspace content</p></ApplicationShell>);
 
-    expect(screen.getByRole("complementary")).toHaveAttribute("data-collapsible", "none");
+    expect(screen.getByRole("complementary")).toHaveAttribute("data-collapsible", "offcanvas");
     expect(screen.getByRole("navigation", {name: "Primary"})).toBeVisible();
     expect(screen.queryByRole("button", {name: "Close navigation"})).not.toBeInTheDocument();
     expect(matchMedia).toHaveBeenCalledWith("(max-width: 768px)");

@@ -24,7 +24,10 @@ export function MapCanvas({styleUrl}: MapCanvasProps) {
     });
 
     map.addControl(new NavigationControl({showCompass: false}), "top-right");
-    map.addControl(new AttributionControl({compact: true}), "bottom-right");
+    map.addControl(
+      new AttributionControl({compact: true, customAttribution: "MapLibre GL JS"}),
+      "bottom-right",
+    );
     map.resize();
 
     const handleResize = () => map.resize();
@@ -36,5 +39,5 @@ export function MapCanvas({styleUrl}: MapCanvasProps) {
     };
   }, [styleUrl]);
 
-  return <div aria-hidden="true" className="absolute inset-0" data-map-container ref={containerRef} />;
+  return <div className="absolute inset-0" data-map-container ref={containerRef} />;
 }

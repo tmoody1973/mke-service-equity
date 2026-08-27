@@ -423,6 +423,11 @@ import nextTypescript from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTypescript,
+  {
+    settings: {
+      next: {rootDir: "apps/web"},
+    },
+  },
   globalIgnores([
     "**/.next/**",
     "**/coverage/**",
@@ -435,7 +440,7 @@ export default defineConfig([
 ]);
 ```
 
-This single root command lints application and TypeScript package source; packages do not duplicate ESLint configs.
+This single root command lints application and TypeScript package source; packages do not duplicate ESLint configs. The Next plugin root points at `apps/web` so monorepo linting resolves the App Router without emitting a false missing-pages warning.
 
 The root repeats the exact `drizzle-orm` pin as a development-only CLI companion because npm hoists `drizzle-kit` from `@mke/database` while retaining the ORM under that workspace. Without the root companion, Drizzle Kit cannot resolve its version module and stops before migration SQL runs. Runtime database ownership remains in `@mke/database`.
 
@@ -989,13 +994,14 @@ Run `npm run typecheck --workspace @mke/web` once after the App Router files exi
 
 Use this exact live compound structure:
 
-- `Sidebar.Provider` wraps the desktop `Sidebar`, `Sidebar.Mobile`, and `Sidebar.Main` siblings. Set `collapsible="none"` so Plan 1 desktop navigation is persistently expanded, and `toggleShortcut={false}` so no hidden keyboard command changes that fixed layout.
+- `Sidebar.Provider` wraps the desktop `Sidebar`, `Sidebar.Mobile`, and `Sidebar.Main` siblings. Set `collapsible="offcanvas"` because the installed Pro beta disables `Sidebar.Trigger` entirely when `collapsible="none"`; with no desktop trigger or rail and `toggleShortcut={false}`, the desktop navigation remains persistently expanded while the built-in mobile trigger can still open its Sheet.
+- Pass Next App Router's `router.push` to the Provider's documented `navigate` callback so activating the current Atlas item closes the mobile Sheet without a full document reload or MapLibre remount.
 - The desktop `Sidebar` keeps the shipped 240px width, then uses `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Group`, and a semantic `<nav aria-label="Primary">` around `Sidebar.Menu`.
 - The single menu item is `Sidebar.MenuItem` with `id="atlas"`, `href="/"`, `isCurrent`, and `textValue="Atlas"`, containing `Sidebar.MenuLabel`. Do not add links for future Plans 4–6.
 - `Sidebar.Mobile` uses `backdrop="blur"` and reuses the same navigation model/menu renderer. Its header includes `Sidebar.Trigger` named `Close navigation`. The component's documented `closeMobileOnAction` default closes the Sheet when Atlas is pressed; its built-in React Aria Sheet owns Escape dismissal and focus return.
 - `Sidebar.Main` is the only `<main>` landmark and receives `id="map-workspace"` and `tabIndex={-1}`. Its top bar contains `Sidebar.Trigger` named `Open navigation`, with a 44px minimum target and a `min-[769px]:hidden` class so it is visible only at the component's documented mobile range.
 
-Do not compose a separate `Sheet`, duplicate Sidebar state, create independent desktop/mobile navigation components, add `Sidebar.Rail`, or use the default icon-collapse mode.
+Do not compose a separate `Sheet`, duplicate Sidebar state, create independent desktop/mobile navigation components, add `Sidebar.Rail`, or expose any desktop collapse control.
 
 Responsive layout contract:
 
@@ -1094,11 +1100,11 @@ git commit -m "feat(map): isolate MapLibre shell lifecycle (MOO-750)"
 - Consumes: production-built `@mke/web` served at `http://127.0.0.1:3000`.
 - Produces: five named Playwright projects and screenshot/overflow/accessibility evidence.
 
-- [ ] **Step 1: Configure the production browser runner and width guard**
+- [x] **Step 1: Configure the production browser runner and width guard**
 
 Configure Playwright `webServer` to run `npm run start --workspace @mke/web`, reuse a matching local server only outside CI, collect traces on first retry, and reject browser console errors. Define projects named `width-375`, `width-430`, `width-768`, `width-1024`, and `width-1440` with viewport heights 812, 932, 1024, 900, and 1000 respectively. `scripts/verify-responsive.mjs` reads `playwright.config.ts` and exits nonzero unless all five exact project names occur once.
 
-- [ ] **Step 2: Write browser acceptance tests for all five widths**
+- [x] **Step 2: Write browser acceptance tests for all five widths**
 
 The application-shell test asserts:
 
@@ -1113,7 +1119,7 @@ The application-shell test asserts:
 
 The accessibility test runs axe against `/` with `wcag2a`, `wcag2aa`, `wcag21aa`, and `wcag22aa` tags and fails on every returned A/AA violation. It separately asserts one main landmark, named Primary navigation, 44px mobile trigger dimensions, a visible nonzero focus outline/ring, and—after `page.emulateMedia({reducedMotion: "reduce"})`—that the Sidebar and mobile Sheet open/close without effective motion (`none`, `0ms`, or an equivalent negligible duration) rather than requiring a universal authored-duration override.
 
-- [ ] **Step 3: Run the first browser acceptance pass**
+- [x] **Step 3: Run the first browser acceptance pass**
 
 Run:
 
@@ -1125,7 +1131,7 @@ npm run test:e2e
 
 Expected: the suite executes all five named projects. Any behavior failure is evidence of an unmet shell requirement; fix all observed failures in one batch, then rerun in Step 4. If the first pass is already green, record it as cross-layer verification rather than claiming a new TDD red-green cycle. Feature behavior already followed red-green cycles in Tasks 7 and 8.
 
-- [ ] **Step 4: Run GREEN at all widths**
+- [x] **Step 4: Run GREEN at all widths**
 
 Run:
 
@@ -1136,7 +1142,7 @@ npm run test:e2e
 
 Expected: 5 responsive shell cases and 5 accessibility cases pass; five PNG screenshots exist; no horizontal overflow, WCAG A/AA axe violation, WebGL lifecycle error, or hidden essential status is reported.
 
-- [ ] **Step 5: Run the bounded Impeccable inspection**
+- [x] **Step 5: Run the bounded Impeccable inspection**
 
 Inspect the 375 and 1440 screenshots together, batch-fix material responsive/design issues once, then run one confirmation screenshot round. Run the detector exactly once:
 
@@ -1146,7 +1152,7 @@ node /Users/tarikmoody/.agents/skills/impeccable/scripts/detect.mjs --json apps/
 
 Expected: mechanical findings are fixed; remaining judgment findings are recorded for the final design reviewer rather than triggering unbounded polish.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add package.json package-lock.json playwright.config.ts tests/e2e scripts/verify-responsive.mjs apps/web packages/design-system
