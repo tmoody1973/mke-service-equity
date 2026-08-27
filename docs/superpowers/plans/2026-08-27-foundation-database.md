@@ -510,7 +510,7 @@ git commit -m "chore(workspace): establish npm monorepo (MOO-750)"
 - Consumes: Zod 4.4.3.
 - Produces: a discriminated `DatabaseHealthResponse`: `ok` requires `database: "reachable"` and a non-empty PostGIS version; `unconfigured` requires `database: "unconfigured"` and `null`; `error` requires `database: "reachable" | "unreachable"` and `null`.
 
-- [ ] **Step 1: Write the failing contract tests**
+- [x] **Step 1: Write the failing contract tests**
 
 ```ts
 import {describe, expect, it} from "vitest";
@@ -543,17 +543,17 @@ describe("databaseHealthResponseSchema", () => {
 });
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `npm test --workspace @mke/contracts`
 
 Expected: FAIL because `src/database-health.ts` does not exist.
 
-- [ ] **Step 3: Implement the contract and public export**
+- [x] **Step 3: Implement the contract and public export**
 
 Use `z.discriminatedUnion("status", [...])` for the exact valid objects above, with `z.string().min(1)` for the successful PostGIS version, and infer the TypeScript type from the schema. Export only the schema and inferred type from `src/index.ts`.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run:
 
@@ -564,7 +564,7 @@ npm run typecheck --workspace @mke/contracts
 
 Expected: both tests pass; TypeScript emits no errors.
 
-- [ ] **Step 5: Document environment variables**
+- [x] **Step 5: Document environment variables**
 
 `.env.example` contains names and non-secret descriptions for:
 
