@@ -725,7 +725,7 @@ WHERE extname = 'postgis';
 
 Expected: exactly one row is returned. Also inspect non-system relations through the same `psql` session and confirm no Plan 1 domain tables exist beyond Drizzle's migration journal. Do not pass `production`, print a connection string, enable shell tracing, or use the unrelated Neon connector.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add packages/database docs/development/database.md
@@ -748,7 +748,7 @@ git commit -m "feat(database): enable PostGIS on isolated Neon dev (MOO-750)"
 - Consumes: Python 3.13 and uv.
 - Produces: importable `pipelines.common.WORKSPACE_NAME` and a deterministic pytest command; no ingestion or scoring behavior.
 
-- [ ] **Step 1: Write the failing Python smoke test**
+- [x] **Step 1: Write the failing Python smoke test**
 
 ```python
 from pipelines.common import WORKSPACE_NAME
@@ -758,13 +758,13 @@ def test_python_workspace_is_importable() -> None:
     assert WORKSPACE_NAME == "mke-service-equity-data"
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `uv run pytest tests/data/test_workspace.py -q`
 
 Expected: FAIL because `pipelines.common` is not importable.
 
-- [ ] **Step 3: Implement the minimal package**
+- [x] **Step 3: Implement the minimal package**
 
 Write `pyproject.toml` exactly as:
 
@@ -786,15 +786,16 @@ package = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests/data"]
+pythonpath = ["."]
 
 [tool.ruff]
 target-version = "py313"
 line-length = 100
 ```
 
-No build backend is added because Plan 1 runs the workspace from the repository and does not publish a Python distribution. `pipelines/common/__init__.py` exports only `WORKSPACE_NAME = "mke-service-equity-data"`. The README explicitly states that Pandas, GeoPandas, ingestion, normalization, spatial preprocessing, and scoring begin in Plan 2 and are intentionally absent from Plan 1.
+No build backend is added because Plan 1 runs the workspace from the repository and does not publish a Python distribution. Pytest explicitly adds the repository root to its import path because `uv` correctly does not install a `package = false` project and the pytest console entry point otherwise omits the workspace root. `pipelines/common/__init__.py` exports only `WORKSPACE_NAME = "mke-service-equity-data"`. The README explicitly states that Pandas, GeoPandas, ingestion, normalization, spatial preprocessing, and scoring begin in Plan 2 and are intentionally absent from Plan 1.
 
-- [ ] **Step 4: Lock and run GREEN**
+- [x] **Step 4: Lock and run GREEN**
 
 Run:
 
