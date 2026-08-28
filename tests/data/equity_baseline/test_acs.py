@@ -30,10 +30,7 @@ from pipelines.equity_baseline.quality import (
 from pipelines.equity_baseline.registry import load_registry
 
 
-FIXTURE = (
-    Path(__file__).parents[1]
-    / "fixtures/equity_baseline/acs/reviewed_formula_case.json"
-)
+FIXTURE = Path(__file__).parents[1] / "fixtures/equity_baseline/acs/reviewed_formula_case.json"
 REGISTRY = load_registry()
 ACS_INDICATORS = tuple(item for item in REGISTRY.indicators if item.source == "acs")
 
@@ -95,10 +92,7 @@ def reviewed_responses() -> tuple[dict[str, bytes], dict[str, object]]:
     geoid = case["geoid"]
     responses: dict[str, bytes] = {}
     for group in APPROVED_ACS_GROUPS:
-        sparse = {
-            variable: (pair[0], pair[1])
-            for variable, pair in case["groups"][group].items()
-        }
+        sparse = {variable: (pair[0], pair[1]) for variable, pair in case["groups"][group].items()}
         responses[group] = make_group_response(group, [(geoid, sparse)])
     return responses, case
 
@@ -203,8 +197,14 @@ def test_validates_official_group_metadata_variables_and_group_identity() -> Non
     variables = {
         header: {"group": "B05002"}
         for header in {
-            "B05002_001E", "B05002_001M", "B05002_001EA", "B05002_001MA",
-            "B05002_013E", "B05002_013M", "B05002_013EA", "B05002_013MA",
+            "B05002_001E",
+            "B05002_001M",
+            "B05002_001EA",
+            "B05002_001MA",
+            "B05002_013E",
+            "B05002_013M",
+            "B05002_013EA",
+            "B05002_013MA",
         }
     }
 
@@ -265,10 +265,7 @@ def test_rejects_extra_groups() -> None:
 def test_rejects_missing_geography_variable_or_annotation_headers(header: str) -> None:
     responses, case = reviewed_responses()
     group = "B05002"
-    values = {
-        variable: (pair[0], pair[1])
-        for variable, pair in case["groups"][group].items()
-    }
+    values = {variable: (pair[0], pair[1]) for variable, pair in case["groups"][group].items()}
     responses[group] = make_group_response(group, [(case["geoid"], values)], drop_headers=[header])
 
     with pytest.raises(AcsSourceError, match="missing required headers"):
@@ -288,10 +285,7 @@ def test_reports_missing_extra_and_duplicate_geoids(
 ) -> None:
     responses, case = reviewed_responses()
     group = "B01003"
-    values = {
-        variable: (pair[0], pair[1])
-        for variable, pair in case["groups"][group].items()
-    }
+    values = {variable: (pair[0], pair[1]) for variable, pair in case["groups"][group].items()}
     responses[group] = make_group_response(group, [(geoid, values) for geoid in geoids])
 
     with pytest.raises(AcsGeographyError, match=message):
@@ -466,10 +460,7 @@ def test_source_row_order_never_changes_normalized_output(order: tuple[str, ...]
     responses, case = reviewed_responses()
     expected = tuple(sorted(order))
     for group in APPROVED_ACS_GROUPS:
-        values = {
-            variable: (pair[0], pair[1])
-            for variable, pair in case["groups"][group].items()
-        }
+        values = {variable: (pair[0], pair[1]) for variable, pair in case["groups"][group].items()}
         responses[group] = make_group_response(group, [(geoid, values) for geoid in order])
 
     result = normalize_acs(responses, expected_geoids=expected, registry=REGISTRY)

@@ -245,9 +245,7 @@ def parse_group_response(
     headers = cast(list[str], raw_headers)
     if len(headers) != len(set(headers)):
         raise AcsSourceError(f"ACS group {group} response contains duplicate headers")
-    required_headers = {"NAME", "state", "county", "tract"} | _variable_headers(
-        required_estimates
-    )
+    required_headers = {"NAME", "state", "county", "tract"} | _variable_headers(required_estimates)
     missing_headers = sorted(required_headers - set(headers))
     if missing_headers:
         raise AcsSourceError(
@@ -340,13 +338,9 @@ def derive_percentage(
     }:
         raise AcsSourceError(f"unsupported ACS formula type {formula.kind.value!r}")
     numerator = sum((estimates[name] for name in formula.numerator), start=Decimal(0))
-    numerator -= sum(
-        (estimates[name] for name in formula.numerator_subtract), start=Decimal(0)
-    )
+    numerator -= sum((estimates[name] for name in formula.numerator_subtract), start=Decimal(0))
     denominator = sum((estimates[name] for name in formula.denominator), start=Decimal(0))
-    denominator -= sum(
-        (estimates[name] for name in formula.denominator_subtract), start=Decimal(0)
-    )
+    denominator -= sum((estimates[name] for name in formula.denominator_subtract), start=Decimal(0))
     if denominator <= 0:
         raise ValueError("nonpositive_denominator")
     return numerator / denominator * Decimal(100), numerator, denominator
@@ -376,12 +370,9 @@ def _normalize_observation(
     for variable in formula.estimate_variables:
         cell = cells[variable]
         if cell.unusable_reason is not None:
-            return _missing_observation(
-                geoid, slug, f"{cell.unusable_reason}:{variable}"
-            )
+            return _missing_observation(geoid, slug, f"{cell.unusable_reason}:{variable}")
     estimates = {
-        variable: cast(Decimal, cells[variable].estimate)
-        for variable in formula.estimate_variables
+        variable: cast(Decimal, cells[variable].estimate) for variable in formula.estimate_variables
     }
     try:
         value, numerator, denominator = derive_percentage(formula, estimates)
