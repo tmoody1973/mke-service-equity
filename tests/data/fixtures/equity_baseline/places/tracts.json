@@ -1,0 +1,8 @@
+[
+  {"year":"2023","countyfips":"55079","locationid":"55079000101","measureid":"CASTHMA","datavaluetypeid":"CrdPrv","data_value":"14.5","low_confidence_limit":"13.0","high_confidence_limit":"16.0"},
+  {"year":"2023","countyfips":"55079","locationid":"55079000101","measureid":"DIABETES","datavaluetypeid":"CrdPrv","data_value":"22.1","low_confidence_limit":"20.1","high_confidence_limit":"24.0"},
+  {"year":"2023","countyfips":"55079","locationid":"55079000101","measureid":"DISABILITY","datavaluetypeid":"CrdPrv","data_value":"45.8","low_confidence_limit":"42.3","high_confidence_limit":"49.2"},
+  {"year":"2023","countyfips":"55079","locationid":"55079000101","measureid":"LPA","datavaluetypeid":"CrdPrv","data_value":"44.2","low_confidence_limit":"40.1","high_confidence_limit":"48.0"},
+  {"year":"2023","countyfips":"55079","locationid":"55079000101","measureid":"MHLTH","datavaluetypeid":"CrdPrv","data_value":"21.0","low_confidence_limit":"18.8","high_confidence_limit":"23.1"},
+  {"year":"2023","countyfips":"55079","locationid":"55079000101","measureid":"OBESITY","datavaluetypeid":"CrdPrv","data_value":"48.8","low_confidence_limit":"45.3","high_confidence_limit":"52.2"}
+]

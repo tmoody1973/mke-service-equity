@@ -39,3 +39,11 @@ class AcsSourceError(EquityBaselineError, ValueError):
 
 class AcsGeographyError(AcsSourceError):
     """Raised when ACS and canonical tract universes do not match exactly."""
+
+
+class PlacesSourceError(EquityBaselineError, ValueError):
+    """Raised when a CDC PLACES response violates the approved source contract."""
+
+
+class PlacesGeographyError(PlacesSourceError):
+    """Raised when PLACES contains geography outside the canonical tract universe."""
