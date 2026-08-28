@@ -1279,7 +1279,7 @@ git commit -m "fix(plan-1): address final foundation review (MOO-750)"
 
 If no files changed, do not create an empty commit. The reviewed SHA is the SHA pushed in Step 5.
 
-- [ ] **Step 5: Push, open the review branch, and verify GitHub Actions**
+- [x] **Step 5: Push, open the review branch, and verify GitHub Actions**
 
 ```bash
 git push -u origin tarikjmoody/moo-750-plan-1-foundation-database
@@ -1289,7 +1289,7 @@ gh pr checks --watch
 
 Expected: a PR exists; the pushed workflow runs on the branch/PR; both `web` and `python` jobs pass on the reviewed implementation SHA. `docs/verification/plan-1-pr.md` contains the issue intent, Plan 1 scope, exact verification commands, isolated-database safety statement, and explicit Plan 2 exclusion.
 
-- [ ] **Step 6: Approve, link, and verify the Vercel preview target**
+- [x] **Step 6: Approve, link, and verify the Vercel preview target**
 
 Run the read-only identity check first:
 
@@ -1315,7 +1315,7 @@ vercel deploy --target preview
 
 Open the returned preview at 375 and 1440 widths and confirm shell/map rendering, keyboard focus, and no secret values in browser source/network responses. Record the commit SHA, CI run URL, preview URL, responsive screenshots, and Neon project/branch identifiers without credentials.
 
-- [ ] **Step 7: Complete the verification evidence document**
+- [x] **Step 7: Complete the verification evidence document**
 
 Record dated command output summaries with pass/fail counts for:
 
@@ -1332,7 +1332,7 @@ Record dated command output summaries with pass/fail counts for:
 
 Do not mark an item passed without fresh output or a real URL/query result.
 
-- [ ] **Step 8: Self-review scope and documentation**
+- [x] **Step 8: Self-review scope and documentation**
 
 Run:
 
@@ -1364,25 +1364,25 @@ Post a MOO-750 comment containing the final commit range, CI URL, Vercel preview
 
 ## Final Verification Checklist
 
-- [ ] Local Git repository and GitHub remote exist; MIT license boundary is explicit.
-- [ ] MOO-750 is the only implementation issue in progress.
-- [ ] npm workspace graph resolves without an additional orchestrator.
-- [ ] Next.js App Router application runs and production build exits 0.
-- [ ] HeroUI v3 and licensed HeroUI Pro artifacts install locally and in CI/Vercel.
-- [ ] Project semantic design tokens and reduced-motion behavior are active.
-- [ ] Responsive shell passes at 375, 430, 768, 1024, and 1440.
-- [ ] MapLibre creates a canvas, controls, attribution, accessible status, and removes its WebGL lifecycle cleanly.
-- [ ] Browser/client bundles contain no Neon credentials or database package imports.
-- [ ] Isolated Neon development target is identified and distinct from production.
-- [ ] Drizzle applies the PostGIS-only migration and independent SQL returns a PostGIS version.
-- [ ] No domain tables, source data, analytical GIS, scoring, or fake values were added.
-- [ ] Python 3.13 uv workspace imports, lints, and tests successfully.
-- [ ] Unit, integration, end-to-end, responsive, accessibility, lint, typecheck, and build gates pass.
-- [ ] GitHub Actions web and Python jobs pass on the branch.
-- [ ] Vercel preview renders the shell at mobile and desktop widths.
-- [ ] README, setup, environment, database, deployment, repository, and verification documentation match reality.
+- [x] Local Git repository and GitHub remote exist; MIT license boundary is explicit.
+- [x] MOO-750 is the only implementation issue in progress.
+- [x] npm workspace graph resolves without an additional orchestrator.
+- [x] Next.js App Router application runs and production build exits 0.
+- [x] HeroUI v3 and licensed HeroUI Pro artifacts install locally and in CI/Vercel.
+- [x] Project semantic design tokens and reduced-motion behavior are active.
+- [x] Responsive shell passes at 375, 430, 768, 1024, and 1440.
+- [x] MapLibre creates a canvas, controls, attribution, accessible status, and removes its WebGL lifecycle cleanly.
+- [x] Browser/client bundles contain no Neon credentials or database package imports.
+- [x] Isolated Neon development target is identified and distinct from production.
+- [x] Drizzle applies the PostGIS-only migration and independent SQL returns a PostGIS version.
+- [x] No domain tables, source data, analytical GIS, scoring, or fake values were added.
+- [x] Python 3.13 uv workspace imports, lints, and tests successfully.
+- [x] Unit, integration, end-to-end, responsive, accessibility, lint, typecheck, and build gates pass.
+- [x] GitHub Actions web and Python jobs pass on the branch.
+- [x] Vercel preview renders the shell at mobile and desktop widths.
+- [x] README, setup, environment, database, deployment, repository, and verification documentation match reality.
 - [ ] Linear evidence comment is posted and MOO-750 is Done only after proof.
-- [ ] Work stops before MOO-751 / Plan 2.
+- [x] Work stops before MOO-751 / Plan 2.
 
 ## Plan Self-Review Record
 
