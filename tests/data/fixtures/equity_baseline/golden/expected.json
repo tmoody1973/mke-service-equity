@@ -1,0 +1,46 @@
+{
+  "component_count": 39,
+  "eligible": {
+    "55079000101": {
+      "indicator_percentile": "0.000000000000",
+      "demographic": "0.000000000000",
+      "socioeconomic": "0.000000000000",
+      "health": "0.000000000000",
+      "demographic_effective_weight": "0.111111111111",
+      "socioeconomic_effective_weight": "0.083333333333",
+      "health_effective_weight": "0.055555555556",
+      "composite": "0.000000000000",
+      "final_percentile": "0.000000000000",
+      "band": "Very Low"
+    },
+    "55079000102": {
+      "indicator_percentile": "75.000000000000",
+      "demographic": "75.000000000000",
+      "socioeconomic": "75.000000000000",
+      "health": "75.000000000000",
+      "demographic_effective_weight": "0.111111111111",
+      "socioeconomic_effective_weight": "0.083333333333",
+      "health_effective_weight": "0.055555555556",
+      "composite": "75.000000000000",
+      "final_percentile": "75.000000000000",
+      "band": "High"
+    },
+    "55079000201": {
+      "indicator_percentile": "75.000000000000",
+      "demographic": "75.000000000000",
+      "socioeconomic": "75.000000000000",
+      "health": "75.000000000000",
+      "demographic_effective_weight": "0.111111111111",
+      "socioeconomic_effective_weight": "0.083333333333",
+      "health_effective_weight": "0.055555555556",
+      "composite": "75.000000000000",
+      "final_percentile": "75.000000000000",
+      "band": "High"
+    }
+  },
+  "excluded": {
+    "55079000202": ["ineligible_zero_population"],
+    "55079000300": ["missing_indicator:people_of_color"]
+  },
+  "canonical_output_hash": "ea1ecc3bc08b2a4140a17250262b8b05443b51245d7b5c1ccc97b0b630d087e8"
+}

@@ -47,3 +47,7 @@ class PlacesSourceError(EquityBaselineError, ValueError):
 
 class PlacesGeographyError(PlacesSourceError):
     """Raised when PLACES contains geography outside the canonical tract universe."""
+
+
+class ScoringError(EquityBaselineError, ValueError):
+    """Raised when normalized inputs cannot satisfy the scoring contract."""
