@@ -126,7 +126,7 @@ class FakeResponse:
         return self.content
 
 
-def test_builds_one_bounded_request_per_approved_group_without_leaking_key(
+def test_builds_one_bounded_group_only_request_without_duplicate_name_or_leaking_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("CENSUS_API_KEY", "private-census-key")
@@ -138,13 +138,13 @@ def test_builds_one_bounded_request_per_approved_group_without_leaking_key(
     for group, request in zip(APPROVED_ACS_GROUPS, requests, strict=True):
         query = parse_qs(urlparse(request.url).query)
         assert query == {
-            "get": [f"NAME,group({group})"],
+            "get": [f"group({group})"],
             "for": ["tract:*"],
             "in": ["state:55 county:079"],
             "key": ["private-census-key"],
         }
         assert request.manifest_metadata == {
-            "get": f"NAME,group({group})",
+            "get": f"group({group})",
             "for": "tract:*",
             "in": "state:55 county:079",
             "group": group,
@@ -171,7 +171,7 @@ def test_fetches_each_group_once_and_preserves_exact_raw_bytes_without_key(
 
     def opener(request: object) -> FakeResponse:
         query = parse_qs(urlparse(request.full_url).query)  # type: ignore[attr-defined]
-        group = query["get"][0].removeprefix("NAME,group(").removesuffix(")")
+        group = query["get"][0].removeprefix("group(").removesuffix(")")
         requested_groups.append(group)
         return FakeResponse(responses[group])
 

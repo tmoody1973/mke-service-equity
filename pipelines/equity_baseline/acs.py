@@ -117,7 +117,7 @@ def build_group_request(group: str) -> AcsGroupRequest:
     if group not in APPROVED_ACS_GROUPS:
         raise AcsSourceError(f"{group!r} is not an approved ACS group")
     metadata = {
-        "get": f"NAME,group({group})",
+        "get": f"group({group})",
         "for": "tract:*",
         "in": "state:55 county:079",
         "group": group,

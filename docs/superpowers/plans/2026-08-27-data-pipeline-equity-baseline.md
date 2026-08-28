@@ -437,7 +437,8 @@ Expected RED: ACS and quality modules are missing.
 
 - [ ] **Step 2: Implement bounded ACS group fetching**
 
-Call the 2024 ACS 5-Year endpoint once per approved group with `NAME,group(<GROUP>)`,
+Call the 2024 ACS 5-Year endpoint once per approved group with `group(<GROUP>)`, which
+already includes `NAME`,
 `for=tract:*`, and `in=state:55 county:079`. Read `CENSUS_API_KEY` only at request time. Store
 each raw group response unchanged, but omit the key from manifest request metadata. Validate
 group metadata and response headers before normalization.
