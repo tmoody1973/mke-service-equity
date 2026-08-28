@@ -4,12 +4,12 @@
     {
       "type": "Feature",
       "properties": {
-        "STATEFP20": "55",
-        "COUNTYFP20": "079",
-        "TRACTCE20": "000200",
-        "GEOID20": "55079000200",
-        "NAME20": "2",
-        "NAMELSAD20": "Census Tract 2"
+        "STATEFP": "55",
+        "COUNTYFP": "079",
+        "TRACTCE": "000200",
+        "GEOID": "55079000200",
+        "NAME": "2",
+        "NAMELSAD": "Census Tract 2"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -29,12 +29,12 @@
     {
       "type": "Feature",
       "properties": {
-        "STATEFP20": "55",
-        "COUNTYFP20": "079",
-        "TRACTCE20": "000100",
-        "GEOID20": "55079000100",
-        "NAME20": "1",
-        "NAMELSAD20": "Census Tract 1"
+        "STATEFP": "55",
+        "COUNTYFP": "079",
+        "TRACTCE": "000100",
+        "GEOID": "55079000100",
+        "NAME": "1",
+        "NAMELSAD": "Census Tract 1"
       },
       "geometry": {
         "type": "Polygon",

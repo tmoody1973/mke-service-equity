@@ -41,12 +41,12 @@ def tract_frame(
         )
     return gpd.GeoDataFrame(
         {
-            "STATEFP20": ["55"] * len(geoids),
-            "COUNTYFP20": list(counties),
-            "TRACTCE20": [geoid[5:] for geoid in geoids],
-            "GEOID20": list(geoids),
-            "NAME20": [str(index) for index in range(len(geoids))],
-            "NAMELSAD20": [f"Census Tract {index}" for index in range(len(geoids))],
+            "STATEFP": ["55"] * len(geoids),
+            "COUNTYFP": list(counties),
+            "TRACTCE": [geoid[5:] for geoid in geoids],
+            "GEOID": list(geoids),
+            "NAME": [str(index) for index in range(len(geoids))],
+            "NAMELSAD": [f"Census Tract {index}" for index in range(len(geoids))],
         },
         geometry=list(geometries),
         crs=crs,
@@ -86,6 +86,18 @@ def test_uses_the_approved_official_tiger_url() -> None:
     assert TIGER_2020_WISCONSIN_TRACTS_URL == (
         "https://www2.census.gov/geo/tiger/TIGER2020/TRACT/tl_2020_55_tract.zip"
     )
+
+
+def test_matches_authoritative_2020_tiger_field_names() -> None:
+    assert REQUIRED_TIGER_COLUMNS == {
+        "STATEFP",
+        "COUNTYFP",
+        "TRACTCE",
+        "GEOID",
+        "NAME",
+        "NAMELSAD",
+        "geometry",
+    }
 
 
 @pytest.mark.parametrize("missing_column", sorted(REQUIRED_TIGER_COLUMNS - {"geometry"}))

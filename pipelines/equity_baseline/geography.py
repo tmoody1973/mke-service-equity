@@ -23,12 +23,12 @@ TIGER_2020_WISCONSIN_TRACTS_URL = (
 )
 REQUIRED_TIGER_COLUMNS = frozenset(
     {
-        "STATEFP20",
-        "COUNTYFP20",
-        "TRACTCE20",
-        "GEOID20",
-        "NAME20",
-        "NAMELSAD20",
+        "STATEFP",
+        "COUNTYFP",
+        "TRACTCE",
+        "GEOID",
+        "NAME",
+        "NAMELSAD",
         "geometry",
     }
 )
@@ -60,9 +60,9 @@ def _require_codes(frame: gpd.GeoDataFrame, column: str, width: int) -> list[str
 
 
 def _require_names(frame: gpd.GeoDataFrame) -> list[str]:
-    values = _column_values(frame, "NAMELSAD20")
+    values = _column_values(frame, "NAMELSAD")
     if any(not isinstance(value, str) or not value.strip() for value in values):
-        raise GeographyValidationError("NAMELSAD20 must contain non-empty tract names")
+        raise GeographyValidationError("NAMELSAD must contain non-empty tract names")
     return cast(list[str], values)
 
 
@@ -92,19 +92,19 @@ def _validate_source(frame: gpd.GeoDataFrame) -> None:
     if frame.empty:
         raise GeographyValidationError("authoritative TIGER source is empty")
 
-    state_codes = _require_codes(frame, "STATEFP20", 2)
-    county_codes = _require_codes(frame, "COUNTYFP20", 3)
-    geoids = _require_codes(frame, "GEOID20", 11)
-    tract_codes = _require_codes(frame, "TRACTCE20", 6)
+    state_codes = _require_codes(frame, "STATEFP", 2)
+    county_codes = _require_codes(frame, "COUNTYFP", 3)
+    geoids = _require_codes(frame, "GEOID", 11)
+    tract_codes = _require_codes(frame, "TRACTCE", 6)
     _require_names(frame)
 
     if len(geoids) != len(set(geoids)):
-        raise GeographyValidationError("GEOID20 values must be unique")
+        raise GeographyValidationError("GEOID values must be unique")
     for state_fips, county_fips, tract_code, geoid in zip(
         state_codes, county_codes, tract_codes, geoids, strict=True
     ):
         if geoid != f"{state_fips}{county_fips}{tract_code}":
-            raise GeographyValidationError("GEOID20 does not match its state/county FIPS prefix")
+            raise GeographyValidationError("GEOID does not match its state/county FIPS prefix")
 
     _validate_source_geometry(frame)
 
@@ -122,8 +122,7 @@ def normalize_canonical_tracts(frame: gpd.GeoDataFrame) -> tuple[GeographyRecord
 
     _validate_source(frame)
     selected = frame.loc[
-        (frame["STATEFP20"] == WISCONSIN_STATE_FIPS)
-        & (frame["COUNTYFP20"] == MILWAUKEE_COUNTY_FIPS)
+        (frame["STATEFP"] == WISCONSIN_STATE_FIPS) & (frame["COUNTYFP"] == MILWAUKEE_COUNTY_FIPS)
     ].copy()
     if selected.empty:
         raise GeographyValidationError("authoritative source contains no Milwaukee County tracts")
@@ -141,10 +140,10 @@ def normalize_canonical_tracts(frame: gpd.GeoDataFrame) -> tuple[GeographyRecord
     if any(not isinstance(centroid, Point) or centroid.is_empty for centroid in centroids):
         raise GeographyValidationError("projected centroid calculation produced unusable output")
 
-    geoids = cast(list[str], output["GEOID20"].tolist())
-    names = cast(list[str], output["NAMELSAD20"].tolist())
-    states = cast(list[str], output["STATEFP20"].tolist())
-    counties = cast(list[str], output["COUNTYFP20"].tolist())
+    geoids = cast(list[str], output["GEOID"].tolist())
+    names = cast(list[str], output["NAMELSAD"].tolist())
+    states = cast(list[str], output["STATEFP"].tolist())
+    counties = cast(list[str], output["COUNTYFP"].tolist())
     records = [
         GeographyRecord(
             geoid=geoid,
