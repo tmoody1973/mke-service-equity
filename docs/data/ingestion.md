@@ -40,10 +40,10 @@ After one validated run exists, independently recompute and compare its canonica
 uv run python -m pipelines.equity_baseline run --through validated --verify-existing
 ```
 
-The CLI does not accept `publish` or arbitrary lifecycle mutations. At the offline Task 9
-checkpoint, the command grammar, guards, reporting, and injectable stage orchestration are
-verified; the executable's default live stage wiring must still be completed and exercised as
-part of the isolated Task 10 authoritative run. Until that evidence is recorded, do not
+The CLI does not accept `publish` or arbitrary lifecycle mutations. Its default workflow is
+wired to the approved official-source adapters, immutable artifacts, deterministic scorer, and
+parameterized repository. The isolated Task 10 run must still exercise that wiring against the
+official endpoints and disposable Neon branch. Until that evidence is recorded, do not
 interpret the offline gate as proof of a live ingestion.
 
 Each invocation writes a canonical JSON report beneath `data/reports/equity-baseline/`. The
@@ -126,11 +126,13 @@ Run identity is content-based. An identical run fingerprint reuses the existing 
 instead of duplicating source, value, component, or score rows. With `--verify-existing`, the
 pipeline must recompute the canonical output and reject any output-hash mismatch.
 
-Base records, the draft run, analytical rows, and the transition to `validated` share one
-Psycopg transaction. An exception rolls that transaction back. If a draft already exists, a
-separate transaction may record a redacted `failed` state after rollback. Recovery starts by
-reading the local quality report and correcting the source, configuration, or validation
-failure; never force a status or partially replay SQL.
+The explicit `load` stage idempotently writes source, snapshot, geography, definition, and value
+records. Draft creation, analytical rows, and the transition to `validated` share one Psycopg
+transaction, which also safely replays the idempotent base statements. An exception rolls that
+transaction back. If a draft already exists, a separate transaction may record a redacted
+`failed` state after rollback. Recovery starts by reading the local quality report and
+correcting the source, configuration, or validation failure; never force a status or partially
+replay SQL.
 
 ## Update rhythm
 

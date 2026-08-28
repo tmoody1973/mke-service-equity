@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
@@ -11,6 +10,7 @@ from pathlib import Path
 from typing import Protocol, TextIO
 
 from pipelines.equity_baseline.artifacts import atomic_write_bytes, canonical_json_bytes
+from pipelines.equity_baseline.live import build_live_runner
 from pipelines.equity_baseline.runner import PipelineReport, PipelineRunner, PipelineStage
 
 DEFAULT_REPORT_ROOT = Path("data/reports/equity-baseline")
@@ -45,15 +45,8 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _unconfigured_runner() -> PipelineRunner:
-    def unavailable(_state: dict[str, object]) -> dict[str, object]:
-        raise RuntimeError("default stage wiring is not configured")
-
-    return PipelineRunner(
-        handlers={stage: unavailable for stage in PipelineStage},
-        environment=os.environ,
-        clock=lambda: datetime.now(UTC),
-    )
+def _default_runner() -> PipelineRunner:
+    return build_live_runner()
 
 
 def _report_path(root: Path, command: str, now: datetime) -> Path:
@@ -64,7 +57,7 @@ def _report_path(root: Path, command: str, now: datetime) -> Path:
 def main(
     argv: Sequence[str] | None = None,
     *,
-    runner_factory: Callable[[], RunnerLike] = _unconfigured_runner,
+    runner_factory: Callable[[], RunnerLike] = _default_runner,
     stdout: TextIO = sys.stdout,
     stderr: TextIO = sys.stderr,
     clock: Callable[[], datetime] = lambda: datetime.now(UTC),

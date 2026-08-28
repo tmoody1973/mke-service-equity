@@ -91,9 +91,10 @@ It must run only against the confirmed disposable branch. Independently verify P
 eight domain tables, named constraints/indexes, the lifecycle trigger, and zero published runs
 using `psql` with `ON_ERROR_STOP=1`.
 
-Pipeline persistence uses parameterized statements and one transaction for base records, a
-draft run, analytical components/scores, and validation. Any exception rolls back that unit. A
-separate redacted failure update may change an existing draft to `failed`; there is no command or
-repository operation that publishes.
+Pipeline persistence uses parameterized statements. The explicit `load` stage writes idempotent
+base records; validated-run persistence safely replays those statements with draft creation,
+analytical components/scores, and validation in one transaction. Any exception rolls back that
+validated-run unit. A separate redacted failure update may change an existing draft to `failed`;
+there is no command or repository operation that publishes.
 
 A code deployment does not publish a score run. The public application continues to read only explicitly published analytical runs once later plans add them.

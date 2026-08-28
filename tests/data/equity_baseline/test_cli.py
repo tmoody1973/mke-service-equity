@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from pipelines.equity_baseline.cli import build_parser, main
+from pipelines.equity_baseline.cli import _default_runner, build_parser, main
+from pipelines.equity_baseline.runner import PipelineRunner
 from pipelines.equity_baseline.runner import PipelineReport
 
 
@@ -118,3 +119,7 @@ def test_failed_report_returns_nonzero_and_never_prints_sensitive_error(tmp_path
     assert stdout.getvalue() == ""
     assert stderr.getvalue() == "score failed; see report\n"
     assert "postgresql" not in stderr.getvalue()
+
+
+def test_default_cli_factory_builds_a_concrete_pipeline_runner() -> None:
+    assert isinstance(_default_runner(), PipelineRunner)

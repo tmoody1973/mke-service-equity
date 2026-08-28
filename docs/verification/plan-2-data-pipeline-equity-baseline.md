@@ -28,9 +28,9 @@ Run from the MOO-751 worktree with the locked Node.js 24 and Python 3.13 environ
 |---|---|
 | `uv sync --locked` | 31 packages resolved; 28 checked |
 | `uv run ruff check pipelines tests/data` | passed |
-| `uv run ruff format --check pipelines tests/data` | 27 files already formatted |
-| `uv run mypy pipelines` | success across 17 source files |
-| `uv run pytest tests/data -q` | 178 passed, 2 integration tests deselected |
+| `uv run ruff format --check pipelines tests/data` | 30 files already formatted |
+| `uv run mypy pipelines` | success across 19 source files |
+| `uv run pytest tests/data -q` | 182 passed, 2 integration tests deselected |
 | `npm run lint` | passed |
 | `npm run typecheck` | all workspaces passed |
 | `npm run test` | 9 files / 30 tests passed across workspaces |
@@ -42,7 +42,9 @@ validation, canonical tract geometry, ACS annotations/jam values/MOEs/reliabilit
 measure and confidence-interval validation, exact average-rank ties, strict completeness,
 deterministic golden output, stage ordering, stop-on-failure, development-only database guards,
 transaction rollback, failure redaction, lifecycle boundaries, run reuse, and output-hash
-comparison.
+comparison. The concrete CLI wiring also has fixture proof for exact stage dispatch and a
+complete two-tract persistence plan: 54 idempotent base statements, 26 indicator values and
+components, two scores, deterministic input/output hashes, and no publication SQL.
 
 Fixture scoring golden output SHA-256:
 
