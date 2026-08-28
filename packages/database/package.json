@@ -1,0 +1,21 @@
+{
+  "name": "@mke/database",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {"./server": "./src/server.ts"},
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude **/*.integration.test.ts",
+    "test:integration": "vitest run tests/health.integration.test.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@mke/contracts": "0.0.0",
+    "@neondatabase/serverless": "1.1.0",
+    "drizzle-orm": "0.45.2",
+    "server-only": "0.0.1"
+  },
+  "devDependencies": {"@types/node": "26.4.0", "drizzle-kit": "0.31.10", "typescript": "6.0.3", "vitest": "4.1.11"}
+}

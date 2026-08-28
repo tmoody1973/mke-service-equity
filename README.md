@@ -57,8 +57,10 @@ Mobile behavior is part of acceptance criteria, not a later optimization.
 
 Plan 1 establishes the repository, application, database, Python, testing, and
 delivery foundations. Node.js 24 and Python 3.13 are the pinned local runtimes.
-Until the workspace scaffolds and their documented commands are committed,
-the approved implementation plan is the source of truth for execution.
+Use the [local setup guide](docs/development/setup.md) for installation and
+verification commands, the [database guide](docs/development/database.md) for
+isolated Neon work, and the [Vercel guide](docs/deployment/vercel.md) for preview
+deployment.
 
 Local environment files, Neon CLI linkage, generated data, build output, and
 test artifacts are excluded from version control. Secrets must remain in local

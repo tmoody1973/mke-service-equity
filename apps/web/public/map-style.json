@@ -1,0 +1,14 @@
+{
+  "version": 8,
+  "name": "MKE Service Equity neutral foundation",
+  "sources": {},
+  "layers": [
+    {
+      "id": "neutral-background",
+      "type": "background",
+      "paint": {
+        "background-color": "#e8e6df"
+      }
+    }
+  ]
+}

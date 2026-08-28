@@ -6,13 +6,13 @@
 
 **Architecture:** npm workspaces coordinate a server-first Next.js application and three focused TypeScript packages: contracts, database, and design system. The browser owns only presentation and MapLibre lifecycle; Neon/PostGIS remains server-only, and the only Plan 1 database change is enabling PostGIS through a custom Drizzle migration. Python is packaged independently with uv so later ingestion and scoring plans can evolve without coupling analytical code to the web application.
 
-**Tech Stack:** Node.js 24 LTS, npm 11, Next.js 16.3.3 App Router, React 19.2.8, TypeScript 7.0.2, Tailwind CSS 4.3.3, HeroUI 3.2.4, HeroUI Pro 1.0.0-beta.8, MapLibre GL JS 6.6.0, Neon serverless driver 1.1.0, Drizzle ORM 0.45.2, Drizzle Kit 0.31.10, Zod 4.4.3, Python 3.13, uv, pytest 9.0.2, Ruff 0.14.10, Vitest 4.1.11, Testing Library 16.3.2, Playwright 1.62.1, axe-core 4.13.0, GitHub Actions, and Vercel. Pandas and GeoPandas remain approved stack items but are installed in Plan 2 when ingestion begins, avoiding unused binary dependencies in Plan 1.
+**Tech Stack:** Node.js 24 LTS, npm 11, Next.js 16.3.3 App Router, React 19.2.8, TypeScript 6.0.3, Tailwind CSS 4.3.3, HeroUI 3.2.4, HeroUI Pro 1.0.0-beta.8, MapLibre GL JS 6.6.0, Neon serverless driver 1.1.0, Drizzle ORM 0.45.2, Drizzle Kit 0.31.10, Zod 4.4.3, Python 3.13, uv, pytest 9.0.2, Ruff 0.14.10, Vitest 4.1.11, Testing Library 16.3.2, Playwright 1.62.1, axe-core 4.13.0, GitHub Actions, and Vercel. Pandas and GeoPandas remain approved stack items but are installed in Plan 2 when ingestion begins, avoiding unused binary dependencies in Plan 1.
 
 **Spec:** `docs/superpowers/specs/2026-08-27-mke-service-equity-design.md`
 
 **Tracking:** Linear `MOO-750` — Plan 1 — Foundation + Database.
 
-**Plan status:** Finalized and self-reviewed with live HeroUI Pro MCP documentation on 2026-08-27. Execution is paused at the approval gates below.
+**Plan status:** Local implementation and final review completed on 2026-08-27. External verification awaits GitHub CLI authentication, the GitHub Actions HeroUI token, and Vercel Preview environment variables.
 
 ## Approved Execution Decisions
 
@@ -175,7 +175,7 @@ git check-ignore .DS_Store .neon .env.local node_modules/example .worktrees/exam
 
 Expected: both license lines are found and all five generated/private paths are ignored.
 
-- [ ] **Step 4: Commit the documentation baseline on `main`**
+- [x] **Step 4: Commit the documentation baseline on `main`**
 
 Run:
 
@@ -186,7 +186,7 @@ git commit -m "chore(repo): initialize MIT-licensed project (MOO-750)"
 
 Expected: one root commit exists on `main`; it contains approved documentation, the reviewed Plan 1 plan, repository policy, and no implementation.
 
-- [ ] **Step 5: Create the GitHub repository after the external-visibility gate**
+- [x] **Step 5: Create the GitHub repository after the external-visibility gate**
 
 The approved command target is `tmoody1973/mke-service-equity`. Before running it, confirm the owner and whether the repository is public; MIT licensing alone does not publish the repository. Then authenticate and create/push using the confirmed visibility.
 
@@ -210,7 +210,7 @@ git remote -v
 
 Expected: the authenticated owner is `tmoody1973`, `origin` points to the new GitHub repository, and `main` is pushed. The MOO-750 branch is created in Step 6 and pushed after its first implementation commit. If authentication is invalid, stop and request `gh auth login -h github.com`; do not claim GitHub setup is complete.
 
-- [ ] **Step 6: Create the isolated MOO-750 worktree**
+- [x] **Step 6: Create the isolated MOO-750 worktree**
 
 After obtaining the worktree consent required by the Superpowers `using-git-worktrees` workflow, run from the primary checkout:
 
@@ -222,7 +222,7 @@ git worktree list --porcelain
 
 Expected: `.worktrees` is ignored, the linked workspace is on the MOO-750 branch, and every later task runs with `.worktrees/moo-750` as its working directory. If the user declines a linked worktree, create the feature branch in place and record that explicit choice in the evidence document.
 
-- [ ] **Step 7: Commit checkpoint**
+- [x] **Step 7: Commit checkpoint**
 
 No additional commit is needed if Step 4 is clean. Record the root commit SHA and GitHub URL in the verification evidence file during Task 10.
 
@@ -248,7 +248,7 @@ No additional commit is needed if Step 4 is clean. Record the root commit SHA an
 - Consumes: Node 24, npm 11, repository structure in `docs/architecture/repository.md`.
 - Produces: npm workspace names `@mke/web`, `@mke/contracts`, `@mke/database`, `@mke/design-system`, and `@mke/config` with root verification scripts.
 
-- [ ] **Step 1: Write the root workspace manifest**
+- [x] **Step 1: Write the root workspace manifest**
 
 Create the root manifest exactly as follows:
 
@@ -261,6 +261,9 @@ Create the root manifest exactly as follows:
   "packageManager": "npm@11.12.1",
   "engines": {"node": ">=24 <27"},
   "workspaces": ["apps/*", "packages/*"],
+  "overrides": {
+    "tar": "$tar"
+  },
   "scripts": {
     "build": "npm run build --workspace @mke/web",
     "dev": "npm run dev --workspace @mke/web",
@@ -270,15 +273,35 @@ Create the root manifest exactly as follows:
     "test:e2e": "playwright test",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build"
   },
+  "dependencies": {
+    "@heroui/react": "3.2.4",
+    "@heroui/styles": "3.2.4",
+    "@react-aria/utils": "3.34.1",
+    "motion": "13.1.1",
+    "react": "19.2.8",
+    "react-aria-components": "1.20.0",
+    "react-dom": "19.2.8",
+    "react-resizable-panels": "4.12.3",
+    "tailwind-merge": "3.6.0",
+    "tailwind-variants": "3.3.1",
+    "tailwindcss": "4.3.3"
+  },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
-    "eslint": "10.9.1",
+    "drizzle-orm": "0.45.2",
+    "eslint": "9.39.5",
     "eslint-config-next": "16.3.3",
-    "typescript": "7.0.2"
+    "heroui-pro": "1.0.0-beta.12",
+    "jsdom": "30.0.1",
+    "next": "16.3.3",
+    "tar": "7.5.22",
+    "typescript": "6.0.3"
   }
 }
 ```
+
+`next` is also declared at the repository root so the root-hoisted `eslint-config-next` can resolve its bundled parser consistently after a fresh npm install on Linux CI; the web workspace keeps the same exact runtime version. The root dependency boundary also pins the core peers reported by `heroui-pro install --dry-run --yes react`, preventing a hoisted Pro package from resolving peers outside the repository.
 
 Create workspace manifests with version `0.0.0`, `private: true`, `type: "module"`, and these exact boundaries:
 
@@ -293,7 +316,7 @@ For `packages/contracts/package.json`:
   "exports": {".": "./src/index.ts"},
   "scripts": {"typecheck": "tsc --noEmit", "test": "vitest run"},
   "dependencies": {"zod": "4.4.3"},
-  "devDependencies": {"@types/node": "26.4.0", "typescript": "7.0.2", "vitest": "4.1.11"}
+  "devDependencies": {"@types/node": "26.4.0", "typescript": "6.0.3", "vitest": "4.1.11"}
 }
 ```
 
@@ -319,7 +342,7 @@ For `packages/database/package.json`:
     "drizzle-orm": "0.45.2",
     "server-only": "0.0.1"
   },
-  "devDependencies": {"@types/node": "26.4.0", "drizzle-kit": "0.31.10", "typescript": "7.0.2", "vitest": "4.1.11"}
+  "devDependencies": {"@types/node": "26.4.0", "drizzle-kit": "0.31.10", "typescript": "6.0.3", "vitest": "4.1.11"}
 }
 ```
 
@@ -333,7 +356,7 @@ For `packages/design-system/package.json`:
   "type": "module",
   "exports": {"./tokens.css": "./src/tokens.css"},
   "scripts": {"typecheck": "tsc --noEmit", "test": "vitest run"},
-  "devDependencies": {"@types/node": "26.4.0", "typescript": "7.0.2", "vitest": "4.1.11"}
+  "devDependencies": {"@types/node": "26.4.0", "typescript": "6.0.3", "vitest": "4.1.11"}
 }
 ```
 
@@ -362,7 +385,7 @@ For `apps/web/package.json`:
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
@@ -390,7 +413,7 @@ For `apps/web/package.json`:
     "@types/react-dom": "19.2.5",
     "jsdom": "30.0.1",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2",
+    "typescript": "6.0.3",
     "vitest": "4.1.11"
   }
 }
@@ -408,6 +431,11 @@ import nextTypescript from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTypescript,
+  {
+    settings: {
+      next: {rootDir: "apps/web"},
+    },
+  },
   globalIgnores([
     "**/.next/**",
     "**/coverage/**",
@@ -420,9 +448,11 @@ export default defineConfig([
 ]);
 ```
 
-This single root command lints application and TypeScript package source; packages do not duplicate ESLint configs.
+This single root command lints application and TypeScript package source; packages do not duplicate ESLint configs. The Next plugin root points at `apps/web` so monorepo linting resolves the App Router without emitting a false missing-pages warning.
 
-- [ ] **Step 2: Write shared TypeScript configuration**
+The root repeats the exact `drizzle-orm` pin as a development-only CLI companion because npm hoists `drizzle-kit` from `@mke/database` while retaining the ORM under that workspace. Without the root companion, Drizzle Kit cannot resolve its version module and stops before migration SQL runs. Runtime database ownership remains in `@mke/database`.
+
+- [x] **Step 2: Write shared TypeScript configuration**
 
 Write `packages/config/typescript/base.json` as:
 
@@ -462,7 +492,7 @@ Write `nextjs.json` as:
 
 The root `tsconfig.json` is `{"extends":"./packages/config/typescript/base.json","files":[]}`; each source package has its own include list and runs `tsc --noEmit`, avoiding invalid build references to no-emit projects.
 
-- [ ] **Step 3: Install and lock dependencies**
+- [x] **Step 3: Install and lock dependencies**
 
 Run:
 
@@ -473,7 +503,7 @@ npm ls --workspaces --depth=0
 
 Expected: npm creates one root `package-lock.json`, resolves every workspace, and reports no invalid or extraneous workspace dependency.
 
-- [ ] **Step 4: Verify the workspace graph**
+- [x] **Step 4: Verify the workspace graph**
 
 Run:
 
@@ -484,7 +514,9 @@ npm run typecheck --workspaces --if-present
 
 Expected: all five package names are returned; packages with source files type-check and empty scaffolds exit cleanly.
 
-- [ ] **Step 5: Commit**
+Execution note (2026-08-27): the four non-web workspaces type-check cleanly. The web command remains intentionally RED until Task 5 creates `apps/web/app`; current Next.js `typegen` rejects a project with neither an `app` nor `pages` directory. Do not add premature route files merely to make this sequencing check green. Live package metadata and a lint-startup check also showed that `eslint-config-next@16.3.3`'s bundled `typescript-eslint@8.68.0` rejects the TypeScript 7 API and that its bundled React/import plugins cap ESLint support at 9. The executable pins were corrected to TypeScript 6.0.3 and ESLint 9.39.5, the newest mutually supported releases.
+
+- [x] **Step 5: Commit**
 
 ```bash
 git add package.json package-lock.json tsconfig.json eslint.config.mjs apps/web/package.json packages/config packages/contracts/package.json packages/database/package.json packages/design-system/package.json
@@ -508,7 +540,7 @@ git commit -m "chore(workspace): establish npm monorepo (MOO-750)"
 - Consumes: Zod 4.4.3.
 - Produces: a discriminated `DatabaseHealthResponse`: `ok` requires `database: "reachable"` and a non-empty PostGIS version; `unconfigured` requires `database: "unconfigured"` and `null`; `error` requires `database: "reachable" | "unreachable"` and `null`.
 
-- [ ] **Step 1: Write the failing contract tests**
+- [x] **Step 1: Write the failing contract tests**
 
 ```ts
 import {describe, expect, it} from "vitest";
@@ -541,17 +573,17 @@ describe("databaseHealthResponseSchema", () => {
 });
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `npm test --workspace @mke/contracts`
 
 Expected: FAIL because `src/database-health.ts` does not exist.
 
-- [ ] **Step 3: Implement the contract and public export**
+- [x] **Step 3: Implement the contract and public export**
 
 Use `z.discriminatedUnion("status", [...])` for the exact valid objects above, with `z.string().min(1)` for the successful PostGIS version, and infer the TypeScript type from the schema. Export only the schema and inferred type from `src/index.ts`.
 
-- [ ] **Step 4: Run GREEN**
+- [x] **Step 4: Run GREEN**
 
 Run:
 
@@ -562,7 +594,7 @@ npm run typecheck --workspace @mke/contracts
 
 Expected: both tests pass; TypeScript emits no errors.
 
-- [ ] **Step 5: Document environment variables**
+- [x] **Step 5: Document environment variables**
 
 `.env.example` contains names and non-secret descriptions for:
 
@@ -575,7 +607,7 @@ HEROUI_AUTH_TOKEN=
 
 Document that `DATABASE_URL` is pooled runtime access, `DATABASE_URL_UNPOOLED` is preferred for migrations, `NEXT_PUBLIC_MAP_STYLE_URL` is intentionally public, and `HEROUI_AUTH_TOKEN` is installation-only and belongs in local secure storage, GitHub Actions secrets, and Vercel encrypted environment variables. Explicitly forbid committing `.env.local` or logging values.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add .env.example packages/contracts docs/development/environment.md
@@ -607,7 +639,7 @@ git commit -m "feat(contracts): define foundation health contract (MOO-750)"
 - Consumes: pooled `DATABASE_URL`, preferred migration `DATABASE_URL_UNPOOLED`, and `DatabaseHealthResponse`.
 - Produces: public subpath `@mke/database/server` with `checkDatabaseHealth(): Promise<DatabaseHealthResponse>`; URL readers and the Drizzle client remain private package internals.
 
-- [ ] **Step 1: Write the failing environment and migration-scope tests**
+- [x] **Step 1: Write the failing environment and migration-scope tests**
 
 ```ts
 import {describe, expect, it} from "vitest";
@@ -634,13 +666,13 @@ describe("database URL selection", () => {
 
 The health unit test injects a client factory and asserts that missing `DATABASE_URL` returns `unconfigured` without invoking the factory, client initialization or the first query failing returns `error`/`unreachable`, the PostGIS query failing after `current_database()` succeeds returns `error`/`reachable`, and a non-empty PostGIS version returns `ok`/`reachable`. The migration-scope test reads `drizzle/0000_enable_postgis.sql`, expects `CREATE EXTENSION IF NOT EXISTS postgis`, and rejects `CREATE TABLE`, `INSERT INTO`, and any score/resource/geography domain identifier.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `npm test --workspace @mke/database`
 
 Expected: FAIL because `src/env.ts` and the migration do not exist.
 
-- [ ] **Step 3: Implement the server-only database package**
+- [x] **Step 3: Implement the server-only database package**
 
 `src/env.ts` exports the two readers exercised above; neither logs its input. `drizzle.config.ts` calls `readMigrationDatabaseUrl(process.env)`. `src/client.ts` exports a lazy factory that accepts a validated runtime URL, constructs `neon(url)`, and passes it to `drizzle({client})`; it must not read the environment or create a client at module evaluation time. `src/health.ts` first returns `{status: "unconfigured", database: "unconfigured", postgisVersion: null}` when `DATABASE_URL` is absent. Otherwise it validates the URL and creates the client inside the health-call boundary. It first runs a parameter-free `current_database()` reachability query: initialization or reachability failures return `{status: "error", database: "unreachable", postgisVersion: null}`. It then runs `postgis_lib_version()`: a failure after reachability succeeds returns `{status: "error", database: "reachable", postgisVersion: null}`. A non-empty PostGIS version returns `ok`. No branch logs the URL or raw server error.
 
@@ -654,7 +686,7 @@ export {checkDatabaseHealth} from "./health";
 
 `package.json` exposes only `"./server": "./src/server.ts"`; it does not expose `env.ts` or `client.ts`. Both database and web Vitest configs alias `server-only` to the empty `tests/server-only-stub.ts`, while Next's real build resolves the poison package normally. The integration test imports `@mke/database/server`; the post-build client-chunk scan in Task 10 proves the server package never enters the browser graph.
 
-- [ ] **Step 4: Generate and narrow the custom migration**
+- [x] **Step 4: Generate and narrow the custom migration**
 
 Run from `packages/database`:
 
@@ -670,7 +702,7 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 
 Expected: Drizzle creates migration metadata and the only application SQL change enables PostGIS.
 
-- [ ] **Step 5: Run unit GREEN**
+- [x] **Step 5: Run unit GREEN**
 
 Run:
 
@@ -681,11 +713,13 @@ npm run typecheck --workspace @mke/database
 
 Expected: environment, health-state, and scope tests pass; TypeScript emits no errors.
 
-- [ ] **Step 6: Provision or select the isolated Neon development target**
+- [x] **Step 6: Provision or select the isolated Neon development target**
 
-Use the Neon CLI link already stored locally for the personal `mke-service-equity` project; do not use the loaded Neon connector, which is authenticated to an unrelated organization. Before changing branch context, inspect only the non-secret `.neon` metadata and confirm the linked branch is `production`. After the user approves the branch name and lifetime, run the current Neon CLI checkout flow for that explicit non-default name. The checked-in `neon.ts` applies a seven-day TTL when the approved branch does not already exist, and current Neon CLI checkout behavior repulls branch-scoped variables automatically. Immediately verify `NEON_BRANCH` is the approved name and not `production` without printing either database URL. Record the project ID, branch ID, database name, role name, approved expiration policy, and the phrase `development-only`; never record the connection string. If the CLI resolves a different project or organization, stop for direction.
+Use the Neon CLI link already stored locally for the personal `mke-service-equity` project; do not use the loaded Neon connector, which is authenticated to an unrelated organization. Before changing branch context, inspect only the non-secret `.neon` metadata and confirm the linked branch is `production`. After the user approves the branch name and lifetime, run the current Neon CLI flow for that explicit non-default name. If `checkout` does not create a missing branch, use `branches create --name <approved-name> --parent production --expires-at <resolved-seven-day-UTC-timestamp> --no-secrets`, then check it out. Checkout repulls branch-scoped variables automatically. Immediately verify that `.neon` resolves the approved branch name and that `NEON_BRANCH` matches its non-production branch ID without printing either database URL. Record the project ID, branch ID, database name, role name, approved expiration policy, and the phrase `development-only`; never record the connection string. If the CLI resolves a different project or organization, stop for direction.
 
-- [ ] **Step 7: Apply the migration to real development infrastructure**
+Execution evidence (2026-08-27): `development-only`; project `wispy-glitter-41930798`; branch `moo-750-foundation` / `br-dark-dew-a5x4dxm6`; database `neondb`; role `neondb_owner`; explicit expiry `2026-09-03T20:01:31Z` (seven-day policy). No connection string is recorded.
+
+- [x] **Step 7: Apply the migration to real development infrastructure**
 
 Set local secret variables without echoing them, then run:
 
@@ -696,7 +730,7 @@ npm run test:integration --workspace @mke/database
 
 Expected: Drizzle reports the migration applied; the integration test returns `database: "reachable"` and a non-empty PostGIS version from the isolated development database.
 
-- [ ] **Step 8: Verify real database state independently**
+- [x] **Step 8: Verify real database state independently**
 
 Load `.env.local` without shell tracing and run `psql` against `DATABASE_URL_UNPOOLED` on the same approved branch:
 
@@ -718,7 +752,7 @@ WHERE extname = 'postgis';
 
 Expected: exactly one row is returned. Also inspect non-system relations through the same `psql` session and confirm no Plan 1 domain tables exist beyond Drizzle's migration journal. Do not pass `production`, print a connection string, enable shell tracing, or use the unrelated Neon connector.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add packages/database docs/development/database.md
@@ -741,7 +775,7 @@ git commit -m "feat(database): enable PostGIS on isolated Neon dev (MOO-750)"
 - Consumes: Python 3.13 and uv.
 - Produces: importable `pipelines.common.WORKSPACE_NAME` and a deterministic pytest command; no ingestion or scoring behavior.
 
-- [ ] **Step 1: Write the failing Python smoke test**
+- [x] **Step 1: Write the failing Python smoke test**
 
 ```python
 from pipelines.common import WORKSPACE_NAME
@@ -751,13 +785,13 @@ def test_python_workspace_is_importable() -> None:
     assert WORKSPACE_NAME == "mke-service-equity-data"
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `uv run pytest tests/data/test_workspace.py -q`
 
 Expected: FAIL because `pipelines.common` is not importable.
 
-- [ ] **Step 3: Implement the minimal package**
+- [x] **Step 3: Implement the minimal package**
 
 Write `pyproject.toml` exactly as:
 
@@ -779,15 +813,16 @@ package = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests/data"]
+pythonpath = ["."]
 
 [tool.ruff]
 target-version = "py313"
 line-length = 100
 ```
 
-No build backend is added because Plan 1 runs the workspace from the repository and does not publish a Python distribution. `pipelines/common/__init__.py` exports only `WORKSPACE_NAME = "mke-service-equity-data"`. The README explicitly states that Pandas, GeoPandas, ingestion, normalization, spatial preprocessing, and scoring begin in Plan 2 and are intentionally absent from Plan 1.
+No build backend is added because Plan 1 runs the workspace from the repository and does not publish a Python distribution. Pytest explicitly adds the repository root to its import path because `uv` correctly does not install a `package = false` project and the pytest console entry point otherwise omits the workspace root. `pipelines/common/__init__.py` exports only `WORKSPACE_NAME = "mke-service-equity-data"`. The README explicitly states that Pandas, GeoPandas, ingestion, normalization, spatial preprocessing, and scoring begin in Plan 2 and are intentionally absent from Plan 1.
 
-- [ ] **Step 4: Lock and run GREEN**
+- [x] **Step 4: Lock and run GREEN**
 
 Run:
 
@@ -800,7 +835,7 @@ uv run ruff check pipelines tests/data
 
 Expected: one test passes and Ruff reports no violations.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add pyproject.toml uv.lock pipelines tests/data
@@ -824,35 +859,38 @@ git commit -m "chore(python): establish data workspace (MOO-750)"
 - Consumes: Approved product/UX documents, HeroUI v3 styles, licensed HeroUI Pro artifacts.
 - Produces: stable semantic aliases `--mke-canvas`, `--mke-panel`, `--mke-text`, `--mke-muted`, `--mke-accent`, `--mke-focus`, `--mke-radius-panel`, and `--mke-touch-target`.
 
-- [ ] **Step 1: Capture confirmed product truth**
+- [x] **Step 1: Capture confirmed product truth**
 
 Create `PRODUCT.md` using the Impeccable schema comment and only confirmed facts: platform `web`; primary Milwaukee public-sector decision-makers; public/community secondary users; evidence-before-recommendation position; Food Equity Atlas MVP; responsive widths; WCAG 2.2 AA target; locked stack; no authentication/AI/fake data; and absence of approved brand imagery. Do not add aesthetic claims, metrics, testimonials, or unapproved product behavior.
 
-- [ ] **Step 2: Verify HeroUI Pro authorization before modifying UI**
+- [x] **Step 2: Verify HeroUI Pro authorization before modifying UI**
 
 Run `status` at repository root, then run `install` with `apps/web` as the command working directory:
 
 ```bash
-npx heroui-pro@latest status
-npx heroui-pro@latest install --yes
+npx heroui-pro status
+npx heroui-pro install react --yes
+npm rebuild @heroui-pro/react
 npm ls @heroui-pro/react --workspace @mke/web
 ```
 
-Expected: the CLI confirms an authorized React Pro entitlement, installs artifacts into the web workspace, and npm reports `@heroui-pro/react@1.0.0-beta.8` under `@mke/web`. If authorization is absent, stop and ask the user to run `npx heroui-pro@latest login`; do not substitute imitation Pro components.
+Expected: the CLI confirms an authorized React Pro entitlement, installs artifacts into the web workspace, and npm reports `@heroui-pro/react@1.0.0-beta.8` under `@mke/web`. If authorization is absent, stop and ask the user to run `npx heroui-pro login`; do not substitute imitation Pro components.
+
+Keep the licensed React package pinned exactly at `1.0.0-beta.8`. The explicit `react` product argument prevents the current CLI from attempting both React and Native. If an earlier bare install added `heroui-native-pro`, remove that unrelated native package. npm workspaces hoist the package away from the CLI's app-local detector, so run the official package postinstall through `npm rebuild @heroui-pro/react` and verify real `Sidebar`/`Sheet` exports plus `dist/css/index.css`. The hydrated root package imports runtime peers from its own resolution level, so pin the Sidebar/Sheet peer set in the root `dependencies` block as well as the web workspace; this keeps local, CI, and Vercel production builds deterministic. The same layout hoists Vitest, so root `jsdom` keeps its browser environment resolvable while the web workspace retains the direct test dependency. Pin the CLI itself at the root so npm 11 does not drop the transitive override across the web workspace link. The root `tar` development dependency and npm `$tar` override then keep the CLI's archive utility on patched `tar@7.5.22`; do not remove them until the licensed CLI itself depends on a non-vulnerable release.
 
 Planning evidence captured on 2026-08-27: the live unified HeroUI MCP lists `sheet` and `sidebar` as root exports from `@heroui-pro/react`; `get_component_docs` confirms the compound APIs and built-in `Sidebar.Mobile` Sheet; `get_css` confirms the shipped `max-width: 768px` switch, 240px desktop width, 80vw/500px mobile width, and reduced-motion behavior; `get_theme_variables({theme: "default"})` confirms the semantic tokens used below; and the installation guide confirms React 19+, Tailwind v4, CLI-managed peer installation, no provider, and CSS import order. Direct Sheet anatomy is `Sheet.Trigger`, `Sheet.Backdrop`, `Sheet.Content`, `Sheet.Dialog`, optional `Sheet.CloseTrigger`, `Sheet.Header`/`Sheet.Heading`, and `Sheet.Body`, but Plan 1 navigation uses `Sidebar.Mobile` rather than composing those parts independently. After the licensed package install, repeat `list_components` and the focused `get_component_docs` calls as a drift check. Stop if live interfaces no longer match this finalized plan.
 
-- [ ] **Step 3: Write the failing token-contract test**
+- [x] **Step 3: Write the failing token-contract test**
 
 The Vitest test reads `src/tokens.css` and asserts that each semantic variable listed in Interfaces appears exactly once and that `--mke-touch-target` equals `44px`.
 
-- [ ] **Step 4: Run RED**
+- [x] **Step 4: Run RED**
 
 Run: `npm test --workspace @mke/design-system`
 
 Expected: FAIL because `src/tokens.css` does not exist.
 
-- [ ] **Step 5: Implement semantic token aliases**
+- [x] **Step 5: Implement semantic token aliases**
 
 Map project variables to HeroUI semantic tokens rather than numbered colors:
 
@@ -871,7 +909,7 @@ Map project variables to HeroUI semantic tokens rather than numbered colors:
 
 Do not add a universal motion override. The live Sidebar and Sheet CSS already honors `prefers-reduced-motion`; any future project-owned motion must opt into the same preference without rewriting third-party component behavior.
 
-- [ ] **Step 6: Run GREEN and design-system checks**
+- [x] **Step 6: Run GREEN and design-system checks**
 
 Run:
 
@@ -882,7 +920,7 @@ npm run typecheck --workspace @mke/design-system
 
 Expected: token-contract test passes; no TypeScript errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add PRODUCT.md packages/design-system apps/web/package.json package.json package-lock.json
@@ -914,11 +952,11 @@ git commit -m "feat(design-system): establish HeroUI Pro foundation (MOO-750)"
 - Consumes: HeroUI/Pro, design tokens, `checkDatabaseHealth()`, shared health contract.
 - Produces: a Server Component page and `ApplicationShell`, one client-only responsive Pro `Sidebar` boundary that owns its built-in mobile Sheet, and `GET /api/health/database`.
 
-- [ ] **Step 1: Load the Impeccable craft floor before UI edits**
+- [x] **Step 1: Load the Impeccable craft floor before UI edits**
 
 Read `/Users/tarikmoody/.agents/skills/impeccable/reference/craft-floor.md` completely. Use Operate mode and the approved HeroUI Pro visual authority. Do not run a new visual-world tournament because the project explicitly pins HeroUI/Pro as the primary component system.
 
-- [ ] **Step 2: Write failing shell tests**
+- [x] **Step 2: Write failing shell tests**
 
 Testing Library must assert:
 
@@ -934,7 +972,7 @@ The shell test also verifies the documented Tree/Menu semantics and that the cur
 
 The route test mocks `checkDatabaseHealth()` and expects `GET()` to return status 200 with the exact parsed health contract. A second case expects status 503 for `{status: "error", database: "unreachable", postgisVersion: null}`.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 Run:
 
@@ -944,9 +982,11 @@ npm test --workspace @mke/web -- application-shell.test.tsx route.test.ts
 
 Expected: FAIL because the shell and route do not exist.
 
-- [ ] **Step 4: Configure Next.js and CSS imports**
+- [x] **Step 4: Configure Next.js and CSS imports**
 
 `next.config.ts` transpiles `@mke/contracts`, `@mke/database`, and `@mke/design-system`. `globals.css` imports in this exact order:
+
+The web build script uses Next's supported `--webpack` builder so PostCSS compilation does not depend on Turbopack's local worker-port capability in restricted development and verification environments. CI and Vercel run the same deterministic script.
 
 ```css
 @import "tailwindcss";
@@ -958,19 +998,20 @@ Expected: FAIL because the shell and route do not exist.
 
 Add global focus-visible styles, full-height layout, and no horizontal overflow. Do not hide focus outlines.
 
-- [ ] **Step 5: Implement server-first shell structure**
+- [x] **Step 5: Implement server-first shell structure**
 
 Run `npm run typecheck --workspace @mke/web` once after the App Router files exist; its `next typegen` prefix deterministically creates `next-env.d.ts` and `.next/types` before `tsc`. Commit the generated `next-env.d.ts` so a clean checkout has Next's reference file, while every typecheck refreshes route types. `layout.tsx`, `page.tsx`, and `ApplicationShell` remain Server Components. `responsive-sidebar.tsx` is the only shell client boundary and imports `{Sidebar}` from `@heroui-pro/react`; Server Component content crosses that boundary only as `children`.
 
 Use this exact live compound structure:
 
-- `Sidebar.Provider` wraps the desktop `Sidebar`, `Sidebar.Mobile`, and `Sidebar.Main` siblings. Set `collapsible="none"` so Plan 1 desktop navigation is persistently expanded, and `toggleShortcut={false}` so no hidden keyboard command changes that fixed layout.
+- `Sidebar.Provider` wraps the desktop `Sidebar`, `Sidebar.Mobile`, and `Sidebar.Main` siblings. Set `collapsible="offcanvas"` because the installed Pro beta disables `Sidebar.Trigger` entirely when `collapsible="none"`; with no desktop trigger or rail and `toggleShortcut={false}`, the desktop navigation remains persistently expanded while the built-in mobile trigger can still open its Sheet.
+- Pass Next App Router's `router.push` to the Provider's documented `navigate` callback so activating the current Atlas item closes the mobile Sheet without a full document reload or MapLibre remount.
 - The desktop `Sidebar` keeps the shipped 240px width, then uses `Sidebar.Header`, `Sidebar.Content`, `Sidebar.Group`, and a semantic `<nav aria-label="Primary">` around `Sidebar.Menu`.
 - The single menu item is `Sidebar.MenuItem` with `id="atlas"`, `href="/"`, `isCurrent`, and `textValue="Atlas"`, containing `Sidebar.MenuLabel`. Do not add links for future Plans 4–6.
 - `Sidebar.Mobile` uses `backdrop="blur"` and reuses the same navigation model/menu renderer. Its header includes `Sidebar.Trigger` named `Close navigation`. The component's documented `closeMobileOnAction` default closes the Sheet when Atlas is pressed; its built-in React Aria Sheet owns Escape dismissal and focus return.
 - `Sidebar.Main` is the only `<main>` landmark and receives `id="map-workspace"` and `tabIndex={-1}`. Its top bar contains `Sidebar.Trigger` named `Open navigation`, with a 44px minimum target and a `min-[769px]:hidden` class so it is visible only at the component's documented mobile range.
 
-Do not compose a separate `Sheet`, duplicate Sidebar state, create independent desktop/mobile navigation components, add `Sidebar.Rail`, or use the default icon-collapse mode.
+Do not compose a separate `Sheet`, duplicate Sidebar state, create independent desktop/mobile navigation components, add `Sidebar.Rail`, or expose any desktop collapse control.
 
 Responsive layout contract:
 
@@ -979,11 +1020,11 @@ Responsive layout contract:
 - 1024/1440: the desktop Sidebar is persistently 240px and `Sidebar.Main` is flexible; the mobile Sheet renders nothing and no second desktop brand/header is introduced.
 - The skip link enters `#map-workspace` at every width.
 
-- [ ] **Step 6: Implement the health route**
+- [x] **Step 6: Implement the health route**
 
 The route runs on the Node.js runtime, imports the database package only in server code, validates the returned object with `databaseHealthResponseSchema`, and maps `ok` to HTTP 200, `unconfigured` to 503, and `error` to 503. It never returns a URL, role, host, stack trace, or raw SQL error.
 
-- [ ] **Step 7: Run GREEN**
+- [x] **Step 7: Run GREEN**
 
 Run:
 
@@ -995,7 +1036,7 @@ npm run typecheck --workspace @mke/web
 
 Expected: shell and route tests pass; lint and TypeScript report zero errors.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/web package.json package-lock.json
@@ -1018,25 +1059,25 @@ git commit -m "feat(web): add responsive application shell (MOO-750)"
 - Consumes: `NEXT_PUBLIC_MAP_STYLE_URL` with `/map-style.json` fallback.
 - Produces: `MapShell` server wrapper; `MapCanvas` client component that constructs one MapLibre map, adds navigation/attribution controls, resizes, and removes it on unmount.
 
-- [ ] **Step 1: Write the failing lifecycle test**
+- [x] **Step 1: Write the failing lifecycle test**
 
 Mock only MapLibre's browser boundary. Assert that rendering creates exactly one map with the resolved style and container, that the shell exposes `role="region"` with `aria-label="Map workspace"`, and that unmount calls `map.remove()` exactly once.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `npm test --workspace @mke/web -- map-canvas.test.tsx`
 
 Expected: FAIL because `MapCanvas` does not exist.
 
-- [ ] **Step 3: Create a deterministic data-free style**
+- [x] **Step 3: Create a deterministic data-free style**
 
 `public/map-style.json` contains MapLibre style version 8, no sources, and one neutral background layer. It contains no tract geometry, resource points, coordinates, classifications, or analytical values. The environment override is the production base-style hook and must retain its provider attribution.
 
-- [ ] **Step 4: Implement the isolated client lifecycle**
+- [x] **Step 4: Implement the isolated client lifecycle**
 
-`map-canvas.tsx` begins with `"use client"`, owns a `ref`, creates the map inside `useEffect`, adds `NavigationControl` and visible `AttributionControl`, and returns `map.remove`. It does not import database, contracts, or analytical modules. It renders a textual status explaining that analytical layers are intentionally absent from Plan 1.
+`map-canvas.tsx` begins with `"use client"`, owns a `ref`, creates the map inside `useEffect`, adds `NavigationControl` and visible `AttributionControl`, and returns `map.remove`. It does not import database, contracts, or analytical modules. The map shell renders the public-facing status `No published Food Equity data is available yet.`
 
-- [ ] **Step 5: Run GREEN**
+- [x] **Step 5: Run GREEN**
 
 Run:
 
@@ -1047,7 +1088,7 @@ npm run typecheck --workspace @mke/web
 
 Expected: lifecycle test passes; TypeScript reports zero errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/features/map apps/web/public/map-style.json apps/web/app/page.tsx
@@ -1069,11 +1110,11 @@ git commit -m "feat(map): isolate MapLibre shell lifecycle (MOO-750)"
 - Consumes: production-built `@mke/web` served at `http://127.0.0.1:3000`.
 - Produces: five named Playwright projects and screenshot/overflow/accessibility evidence.
 
-- [ ] **Step 1: Configure the production browser runner and width guard**
+- [x] **Step 1: Configure the production browser runner and width guard**
 
 Configure Playwright `webServer` to run `npm run start --workspace @mke/web`, reuse a matching local server only outside CI, collect traces on first retry, and reject browser console errors. Define projects named `width-375`, `width-430`, `width-768`, `width-1024`, and `width-1440` with viewport heights 812, 932, 1024, 900, and 1000 respectively. `scripts/verify-responsive.mjs` reads `playwright.config.ts` and exits nonzero unless all five exact project names occur once.
 
-- [ ] **Step 2: Write browser acceptance tests for all five widths**
+- [x] **Step 2: Write browser acceptance tests for all five widths**
 
 The application-shell test asserts:
 
@@ -1088,7 +1129,7 @@ The application-shell test asserts:
 
 The accessibility test runs axe against `/` with `wcag2a`, `wcag2aa`, `wcag21aa`, and `wcag22aa` tags and fails on every returned A/AA violation. It separately asserts one main landmark, named Primary navigation, 44px mobile trigger dimensions, a visible nonzero focus outline/ring, and—after `page.emulateMedia({reducedMotion: "reduce"})`—that the Sidebar and mobile Sheet open/close without effective motion (`none`, `0ms`, or an equivalent negligible duration) rather than requiring a universal authored-duration override.
 
-- [ ] **Step 3: Run the first browser acceptance pass**
+- [x] **Step 3: Run the first browser acceptance pass**
 
 Run:
 
@@ -1100,7 +1141,7 @@ npm run test:e2e
 
 Expected: the suite executes all five named projects. Any behavior failure is evidence of an unmet shell requirement; fix all observed failures in one batch, then rerun in Step 4. If the first pass is already green, record it as cross-layer verification rather than claiming a new TDD red-green cycle. Feature behavior already followed red-green cycles in Tasks 7 and 8.
 
-- [ ] **Step 4: Run GREEN at all widths**
+- [x] **Step 4: Run GREEN at all widths**
 
 Run:
 
@@ -1111,7 +1152,7 @@ npm run test:e2e
 
 Expected: 5 responsive shell cases and 5 accessibility cases pass; five PNG screenshots exist; no horizontal overflow, WCAG A/AA axe violation, WebGL lifecycle error, or hidden essential status is reported.
 
-- [ ] **Step 5: Run the bounded Impeccable inspection**
+- [x] **Step 5: Run the bounded Impeccable inspection**
 
 Inspect the 375 and 1440 screenshots together, batch-fix material responsive/design issues once, then run one confirmation screenshot round. Run the detector exactly once:
 
@@ -1121,7 +1162,7 @@ node /Users/tarikmoody/.agents/skills/impeccable/scripts/detect.mjs --json apps/
 
 Expected: mechanical findings are fixed; remaining judgment findings are recorded for the final design reviewer rather than triggering unbounded polish.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add package.json package-lock.json playwright.config.ts tests/e2e scripts/verify-responsive.mjs apps/web packages/design-system
@@ -1146,7 +1187,7 @@ git commit -m "test(web): verify responsive accessible shell (MOO-750)"
 - Consumes: all Plan 1 packages, `HEROUI_AUTH_TOKEN`, optional isolated-development database secrets, and Vercel project access.
 - Produces: deterministic CI, a Vercel preview URL, and the permanent verification record used to close MOO-750.
 
-- [ ] **Step 1: Write delivery configuration and operational documentation**
+- [x] **Step 1: Write delivery configuration and operational documentation**
 
 Create `.github/workflows/ci.yml` with the current action versions confirmed from official Context7 sources:
 
@@ -1197,7 +1238,7 @@ jobs:
 
 Do not add a database URL or run migrations in CI. `apps/web/vercel.json` contains only `{"$schema":"https://openapi.vercel.sh/vercel.json","framework":"nextjs"}`. The setup/deployment docs record exact local commands, Project Root Directory `apps/web`, Node 24, secret/public variable boundaries, isolated preview database rules, and that code deployment never publishes a score run. Update the repository tree document to match files that actually exist.
 
-- [ ] **Step 2: Commit delivery configuration before asking CI to run**
+- [x] **Step 2: Commit delivery configuration before asking CI to run**
 
 ```bash
 git add .github/workflows/ci.yml apps/web/vercel.json README.md docs/development docs/deployment docs/architecture/repository.md docs/verification/plan-1-pr.md
@@ -1206,7 +1247,7 @@ git commit -m "ci(plan-1): add foundation delivery gates (MOO-750)"
 
 Expected: the workflow and Vercel/setup documentation are present in the commit that will be pushed and verified.
 
-- [ ] **Step 3: Run the full fresh local verification gate**
+- [x] **Step 3: Run the full fresh local verification gate**
 
 Run in this order:
 
@@ -1227,7 +1268,7 @@ git status --short
 
 Expected: every command exits 0; all five widths pass; the production build completes; real isolated Neon/PostGIS integration passes; and client chunks contain no database environment names, PostgreSQL URLs, Neon driver, or database workspace import.
 
-- [ ] **Step 4: Run final code and design review before external verification**
+- [x] **Step 4: Run final code and design review before external verification**
 
 Use the Superpowers final reviewer on the full branch and the Impeccable finish reviewer with the 375 and 1440 screenshots, original request, HeroUI Pro direction contract, detector findings, and craft-floor path. Address material findings in one bounded batch. Rerun every affected command from Step 3 and commit all source/test/documentation fixes:
 
@@ -1238,7 +1279,7 @@ git commit -m "fix(plan-1): address final foundation review (MOO-750)"
 
 If no files changed, do not create an empty commit. The reviewed SHA is the SHA pushed in Step 5.
 
-- [ ] **Step 5: Push, open the review branch, and verify GitHub Actions**
+- [x] **Step 5: Push, open the review branch, and verify GitHub Actions**
 
 ```bash
 git push -u origin tarikjmoody/moo-750-plan-1-foundation-database
@@ -1248,7 +1289,7 @@ gh pr checks --watch
 
 Expected: a PR exists; the pushed workflow runs on the branch/PR; both `web` and `python` jobs pass on the reviewed implementation SHA. `docs/verification/plan-1-pr.md` contains the issue intent, Plan 1 scope, exact verification commands, isolated-database safety statement, and explicit Plan 2 exclusion.
 
-- [ ] **Step 6: Approve, link, and verify the Vercel preview target**
+- [x] **Step 6: Approve, link, and verify the Vercel preview target**
 
 Run the read-only identity check first:
 
@@ -1259,8 +1300,9 @@ vercel whoami
 Confirm the returned account/team and whether `mke-service-equity` is an existing approved project or a new project to create. Only after that explicit approval, run the local-link command and inspect encrypted variable names:
 
 ```bash
-vercel link --cwd apps/web --project mke-service-equity --yes
-vercel env ls --cwd apps/web
+vercel link --project mke-service-equity --yes
+vercel project inspect mke-service-equity --non-interactive
+vercel env ls preview
 ```
 
 Expected: the authenticated account/team and linked `mke-service-equity` project are explicitly approved; Preview scope lists `HEROUI_AUTH_TOKEN`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `NEXT_PUBLIC_MAP_STYLE_URL` without printing values. If the account/team is ambiguous or a variable is absent, stop and configure it through Vercel's encrypted environment UI before deployment.
@@ -1268,12 +1310,12 @@ Expected: the authenticated account/team and linked `mke-service-equity` project
 Create the preview:
 
 ```bash
-vercel --cwd apps/web
+vercel deploy --target preview
 ```
 
 Open the returned preview at 375 and 1440 widths and confirm shell/map rendering, keyboard focus, and no secret values in browser source/network responses. Record the commit SHA, CI run URL, preview URL, responsive screenshots, and Neon project/branch identifiers without credentials.
 
-- [ ] **Step 7: Complete the verification evidence document**
+- [x] **Step 7: Complete the verification evidence document**
 
 Record dated command output summaries with pass/fail counts for:
 
@@ -1290,7 +1332,7 @@ Record dated command output summaries with pass/fail counts for:
 
 Do not mark an item passed without fresh output or a real URL/query result.
 
-- [ ] **Step 8: Self-review scope and documentation**
+- [x] **Step 8: Self-review scope and documentation**
 
 Run:
 
@@ -1303,7 +1345,7 @@ git log --oneline main..HEAD
 
 Expected: no prohibited dependency/feature or domain migration is present; allowed prose references are inspected rather than blindly accepted; diff check is clean; commits are independently understandable.
 
-- [ ] **Step 9: Commit evidence, push, and verify the final documentation SHA**
+- [x] **Step 9: Commit evidence, push, and verify the final documentation SHA**
 
 ```bash
 git add docs/verification/plan-1-foundation-database.md
@@ -1314,7 +1356,7 @@ gh pr checks --watch
 
 Expected: the evidence file records the verified implementation SHA and external URLs; the final evidence commit also receives passing GitHub Actions checks. Record that final run URL in Linear because writing it back into the same file would create an endless evidence-commit cycle.
 
-- [ ] **Step 10: Close Linear with proof and stop**
+- [x] **Step 10: Close Linear with proof and stop**
 
 Post a MOO-750 comment containing the final commit range, CI URL, Vercel preview URL, Neon development branch identifier, migration/PostGIS evidence, test counts, five responsive widths, accessibility result, reviewer disposition, and unresolved issues. Move MOO-750 to Done only if every acceptance and verification item passes. Do not start MOO-751 or Plan 2.
 
@@ -1322,25 +1364,25 @@ Post a MOO-750 comment containing the final commit range, CI URL, Vercel preview
 
 ## Final Verification Checklist
 
-- [ ] Local Git repository and GitHub remote exist; MIT license boundary is explicit.
-- [ ] MOO-750 is the only implementation issue in progress.
-- [ ] npm workspace graph resolves without an additional orchestrator.
-- [ ] Next.js App Router application runs and production build exits 0.
-- [ ] HeroUI v3 and licensed HeroUI Pro artifacts install locally and in CI/Vercel.
-- [ ] Project semantic design tokens and reduced-motion behavior are active.
-- [ ] Responsive shell passes at 375, 430, 768, 1024, and 1440.
-- [ ] MapLibre creates a canvas, controls, attribution, accessible status, and removes its WebGL lifecycle cleanly.
-- [ ] Browser/client bundles contain no Neon credentials or database package imports.
-- [ ] Isolated Neon development target is identified and distinct from production.
-- [ ] Drizzle applies the PostGIS-only migration and independent SQL returns a PostGIS version.
-- [ ] No domain tables, source data, analytical GIS, scoring, or fake values were added.
-- [ ] Python 3.13 uv workspace imports, lints, and tests successfully.
-- [ ] Unit, integration, end-to-end, responsive, accessibility, lint, typecheck, and build gates pass.
-- [ ] GitHub Actions web and Python jobs pass on the branch.
-- [ ] Vercel preview renders the shell at mobile and desktop widths.
-- [ ] README, setup, environment, database, deployment, repository, and verification documentation match reality.
-- [ ] Linear evidence comment is posted and MOO-750 is Done only after proof.
-- [ ] Work stops before MOO-751 / Plan 2.
+- [x] Local Git repository and GitHub remote exist; MIT license boundary is explicit.
+- [x] MOO-750 is the only implementation issue in progress.
+- [x] npm workspace graph resolves without an additional orchestrator.
+- [x] Next.js App Router application runs and production build exits 0.
+- [x] HeroUI v3 and licensed HeroUI Pro artifacts install locally and in CI/Vercel.
+- [x] Project semantic design tokens and reduced-motion behavior are active.
+- [x] Responsive shell passes at 375, 430, 768, 1024, and 1440.
+- [x] MapLibre creates a canvas, controls, attribution, accessible status, and removes its WebGL lifecycle cleanly.
+- [x] Browser/client bundles contain no Neon credentials or database package imports.
+- [x] Isolated Neon development target is identified and distinct from production.
+- [x] Drizzle applies the PostGIS-only migration and independent SQL returns a PostGIS version.
+- [x] No domain tables, source data, analytical GIS, scoring, or fake values were added.
+- [x] Python 3.13 uv workspace imports, lints, and tests successfully.
+- [x] Unit, integration, end-to-end, responsive, accessibility, lint, typecheck, and build gates pass.
+- [x] GitHub Actions web and Python jobs pass on the branch.
+- [x] Vercel preview renders the shell at mobile and desktop widths.
+- [x] README, setup, environment, database, deployment, repository, and verification documentation match reality.
+- [x] Linear evidence comment is posted and MOO-750 is Done only after proof.
+- [x] Work stops before MOO-751 / Plan 2.
 
 ## Plan Self-Review Record
 

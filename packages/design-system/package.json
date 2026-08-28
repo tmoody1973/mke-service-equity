@@ -1,0 +1,9 @@
+{
+  "name": "@mke/design-system",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {"./tokens.css": "./src/tokens.css"},
+  "scripts": {"typecheck": "tsc --noEmit", "test": "vitest run"},
+  "devDependencies": {"@types/node": "26.4.0", "typescript": "6.0.3", "vitest": "4.1.11"}
+}

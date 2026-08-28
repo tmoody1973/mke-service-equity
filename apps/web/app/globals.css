@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+@import "@heroui-pro/react/css";
+@import "@mke/design-system/tokens.css";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background: var(--mke-canvas);
+  color: var(--mke-text);
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--mke-focus);
+  outline-offset: 3px;
+}
+
+.mke-skip-link {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 100;
+  translate: 0 -200%;
+  border-radius: 0.5rem;
+  background: var(--mke-panel);
+  color: var(--mke-text);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.mke-skip-link:focus-visible {
+  translate: 0;
+}
+
+[data-map-container] .maplibregl-ctrl-group button {
+  width: var(--mke-touch-target);
+  height: var(--mke-touch-target);
+}
+
+[data-map-container].maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+[data-map-container] .maplibregl-ctrl-top-right {
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+}
+
+[data-map-container] .maplibregl-ctrl-bottom-right {
+  inset-block-end: 4.5rem;
+  inset-inline-end: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  [data-map-container] .maplibregl-ctrl-bottom-right {
+    inset-block-end: 0.75rem;
+  }
+}
