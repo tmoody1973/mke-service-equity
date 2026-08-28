@@ -27,3 +27,7 @@ class HttpFetchError(EquityBaselineError):
 
 class ResponseSchemaError(EquityBaselineError, ValueError):
     """Raised when fetched bytes do not match the required response schema."""
+
+
+class GeographyValidationError(EquityBaselineError, ValueError):
+    """Raised when authoritative tract geography violates the approved contract."""
