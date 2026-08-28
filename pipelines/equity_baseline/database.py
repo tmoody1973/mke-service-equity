@@ -6,6 +6,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Protocol, cast
+from uuid import UUID
 
 import psycopg
 from psycopg.types.json import Jsonb
@@ -22,12 +23,20 @@ class ResultLike(Protocol):
     def fetchone(self) -> tuple[object, ...] | None: ...
 
 
+class PipelineLike(Protocol):
+    def __enter__(self) -> PipelineLike: ...
+
+    def __exit__(self, *args: object) -> object: ...
+
+
 class ConnectionLike(Protocol):
     def __enter__(self) -> ConnectionLike: ...
 
     def __exit__(self, *args: object) -> object: ...
 
     def execute(self, query: str, parameters: tuple[object, ...] | None = None) -> ResultLike: ...
+
+    def pipeline(self) -> PipelineLike: ...
 
 
 Connect = Callable[[str], ConnectionLike]
@@ -109,14 +118,21 @@ class PsycopgRunRepository:
     def _existing(row: tuple[object, ...] | None) -> ExistingRun | None:
         if row is None:
             return None
-        if len(row) != 4 or not all(isinstance(value, str) for value in row):
+        if len(row) != 4:
             raise DatabaseRepositoryError("score run lookup returned an invalid row")
-        run_id, fingerprint, output_hash, status = cast(tuple[str, str, str, str], row)
+        raw_run_id, fingerprint, output_hash, status = row
+        if (
+            not isinstance(raw_run_id, (str, UUID))
+            or not isinstance(fingerprint, str)
+            or not isinstance(output_hash, str)
+            or not isinstance(status, str)
+        ):
+            raise DatabaseRepositoryError("score run lookup returned an invalid row")
         if not output_hash:
             raise DatabaseRepositoryError(
-                f"existing run {run_id} is not validated and cannot be reused"
+                f"existing run {raw_run_id} is not validated and cannot be reused"
             )
-        return ExistingRun(run_id, fingerprint, output_hash, status)
+        return ExistingRun(str(raw_run_id), fingerprint, output_hash, status)
 
     def find_by_fingerprint(self, fingerprint: str) -> ExistingRun | None:
         with self._connect(self._database_url) as connection:
@@ -127,8 +143,9 @@ class PsycopgRunRepository:
         """Execute ordered parameterized statements in one rollback-safe transaction."""
 
         with self._connect(self._database_url) as connection:
-            for statement in statements:
-                connection.execute(statement.sql, statement.parameters)
+            with connection.pipeline():
+                for statement in statements:
+                    connection.execute(statement.sql, statement.parameters)
 
     def persist_validated(self, candidate: RunCandidate) -> ExistingRun:
         """Persist base records, draft, analytics, then validate in one transaction."""
@@ -143,34 +160,35 @@ class PsycopgRunRepository:
             )
             if existing is not None:
                 return existing
-            for statement in plan.load_statements:
-                connection.execute(statement.sql, statement.parameters)
-            connection.execute(
-                INSERT_DRAFT_SQL,
-                (
-                    plan.run_id,
-                    plan.methodology_version,
-                    plan.registry_hash,
-                    plan.input_manifest_hash,
-                    candidate.run_fingerprint,
-                    plan.scoring_implementation_version,
-                    now,
-                    Jsonb(dict(plan.data_vintages)),
-                    plan.git_commit,
-                    now,
-                ),
-            )
-            for statement in plan.analytical_statements:
-                connection.execute(statement.sql, statement.parameters)
-            connection.execute(
-                VALIDATE_RUN_SQL,
-                (
-                    self._clock(),
-                    Jsonb(dict(plan.validation_result)),
-                    candidate.output_hash,
-                    plan.run_id,
-                ),
-            )
+            with connection.pipeline():
+                for statement in plan.load_statements:
+                    connection.execute(statement.sql, statement.parameters)
+                connection.execute(
+                    INSERT_DRAFT_SQL,
+                    (
+                        plan.run_id,
+                        plan.methodology_version,
+                        plan.registry_hash,
+                        plan.input_manifest_hash,
+                        candidate.run_fingerprint,
+                        plan.scoring_implementation_version,
+                        now,
+                        Jsonb(dict(plan.data_vintages)),
+                        plan.git_commit,
+                        now,
+                    ),
+                )
+                for statement in plan.analytical_statements:
+                    connection.execute(statement.sql, statement.parameters)
+                connection.execute(
+                    VALIDATE_RUN_SQL,
+                    (
+                        self._clock(),
+                        Jsonb(dict(plan.validation_result)),
+                        candidate.output_hash,
+                        plan.run_id,
+                    ),
+                )
         return ExistingRun(
             plan.run_id,
             candidate.run_fingerprint,

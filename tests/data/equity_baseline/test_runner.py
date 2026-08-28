@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import UTC, datetime
+from uuid import UUID
 
 import pytest
 
@@ -33,11 +34,36 @@ class FakeResult:
         return self.row
 
 
+class FakePipeline:
+    def __init__(self, connection: FakeConnection) -> None:
+        self.connection = connection
+
+    def __enter__(self) -> FakePipeline:
+        self.connection.pipeline_entries += 1
+        return self
+
+    def __exit__(
+        self,
+        error_type: type[BaseException] | None,
+        _error: BaseException | None,
+        _traceback: object,
+    ) -> None:
+        self.connection.pipeline_exit_error = error_type
+
+
 class FakeConnection:
-    def __init__(self, *, fail_on: str | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        fail_on: str | None = None,
+        row: tuple[object, ...] | None = None,
+    ) -> None:
         self.fail_on = fail_on
+        self.row = row
         self.executions: list[tuple[str, tuple[object, ...] | None]] = []
         self.exit_error: type[BaseException] | None = None
+        self.pipeline_entries = 0
+        self.pipeline_exit_error: type[BaseException] | None = None
 
     def __enter__(self) -> FakeConnection:
         return self
@@ -54,7 +80,10 @@ class FakeConnection:
         self.executions.append((sql, parameters))
         if self.fail_on is not None and self.fail_on in sql:
             raise RuntimeError("simulated database failure")
-        return FakeResult()
+        return FakeResult(self.row if sql.startswith("SELECT id,") else None)
+
+    def pipeline(self) -> FakePipeline:
+        return FakePipeline(self)
 
 
 class FakeFailedRunRepository:
@@ -276,6 +305,8 @@ def test_psycopg_transaction_passes_values_separately_and_rolls_back_on_error() 
 
     assert secret_value not in connection.executions[0][0]
     assert connection.executions[0][1] == (secret_value,)
+    assert connection.pipeline_entries == 1
+    assert connection.pipeline_exit_error is RuntimeError
     assert connection.exit_error is RuntimeError
     assert "secret" not in repr(repository)
 
@@ -288,6 +319,18 @@ def test_repository_rejects_multi_command_and_missing_write_plan() -> None:
     )
     with pytest.raises(DatabaseRepositoryError, match="write plan"):
         repository.persist_validated(RunCandidate("a" * 64, "b" * 64))
+
+
+def test_repository_adapts_native_postgres_uuid_for_an_existing_run() -> None:
+    run_id = UUID("502e2a04-b013-53cd-8b09-c9144862701a")
+    connection = FakeConnection(row=(run_id, "a" * 64, "b" * 64, "validated"))
+    repository = PsycopgRunRepository(
+        "postgresql://secret", connect=lambda _url: connection, clock=lambda: NOW
+    )
+
+    existing = repository.find_by_fingerprint("a" * 64)
+
+    assert existing == ExistingRun(str(run_id), "a" * 64, "b" * 64, "validated")
 
 
 def test_repository_persists_load_draft_analytics_and_validation_in_order() -> None:
@@ -318,4 +361,5 @@ def test_repository_persists_load_draft_analytics_and_validation_in_order() -> N
         ["INSERT", "ANALYTICS"],
         ["UPDATE", "score_runs"],
     ]
+    assert connection.pipeline_entries == 1
     assert connection.exit_error is None
