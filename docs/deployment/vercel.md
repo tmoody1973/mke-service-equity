@@ -21,18 +21,19 @@ Run the identity check before changing local project linkage:
 
 ```bash
 vercel whoami
-vercel link --cwd apps/web --project mke-service-equity --yes
-vercel env ls --cwd apps/web
+vercel link --project mke-service-equity --yes
+vercel project inspect mke-service-equity --non-interactive
+vercel env ls preview
 ```
 
-The environment listing may be recorded by variable name and scope only. Never record values.
+Run these commands from the repository root. The Vercel project Root Directory remains `apps/web`, but the CLI must upload the full repository so npm can resolve local workspaces. The environment listing may be recorded by variable name and scope only. Never record values.
 
 ## Create a preview
 
 Force the preview target so a newly created project cannot be promoted implicitly:
 
 ```bash
-vercel deploy --cwd apps/web --target preview
+vercel deploy --target preview
 ```
 
 Verify the returned HTTPS URL at 375 and 1440 px, including keyboard focus, the responsive Sidebar, MapLibre controls and attribution, the explicit no-published-data status, and the absence of secrets in browser source and network responses.

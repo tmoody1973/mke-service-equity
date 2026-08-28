@@ -1300,8 +1300,9 @@ vercel whoami
 Confirm the returned account/team and whether `mke-service-equity` is an existing approved project or a new project to create. Only after that explicit approval, run the local-link command and inspect encrypted variable names:
 
 ```bash
-vercel link --cwd apps/web --project mke-service-equity --yes
-vercel env ls --cwd apps/web
+vercel link --project mke-service-equity --yes
+vercel project inspect mke-service-equity --non-interactive
+vercel env ls preview
 ```
 
 Expected: the authenticated account/team and linked `mke-service-equity` project are explicitly approved; Preview scope lists `HEROUI_AUTH_TOKEN`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `NEXT_PUBLIC_MAP_STYLE_URL` without printing values. If the account/team is ambiguous or a variable is absent, stop and configure it through Vercel's encrypted environment UI before deployment.
@@ -1309,7 +1310,7 @@ Expected: the authenticated account/team and linked `mke-service-equity` project
 Create the preview:
 
 ```bash
-vercel --cwd apps/web
+vercel deploy --target preview
 ```
 
 Open the returned preview at 375 and 1440 widths and confirm shell/map rendering, keyboard focus, and no secret values in browser source/network responses. Record the commit SHA, CI run URL, preview URL, responsive screenshots, and Neon project/branch identifiers without credentials.

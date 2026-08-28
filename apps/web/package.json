@@ -19,10 +19,16 @@
     "@mke/contracts": "0.0.0",
     "@mke/database": "0.0.0",
     "@mke/design-system": "0.0.0",
+    "@react-aria/utils": "3.34.1",
     "maplibre-gl": "6.6.0",
+    "motion": "13.1.1",
     "next": "16.3.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-aria-components": "1.20.0",
+    "react-dom": "19.2.8",
+    "react-resizable-panels": "4.12.3",
+    "tailwind-merge": "3.6.0",
+    "tailwind-variants": "3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
