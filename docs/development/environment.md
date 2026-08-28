@@ -1,6 +1,6 @@
 # Environment variables
 
-Copy `.env.example` to `.env.local` for local development, then provide only the values needed by the command you are running. Never commit `.env.local`, commit other secret-bearing environment files, or log environment variable values.
+Copy `.env.example` to `.env.local` for local development, then provide only the values needed by the command you are running. Never commit `.env.local` or any other secret-bearing environment file, and never log environment variable values.
 
 ## Variables
 

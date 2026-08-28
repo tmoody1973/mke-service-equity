@@ -17,8 +17,8 @@ Populate only the variables needed for the command you are running. Never commit
 The licensed React package is pinned at `@heroui-pro/react@1.0.0-beta.8`. A clean install requires `HEROUI_AUTH_TOKEN` in secure local process storage. To diagnose a missing hydrated package without exposing the token:
 
 ```bash
-npx heroui-pro@latest status
-npx heroui-pro@latest install react --yes
+npx heroui-pro status
+npx heroui-pro install react --yes
 npm rebuild @heroui-pro/react
 ```
 

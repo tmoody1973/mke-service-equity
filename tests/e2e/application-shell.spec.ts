@@ -94,7 +94,7 @@ test("renders and operates the shell at the configured width", async ({page}, te
   } else {
     await expect(desktopSidebar).toBeVisible();
     await expect(openNavigation).toBeHidden();
-    await expect(page.getByRole("main").locator("header").getByText("Food Equity Atlas")).toBeHidden();
+    await expect(page.getByRole("main").locator("header")).toBeHidden();
     await expect(page.locator(".sidebar__mobile-sheet")).toHaveCount(0);
 
     const sidebarBox = await desktopSidebar.boundingBox();

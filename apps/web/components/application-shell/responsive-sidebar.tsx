@@ -83,7 +83,7 @@ export function ResponsiveSidebar({children}: ResponsiveSidebarProps) {
         id="map-workspace"
         tabIndex={-1}
       >
-        <header className="flex h-14 shrink-0 items-center gap-3 px-3 min-[768px]:h-16 min-[769px]:px-4">
+        <header className="flex h-14 shrink-0 items-center gap-3 px-3 min-[768px]:h-16 min-[769px]:hidden">
           <Sidebar.Trigger
             aria-label="Open navigation"
             className="min-h-11 min-w-11 min-[769px]:hidden"

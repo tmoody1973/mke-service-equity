@@ -868,13 +868,13 @@ Create `PRODUCT.md` using the Impeccable schema comment and only confirmed facts
 Run `status` at repository root, then run `install` with `apps/web` as the command working directory:
 
 ```bash
-npx heroui-pro@latest status
-npx heroui-pro@latest install react --yes
+npx heroui-pro status
+npx heroui-pro install react --yes
 npm rebuild @heroui-pro/react
 npm ls @heroui-pro/react --workspace @mke/web
 ```
 
-Expected: the CLI confirms an authorized React Pro entitlement, installs artifacts into the web workspace, and npm reports `@heroui-pro/react@1.0.0-beta.8` under `@mke/web`. If authorization is absent, stop and ask the user to run `npx heroui-pro@latest login`; do not substitute imitation Pro components.
+Expected: the CLI confirms an authorized React Pro entitlement, installs artifacts into the web workspace, and npm reports `@heroui-pro/react@1.0.0-beta.8` under `@mke/web`. If authorization is absent, stop and ask the user to run `npx heroui-pro login`; do not substitute imitation Pro components.
 
 Keep the licensed React package pinned exactly at `1.0.0-beta.8`. The explicit `react` product argument prevents the current CLI from attempting both React and Native. If an earlier bare install added `heroui-native-pro`, remove that unrelated native package. npm workspaces hoist the package away from the CLI's app-local detector, so run the official package postinstall through `npm rebuild @heroui-pro/react` and verify real `Sidebar`/`Sheet` exports plus `dist/css/index.css`. The hydrated root package imports runtime peers from its own resolution level, so pin the Sidebar/Sheet peer set in the root `dependencies` block as well as the web workspace; this keeps local, CI, and Vercel production builds deterministic. The same layout hoists Vitest, so root `jsdom` keeps its browser environment resolvable while the web workspace retains the direct test dependency. Pin the CLI itself at the root so npm 11 does not drop the transitive override across the web workspace link. The root `tar` development dependency and npm `$tar` override then keep the CLI's archive utility on patched `tar@7.5.22`; do not remove them until the licensed CLI itself depends on a non-vulnerable release.
 
