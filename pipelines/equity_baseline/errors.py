@@ -31,3 +31,11 @@ class ResponseSchemaError(EquityBaselineError, ValueError):
 
 class GeographyValidationError(EquityBaselineError, ValueError):
     """Raised when authoritative tract geography violates the approved contract."""
+
+
+class AcsSourceError(EquityBaselineError, ValueError):
+    """Raised when an ACS response violates the approved source contract."""
+
+
+class AcsGeographyError(AcsSourceError):
+    """Raised when ACS and canonical tract universes do not match exactly."""
