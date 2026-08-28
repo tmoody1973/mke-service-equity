@@ -18,7 +18,7 @@ It does not claim that race, immigration status, or neighborhood identity is inh
 Approved indicators:
 
 - residents who are people of color
-- limited English proficiency
+- population age 5+ who speaks English less than “very well” (ACS estimate)
 - foreign-born population
 
 ### 2. Socioeconomic
@@ -84,6 +84,28 @@ Every displayed result must expose:
 - subindex contribution
 - methodology version
 - quality status
+
+### Interpreting centered contributions
+
+Review reports may show a tract's strongest **centered contributions** to help explain its
+composite score. For each indicator, the diagnostic is:
+
+`(indicator county percentile - 50) × approved effective weight`
+
+The result is expressed in **composite-score points relative to the county midpoint**. For
+example, `People of color share: +4.8 composite points vs county midpoint` means that this
+indicator adds 4.8 points more to the tract's composite score than it would at indicator
+percentile 50. A negative value means a lower contribution relative to that midpoint.
+
+These values are not the indicator's raw percentage, percentage-point change, margin of error,
+causal effect, or policy recommendation. They are an explanation of the already-approved score,
+not an additional scoring formula. The approved effective weight combines the indicator's equal
+weight within its subindex with that subindex's one-third weight in the composite.
+
+The registry slug `limited_english_proficiency` refers specifically to the ACS C16001 estimate
+for people age 5 and older who speak a language other than English at home and report speaking
+English less than “very well.” Reader-facing explanations use that Census wording because the
+measure does not assess literacy.
 
 ## Missing data
 

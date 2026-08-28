@@ -70,6 +70,25 @@ The complete formulas and weights remain in the approved
 [methodology](../methodology/equity-baseline.md) and executable registry; this evidence record
 does not redefine them.
 
+## Review-report diagnostic interpretation
+
+The extreme-tract review uses a centered contribution diagnostic to explain the strongest
+indicator-level differences from the Milwaukee County midpoint:
+
+`(indicator county percentile - 50) × approved effective weight`
+
+The signed values are **composite-score points relative to the county midpoint**. Thus the Tract
+89 display `People of color share: +4.8; Housing cost burden: +4.0; Speaks English less than
+“very well,” age 5+: +4.0` means those indicators contribute 4.8, 4.0, and 4.0 more composite
+points, respectively, than they would at indicator percentile 50. The values are not population
+percentages, percentage-point changes, margins of error, causal effects, or separate additions
+to the validated score.
+
+The final item is the ACS C16001 estimate for people age 5 and older who speak a non-English
+language at home and report speaking English less than “very well.” It is not a literacy
+measure. Its ACS estimate and margin of error remain available with the underlying indicator
+record and should be reviewed separately from this centered contribution.
+
 ## Authoritative live-run checklist — passed
 
 Only sanitized facts are recorded. Raw source files, normalized outputs, reports, and credentials

@@ -61,12 +61,13 @@ tract-level exclusion reason.
 | Indicator | 2024 ACS formula |
 |---|---|
 | People of color | `(B03002_001E - B03002_003E) / B03002_001E * 100` |
-| Limited English proficiency | `sum(C16001_005E, 008E, 011E, 014E, 017E, 020E, 023E, 026E, 029E, 032E, 035E, 038E) / C16001_001E * 100` |
+| Speaks English less than “very well,” age 5+ (registry slug: `limited_english_proficiency`) | `sum(C16001_005E, 008E, 011E, 014E, 017E, 020E, 023E, 026E, 029E, 032E, 035E, 038E) / C16001_001E * 100` |
 | Foreign-born | `B05002_013E / B05002_001E * 100` |
 
 “People of color” is operationalized as the total population minus the non-Hispanic
-White-alone population. Limited English proficiency covers the population age five and older
-that speaks English less than “very well” across all table language categories.
+White-alone population. The registry's `limited_english_proficiency` indicator covers the
+population age five and older that speaks English less than “very well” across all table
+language categories. It is a language-proficiency estimate, not a literacy measure.
 
 ### Socioeconomic
 
