@@ -2,12 +2,23 @@
 name = "mke-service-equity-data"
 version = "0.0.0"
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+  "geopandas==1.1.4",
+  "pandas==3.0.5",
+  "psycopg[binary]==3.3.4",
+  "pyogrio==0.13.0",
+  "pyproj==3.7.2",
+  "shapely==2.1.2",
+]
 
 [dependency-groups]
 dev = [
+  "hypothesis==6.165.10",
+  "mypy==2.3.1",
   "pytest==9.0.2",
   "ruff==0.14.10",
+  "types-geopandas==1.1.4.20260807",
+  "types-shapely==2.1.0.20260728",
 ]
 
 [tool.uv]
@@ -16,7 +27,17 @@ package = false
 [tool.pytest.ini_options]
 testpaths = ["tests/data"]
 pythonpath = ["."]
+addopts = "-m 'not integration'"
+markers = [
+  "integration: requires external services or a provisioned integration database",
+]
 
 [tool.ruff]
 target-version = "py313"
 line-length = 100
+
+[tool.mypy]
+python_version = "3.13"
+files = ["pipelines"]
+strict = true
+warn_unreachable = true

@@ -1,6 +1,8 @@
 # Database development
 
-Plan 1 establishes a server-only Neon/PostgreSQL boundary and enables PostGIS. It does not create application tables, ingest source data, or publish a score run.
+Plan 1 establishes a server-only Neon/PostgreSQL boundary and enables PostGIS. Plan 2 adds the
+provenance, tract, indicator, and Equity Baseline score tables. Neither plan publishes a score
+run.
 
 ## Connection boundaries
 
@@ -25,7 +27,11 @@ The only Plan 1 application migration is `packages/database/drizzle/0000_enable_
 CREATE EXTENSION IF NOT EXISTS postgis;
 ```
 
-Drizzle may create its migration journal. No resource, geography, score, ingestion, or other domain table belongs in this plan.
+Drizzle may create its migration journal. Plan 2 migration
+`packages/database/drizzle/0001_equity_baseline.sql` adds the eight approved Equity Baseline
+tables, spatial and relational constraints, and the lifecycle trigger described in the
+[logical schema](../data/schema.md). It deliberately excludes food resources, access metrics,
+publication, and application read models.
 
 ## Local checks
 
@@ -51,6 +57,44 @@ npm run db:migrate --workspace @mke/database
 npm run test:integration --workspace @mke/database
 ```
 
-For an independent check, load `.env.local` without shell tracing and connect `psql` to `DATABASE_URL_UNPOOLED` with `ON_ERROR_STOP=1`. Verify exactly one `postgis` extension row and inspect non-system relations to confirm no Plan 1 domain tables exist beyond Drizzle's migration journal. Never pass the production branch, echo a URL, or enable shell tracing.
+For an independent Plan 1 foundation check before applying migration `0001`, load `.env.local`
+without shell tracing and connect `psql` to `DATABASE_URL_UNPOOLED` with `ON_ERROR_STOP=1`.
+Verify exactly one `postgis` extension row and inspect non-system relations to confirm no domain
+tables exist beyond Drizzle's migration journal. Never pass the production branch, echo a URL,
+or enable shell tracing.
+
+## Plan 2 isolated run
+
+Authoritative Equity Baseline work uses a child branch named
+`moo-751-equity-baseline`, parented from `moo-750-foundation`, with a seven-day TTL. Confirm the
+project, parent, non-default status, expiry, database, role, and `development-only` label before
+running a migration. Repull `.env.local` through the Neon checkout workflow and verify
+`NEON_BRANCH` matches the selected branch ID without printing either URL.
+
+Database-writing pipeline stages require:
+
+```text
+MKE_PIPELINE_ENV=development
+DATABASE_URL_UNPOOLED=<local secret>
+```
+
+Apply and test the schema before source loading:
+
+```bash
+npm run db:migrate --workspace @mke/database
+npm run test:integration --workspace @mke/database
+uv run pytest tests/data/equity_baseline/test_database_integration.py -q -m integration
+```
+
+The Python integration suite skips unless its explicit integration prerequisites are present.
+It must run only against the confirmed disposable branch. Independently verify PostGIS, the
+eight domain tables, named constraints/indexes, the lifecycle trigger, and zero published runs
+using `psql` with `ON_ERROR_STOP=1`.
+
+Pipeline persistence uses parameterized statements. The explicit `load` stage writes idempotent
+base records; validated-run persistence safely replays those statements with draft creation,
+analytical components/scores, and validation in one transaction. Any exception rolls back that
+validated-run unit. A separate redacted failure update may change an existing draft to `failed`;
+there is no command or repository operation that publishes.
 
 A code deployment does not publish a score run. The public application continues to read only explicitly published analytical runs once later plans add them.

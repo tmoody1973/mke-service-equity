@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "STATEFP": "55",
+        "COUNTYFP": "079",
+        "TRACTCE": "000200",
+        "GEOID": "55079000200",
+        "NAME": "2",
+        "NAMELSAD": "Census Tract 2"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [-87.9200, 43.0100],
+              [-87.9000, 43.0100],
+              [-87.9000, 43.0300],
+              [-87.9200, 43.0300],
+              [-87.9200, 43.0100]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "STATEFP": "55",
+        "COUNTYFP": "079",
+        "TRACTCE": "000100",
+        "GEOID": "55079000100",
+        "NAME": "1",
+        "NAMELSAD": "Census Tract 1"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-87.9600, 43.0000],
+            [-87.9250, 43.0000],
+            [-87.9200, 43.0300],
+            [-87.9400, 43.0500],
+            [-87.9600, 43.0000]
+          ]
+        ]
+      }
+    }
+  ]
+}

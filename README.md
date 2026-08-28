@@ -67,6 +67,34 @@ test artifacts are excluded from version control. Secrets must remain in local
 or deployment environment configuration and must never be exposed to browser
 code.
 
+## Equity Baseline pipeline
+
+Plan 2 adds a deterministic Python pipeline for the 2020 Milwaukee County tract
+geography, 2024 ACS 5-Year indicators, and the December 2025 CDC PLACES release.
+The methodology registry is
+[`pipelines/equity_baseline/registry.toml`](pipelines/equity_baseline/registry.toml),
+and the operational contract is documented in
+[`docs/data/ingestion.md`](docs/data/ingestion.md).
+
+The command boundary is intentionally closed to these stages:
+
+```bash
+uv run python -m pipelines.equity_baseline fetch
+uv run python -m pipelines.equity_baseline validate
+uv run python -m pipelines.equity_baseline normalize
+uv run python -m pipelines.equity_baseline load
+uv run python -m pipelines.equity_baseline score
+uv run python -m pipelines.equity_baseline validate-run
+uv run python -m pipelines.equity_baseline run --through validated --verify-existing
+```
+
+Database stages require `MKE_PIPELINE_ENV=development` and the server-only
+`DATABASE_URL_UNPOOLED`. Census requests require `CENSUS_API_KEY`. Values must be
+provided through the local environment without printing or committing them.
+Plan 2 can create only `draft`, `validated`, or `failed` runs; it cannot publish.
+The authoritative live run and its sanitized manifests are recorded separately
+from the [offline verification](docs/verification/plan-2-data-pipeline-equity-baseline.md).
+
 ## License
 
 Original project code and documentation are licensed under the [MIT License](LICENSE).

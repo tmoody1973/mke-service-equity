@@ -1,0 +1,19 @@
+{
+  "tracts": [
+    {"geoid": "55079000101", "population": "100", "default_value": "10"},
+    {
+      "geoid": "55079000102",
+      "population": "200",
+      "default_value": "20",
+      "quality_overrides": {"people_of_color": {"reliability": "high_uncertainty"}}
+    },
+    {"geoid": "55079000201", "population": "300", "default_value": "20"},
+    {"geoid": "55079000202", "population": "0"},
+    {
+      "geoid": "55079000300",
+      "population": "150",
+      "default_value": "30",
+      "missing": ["people_of_color"]
+    }
+  ]
+}

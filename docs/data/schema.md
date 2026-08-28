@@ -13,6 +13,10 @@
 - population
 - vintage
 
+The geography type, GEOID, and vintage form a unique canonical identity. Plan 2 stores 2020
+Milwaukee County Census tracts with valid PostGIS `MultiPolygon` and centroid geometry in
+EPSG:4326.
+
 ## data_sources
 
 - id
@@ -30,9 +34,24 @@
 - status
 - notes
 
+## source_snapshots
+
+- id
+- source_id
+- dataset_version
+- retrieved_at
+- checksum_sha256
+- byte_size
+- storage_uri
+- row_or_feature_count
+- schema_fingerprint
+- request_metadata
+- validation_status
+
 ## indicator_definitions
 
 - indicator_id
+- methodology_version
 - slug
 - name
 - description
@@ -43,17 +62,21 @@
 - baseline_included
 - weight
 - methodology
+- formula_definition
 
 ## indicator_values
 
+- id
 - geoid
 - indicator_id
+- snapshot_id
 - value
 - margin_of_error
-- percentile
+- confidence_low
+- confidence_high
 - data_year
 - quality_status
-- source_id
+- quality_metadata
 
 ## food_resources
 
@@ -97,23 +120,75 @@
 
 - id
 - methodology_version
+- registry_hash
+- input_manifest_hash
+- run_fingerprint
+- scoring_implementation_version
 - started_at
 - completed_at
 - data_vintages
 - git_commit
 - status
+- failure_metadata
+
+Plan 2 may create `draft`, `validated`, or `failed` runs. It does not expose a transition to
+`published`.
+
+## score_components
+
+- score_run_id
+- geoid
+- indicator_value_id
+- indicator_percentile
+- effective_weight
+- quality_status
 
 ## scores
 
 - score_run_id
 - geoid
-- demographic_percentile
-- socioeconomic_percentile
-- health_percentile
+- demographic_score
+- socioeconomic_score
+- health_score
+- composite_score
 - equity_baseline_percentile
-- food_access_percentile
-- food_priority
+- equity_baseline_band
 - quality_status
+
+Indicator values remain independent of score runs because percentiles depend on the eligible
+comparison set. `score_components` records the exact value, percentile, and effective weight
+used by a run. Food access and Food Equity Priority are added only by their later approved
+plans.
+
+## Plan 2 integrity and lifecycle
+
+Migration `0001_equity_baseline.sql` creates eight approved tables: `data_sources`,
+`source_snapshots`, `geographies`, `indicator_definitions`, `indicator_values`, `score_runs`,
+`score_components`, and `scores`. Foreign keys prevent orphan analytical rows, and unique
+constraints make source snapshots, normalized values, and run fingerprints idempotent.
+
+Geography is database-checked as an 11-digit tract GEOID with matching state/county FIPS,
+non-empty valid `MultiPolygon` geometry and non-empty `Point` centroid, both at SRID 4326.
+Indicator value and score constraints preserve the distinction between a usable value and a
+missing-quality state. An incomplete or zero-population score row must have every numerical
+score and band set to null.
+
+The Plan 2 lifecycle trigger permits only:
+
+```text
+draft -> validated
+draft -> failed
+```
+
+It rejects inserts or transitions to `published` and `superseded`, plus every other status
+transition. A validated run requires a 64-character lowercase output hash and validation result;
+a failed run requires completion and failure metadata but no output hash. Later publication work
+must introduce its own reviewed lifecycle migration rather than bypass this trigger.
+
+`run_fingerprint` identifies the methodology, registry, input manifests, implementation, and
+other deterministic inputs for one run. `output_hash` identifies the canonical scored output.
+An existing fingerprint is reused; `--verify-existing` also requires a matching independently
+recomputed output hash.
 
 ## public_investments
 

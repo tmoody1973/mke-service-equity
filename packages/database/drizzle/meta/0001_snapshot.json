@@ -1,0 +1,1376 @@
+{
+  "id": "9edc8491-550d-42f8-873a-309b2aa8a1bb",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.data_sources": {
+      "name": "data_sources",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "publisher": {
+          "name": "publisher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dataset_version": {
+          "name": "dataset_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geography": {
+          "name": "geography",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "retrieved_at": {
+          "name": "retrieved_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valid_from": {
+          "name": "valid_from",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "valid_to": {
+          "name": "valid_to",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "update_frequency": {
+          "name": "update_frequency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "license": {
+          "name": "license",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "methodology_url": {
+          "name": "methodology_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "data_source_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "data_sources_status_idx": {
+          "name": "data_sources_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "data_sources_publisher_name_version_unique": {
+          "name": "data_sources_publisher_name_version_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "publisher",
+            "name",
+            "dataset_version"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "data_sources_valid_dates_check": {
+          "name": "data_sources_valid_dates_check",
+          "value": "\"data_sources\".\"valid_to\" IS NULL OR \"data_sources\".\"valid_from\" IS NULL OR \"data_sources\".\"valid_to\" >= \"data_sources\".\"valid_from\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.geographies": {
+      "name": "geographies",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "geoid": {
+          "name": "geoid",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geography_type": {
+          "name": "geography_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state_fips": {
+          "name": "state_fips",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "county_fips": {
+          "name": "county_fips",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geometry": {
+          "name": "geometry",
+          "type": "geometry(MultiPolygon,4326)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "centroid": {
+          "name": "centroid",
+          "type": "geometry(Point,4326)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "population": {
+          "name": "population",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vintage": {
+          "name": "vintage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "geographies_geometry_gist": {
+          "name": "geographies_geometry_gist",
+          "columns": [
+            {
+              "expression": "geometry",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        },
+        "geographies_centroid_gist": {
+          "name": "geographies_centroid_gist",
+          "columns": [
+            {
+              "expression": "centroid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "geographies_type_geoid_vintage_unique": {
+          "name": "geographies_type_geoid_vintage_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "geography_type",
+            "geoid",
+            "vintage"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "geographies_type_check": {
+          "name": "geographies_type_check",
+          "value": "\"geographies\".\"geography_type\" = 'tract'"
+        },
+        "geographies_geoid_check": {
+          "name": "geographies_geoid_check",
+          "value": "\"geographies\".\"geoid\" ~ '^[0-9]{11}$'"
+        },
+        "geographies_state_fips_check": {
+          "name": "geographies_state_fips_check",
+          "value": "\"geographies\".\"state_fips\" ~ '^[0-9]{2}$'"
+        },
+        "geographies_county_fips_check": {
+          "name": "geographies_county_fips_check",
+          "value": "\"geographies\".\"county_fips\" ~ '^[0-9]{3}$'"
+        },
+        "geographies_geoid_fips_check": {
+          "name": "geographies_geoid_fips_check",
+          "value": "left(\"geographies\".\"geoid\", 2) = \"geographies\".\"state_fips\" AND substring(\"geographies\".\"geoid\" from 3 for 3) = \"geographies\".\"county_fips\""
+        },
+        "geographies_population_check": {
+          "name": "geographies_population_check",
+          "value": "\"geographies\".\"population\" IS NULL OR \"geographies\".\"population\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.indicator_definitions": {
+      "name": "indicator_definitions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "methodology_version": {
+          "name": "methodology_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "domain": {
+          "name": "domain",
+          "type": "indicator_domain",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "higher_is_worse": {
+          "name": "higher_is_worse",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseline_included": {
+          "name": "baseline_included",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight": {
+          "name": "weight",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vintage": {
+          "name": "vintage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "methodology_notes": {
+          "name": "methodology_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "formula_definition": {
+          "name": "formula_definition",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "indicator_definitions_source_idx": {
+          "name": "indicator_definitions_source_idx",
+          "columns": [
+            {
+              "expression": "source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "indicator_definitions_domain_idx": {
+          "name": "indicator_definitions_domain_idx",
+          "columns": [
+            {
+              "expression": "domain",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "indicator_definitions_source_id_data_sources_id_fk": {
+          "name": "indicator_definitions_source_id_data_sources_id_fk",
+          "tableFrom": "indicator_definitions",
+          "tableTo": "data_sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "indicator_definitions_methodology_slug_unique": {
+          "name": "indicator_definitions_methodology_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "methodology_version",
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "indicator_definitions_weight_check": {
+          "name": "indicator_definitions_weight_check",
+          "value": "\"indicator_definitions\".\"weight\" > 0 AND \"indicator_definitions\".\"weight\" <= 1"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.indicator_values": {
+      "name": "indicator_values",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "geography_id": {
+          "name": "geography_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indicator_id": {
+          "name": "indicator_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "margin_of_error": {
+          "name": "margin_of_error",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence_low": {
+          "name": "confidence_low",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence_high": {
+          "name": "confidence_high",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_year": {
+          "name": "data_year",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quality_status": {
+          "name": "quality_status",
+          "type": "data_quality_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quality_metadata": {
+          "name": "quality_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "indicator_values_geography_idx": {
+          "name": "indicator_values_geography_idx",
+          "columns": [
+            {
+              "expression": "geography_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "indicator_values_indicator_idx": {
+          "name": "indicator_values_indicator_idx",
+          "columns": [
+            {
+              "expression": "indicator_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "indicator_values_snapshot_idx": {
+          "name": "indicator_values_snapshot_idx",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "indicator_values_geography_id_geographies_id_fk": {
+          "name": "indicator_values_geography_id_geographies_id_fk",
+          "tableFrom": "indicator_values",
+          "tableTo": "geographies",
+          "columnsFrom": [
+            "geography_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "indicator_values_indicator_id_indicator_definitions_id_fk": {
+          "name": "indicator_values_indicator_id_indicator_definitions_id_fk",
+          "tableFrom": "indicator_values",
+          "tableTo": "indicator_definitions",
+          "columnsFrom": [
+            "indicator_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "indicator_values_snapshot_id_source_snapshots_id_fk": {
+          "name": "indicator_values_snapshot_id_source_snapshots_id_fk",
+          "tableFrom": "indicator_values",
+          "tableTo": "source_snapshots",
+          "columnsFrom": [
+            "snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "indicator_values_geography_indicator_snapshot_unique": {
+          "name": "indicator_values_geography_indicator_snapshot_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "geography_id",
+            "indicator_id",
+            "snapshot_id"
+          ]
+        },
+        "indicator_values_id_geography_unique": {
+          "name": "indicator_values_id_geography_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "geography_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "indicator_values_value_range_check": {
+          "name": "indicator_values_value_range_check",
+          "value": "\"indicator_values\".\"value\" IS NULL OR (\"indicator_values\".\"value\" >= 0 AND \"indicator_values\".\"value\" <= 100)"
+        },
+        "indicator_values_value_quality_check": {
+          "name": "indicator_values_value_quality_check",
+          "value": "(\n        \"indicator_values\".\"value\" IS NOT NULL\n        AND \"indicator_values\".\"quality_status\" IN ('verified', 'provisional', 'stale')\n      ) OR (\n        \"indicator_values\".\"value\" IS NULL\n        AND \"indicator_values\".\"quality_status\" IN ('missing', 'suppressed', 'conflicting')\n      )"
+        },
+        "indicator_values_margin_of_error_check": {
+          "name": "indicator_values_margin_of_error_check",
+          "value": "\"indicator_values\".\"margin_of_error\" IS NULL OR \"indicator_values\".\"margin_of_error\" >= 0"
+        },
+        "indicator_values_confidence_check": {
+          "name": "indicator_values_confidence_check",
+          "value": "(\n        \"indicator_values\".\"confidence_low\" IS NULL AND \"indicator_values\".\"confidence_high\" IS NULL\n      ) OR (\n        \"indicator_values\".\"confidence_low\" IS NOT NULL\n        AND \"indicator_values\".\"confidence_high\" IS NOT NULL\n        AND \"indicator_values\".\"confidence_low\" >= 0\n        AND \"indicator_values\".\"confidence_low\" <= \"indicator_values\".\"confidence_high\"\n        AND \"indicator_values\".\"confidence_high\" <= 100\n      )"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.score_components": {
+      "name": "score_components",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "score_run_id": {
+          "name": "score_run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geography_id": {
+          "name": "geography_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indicator_value_id": {
+          "name": "indicator_value_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "indicator_percentile": {
+          "name": "indicator_percentile",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effective_weight": {
+          "name": "effective_weight",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quality_status": {
+          "name": "quality_status",
+          "type": "data_quality_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "score_components_run_geography_idx": {
+          "name": "score_components_run_geography_idx",
+          "columns": [
+            {
+              "expression": "score_run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "geography_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "score_components_score_run_id_score_runs_id_fk": {
+          "name": "score_components_score_run_id_score_runs_id_fk",
+          "tableFrom": "score_components",
+          "tableTo": "score_runs",
+          "columnsFrom": [
+            "score_run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "score_components_geography_id_geographies_id_fk": {
+          "name": "score_components_geography_id_geographies_id_fk",
+          "tableFrom": "score_components",
+          "tableTo": "geographies",
+          "columnsFrom": [
+            "geography_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "score_components_indicator_value_geography_fk": {
+          "name": "score_components_indicator_value_geography_fk",
+          "tableFrom": "score_components",
+          "tableTo": "indicator_values",
+          "columnsFrom": [
+            "indicator_value_id",
+            "geography_id"
+          ],
+          "columnsTo": [
+            "id",
+            "geography_id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "score_components_run_geography_indicator_value_unique": {
+          "name": "score_components_run_geography_indicator_value_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "score_run_id",
+            "geography_id",
+            "indicator_value_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "score_components_percentile_check": {
+          "name": "score_components_percentile_check",
+          "value": "\"score_components\".\"indicator_percentile\" >= 0 AND \"score_components\".\"indicator_percentile\" <= 100"
+        },
+        "score_components_weight_check": {
+          "name": "score_components_weight_check",
+          "value": "\"score_components\".\"effective_weight\" > 0 AND \"score_components\".\"effective_weight\" <= 1"
+        },
+        "score_components_quality_check": {
+          "name": "score_components_quality_check",
+          "value": "\"score_components\".\"quality_status\" IN ('verified', 'provisional', 'stale')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.score_runs": {
+      "name": "score_runs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "methodology_version": {
+          "name": "methodology_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registry_hash": {
+          "name": "registry_hash",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "input_manifest_hash": {
+          "name": "input_manifest_hash",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "run_fingerprint": {
+          "name": "run_fingerprint",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "scoring_implementation_version": {
+          "name": "scoring_implementation_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_vintages": {
+          "name": "data_vintages",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "git_commit": {
+          "name": "git_commit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "score_run_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "validation_result": {
+          "name": "validation_result",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "failure_metadata": {
+          "name": "failure_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "output_hash": {
+          "name": "output_hash",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "score_runs_status_idx": {
+          "name": "score_runs_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "score_runs_methodology_version_idx": {
+          "name": "score_runs_methodology_version_idx",
+          "columns": [
+            {
+              "expression": "methodology_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "score_runs_run_fingerprint_unique": {
+          "name": "score_runs_run_fingerprint_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "run_fingerprint"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "score_runs_registry_hash_check": {
+          "name": "score_runs_registry_hash_check",
+          "value": "\"score_runs\".\"registry_hash\" ~ '^[0-9a-f]{64}$'"
+        },
+        "score_runs_input_manifest_hash_check": {
+          "name": "score_runs_input_manifest_hash_check",
+          "value": "\"score_runs\".\"input_manifest_hash\" ~ '^[0-9a-f]{64}$'"
+        },
+        "score_runs_run_fingerprint_check": {
+          "name": "score_runs_run_fingerprint_check",
+          "value": "\"score_runs\".\"run_fingerprint\" ~ '^[0-9a-f]{64}$'"
+        },
+        "score_runs_output_hash_check": {
+          "name": "score_runs_output_hash_check",
+          "value": "(\n        \"score_runs\".\"status\" IN ('validated', 'published', 'superseded')\n        AND \"score_runs\".\"output_hash\" IS NOT NULL\n        AND \"score_runs\".\"output_hash\" ~ '^[0-9a-f]{64}$'\n      ) OR (\n        \"score_runs\".\"status\" IN ('draft', 'failed')\n        AND \"score_runs\".\"output_hash\" IS NULL\n      )"
+        },
+        "score_runs_completion_check": {
+          "name": "score_runs_completion_check",
+          "value": "(\"score_runs\".\"status\" = 'draft' AND \"score_runs\".\"completed_at\" IS NULL) OR (\"score_runs\".\"status\" <> 'draft' AND \"score_runs\".\"completed_at\" IS NOT NULL)"
+        },
+        "score_runs_failure_metadata_check": {
+          "name": "score_runs_failure_metadata_check",
+          "value": "(\"score_runs\".\"status\" = 'failed' AND \"score_runs\".\"failure_metadata\" IS NOT NULL) OR (\"score_runs\".\"status\" <> 'failed' AND \"score_runs\".\"failure_metadata\" IS NULL)"
+        },
+        "score_runs_validation_result_check": {
+          "name": "score_runs_validation_result_check",
+          "value": "\"score_runs\".\"status\" NOT IN ('validated', 'published', 'superseded') OR \"score_runs\".\"validation_result\" IS NOT NULL"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.scores": {
+      "name": "scores",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "score_run_id": {
+          "name": "score_run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geography_id": {
+          "name": "geography_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "demographic_score": {
+          "name": "demographic_score",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "socioeconomic_score": {
+          "name": "socioeconomic_score",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "health_score": {
+          "name": "health_score",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "composite_score": {
+          "name": "composite_score",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "equity_baseline_percentile": {
+          "name": "equity_baseline_percentile",
+          "type": "numeric(15, 12)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "equity_baseline_band": {
+          "name": "equity_baseline_band",
+          "type": "equity_baseline_band",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quality_status": {
+          "name": "quality_status",
+          "type": "score_quality_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "scores_run_quality_idx": {
+          "name": "scores_run_quality_idx",
+          "columns": [
+            {
+              "expression": "score_run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "quality_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "scores_score_run_id_score_runs_id_fk": {
+          "name": "scores_score_run_id_score_runs_id_fk",
+          "tableFrom": "scores",
+          "tableTo": "score_runs",
+          "columnsFrom": [
+            "score_run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "scores_geography_id_geographies_id_fk": {
+          "name": "scores_geography_id_geographies_id_fk",
+          "tableFrom": "scores",
+          "tableTo": "geographies",
+          "columnsFrom": [
+            "geography_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "scores_run_geography_unique": {
+          "name": "scores_run_geography_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "score_run_id",
+            "geography_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "scores_numeric_range_check": {
+          "name": "scores_numeric_range_check",
+          "value": "(\"scores\".\"demographic_score\" IS NULL OR \"scores\".\"demographic_score\" BETWEEN 0 AND 100)\n        AND (\"scores\".\"socioeconomic_score\" IS NULL OR \"scores\".\"socioeconomic_score\" BETWEEN 0 AND 100)\n        AND (\"scores\".\"health_score\" IS NULL OR \"scores\".\"health_score\" BETWEEN 0 AND 100)\n        AND (\"scores\".\"composite_score\" IS NULL OR \"scores\".\"composite_score\" BETWEEN 0 AND 100)\n        AND (\"scores\".\"equity_baseline_percentile\" IS NULL OR \"scores\".\"equity_baseline_percentile\" BETWEEN 0 AND 100)"
+        },
+        "scores_output_quality_check": {
+          "name": "scores_output_quality_check",
+          "value": "(\n        \"scores\".\"quality_status\" = 'complete'\n        AND \"scores\".\"demographic_score\" IS NOT NULL\n        AND \"scores\".\"socioeconomic_score\" IS NOT NULL\n        AND \"scores\".\"health_score\" IS NOT NULL\n        AND \"scores\".\"composite_score\" IS NOT NULL\n        AND \"scores\".\"equity_baseline_percentile\" IS NOT NULL\n        AND \"scores\".\"equity_baseline_band\" IS NOT NULL\n      ) OR (\n        \"scores\".\"quality_status\" IN ('insufficient_data', 'ineligible_zero_population')\n        AND \"scores\".\"demographic_score\" IS NULL\n        AND \"scores\".\"socioeconomic_score\" IS NULL\n        AND \"scores\".\"health_score\" IS NULL\n        AND \"scores\".\"composite_score\" IS NULL\n        AND \"scores\".\"equity_baseline_percentile\" IS NULL\n        AND \"scores\".\"equity_baseline_band\" IS NULL\n      )"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.source_snapshots": {
+      "name": "source_snapshots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dataset_version": {
+          "name": "dataset_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "retrieved_at": {
+          "name": "retrieved_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "checksum_sha256": {
+          "name": "checksum_sha256",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "byte_size": {
+          "name": "byte_size",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "storage_uri": {
+          "name": "storage_uri",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "row_or_feature_count": {
+          "name": "row_or_feature_count",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "schema_fingerprint": {
+          "name": "schema_fingerprint",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot_fingerprint": {
+          "name": "snapshot_fingerprint",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "request_metadata": {
+          "name": "request_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "validation_status": {
+          "name": "validation_status",
+          "type": "snapshot_validation_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "source_snapshots_source_retrieved_idx": {
+          "name": "source_snapshots_source_retrieved_idx",
+          "columns": [
+            {
+              "expression": "source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "retrieved_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "source_snapshots_source_id_data_sources_id_fk": {
+          "name": "source_snapshots_source_id_data_sources_id_fk",
+          "tableFrom": "source_snapshots",
+          "tableTo": "data_sources",
+          "columnsFrom": [
+            "source_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "source_snapshots_source_version_checksum_unique": {
+          "name": "source_snapshots_source_version_checksum_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "source_id",
+            "dataset_version",
+            "checksum_sha256"
+          ]
+        },
+        "source_snapshots_snapshot_fingerprint_unique": {
+          "name": "source_snapshots_snapshot_fingerprint_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "snapshot_fingerprint"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "source_snapshots_checksum_check": {
+          "name": "source_snapshots_checksum_check",
+          "value": "\"source_snapshots\".\"checksum_sha256\" ~ '^[0-9a-f]{64}$'"
+        },
+        "source_snapshots_schema_fingerprint_check": {
+          "name": "source_snapshots_schema_fingerprint_check",
+          "value": "\"source_snapshots\".\"schema_fingerprint\" ~ '^[0-9a-f]{64}$'"
+        },
+        "source_snapshots_snapshot_fingerprint_check": {
+          "name": "source_snapshots_snapshot_fingerprint_check",
+          "value": "\"source_snapshots\".\"snapshot_fingerprint\" ~ '^[0-9a-f]{64}$'"
+        },
+        "source_snapshots_byte_size_check": {
+          "name": "source_snapshots_byte_size_check",
+          "value": "\"source_snapshots\".\"byte_size\" >= 0"
+        },
+        "source_snapshots_record_count_check": {
+          "name": "source_snapshots_record_count_check",
+          "value": "\"source_snapshots\".\"row_or_feature_count\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.data_quality_status": {
+      "name": "data_quality_status",
+      "schema": "public",
+      "values": [
+        "verified",
+        "provisional",
+        "stale",
+        "missing",
+        "suppressed",
+        "conflicting"
+      ]
+    },
+    "public.data_source_status": {
+      "name": "data_source_status",
+      "schema": "public",
+      "values": [
+        "active",
+        "stale",
+        "unavailable",
+        "deprecated"
+      ]
+    },
+    "public.equity_baseline_band": {
+      "name": "equity_baseline_band",
+      "schema": "public",
+      "values": [
+        "very_low",
+        "low",
+        "moderate",
+        "high",
+        "very_high"
+      ]
+    },
+    "public.indicator_domain": {
+      "name": "indicator_domain",
+      "schema": "public",
+      "values": [
+        "demographic",
+        "socioeconomic",
+        "health"
+      ]
+    },
+    "public.score_quality_status": {
+      "name": "score_quality_status",
+      "schema": "public",
+      "values": [
+        "complete",
+        "insufficient_data",
+        "ineligible_zero_population"
+      ]
+    },
+    "public.score_run_status": {
+      "name": "score_run_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "validated",
+        "published",
+        "superseded",
+        "failed"
+      ]
+    },
+    "public.snapshot_validation_status": {
+      "name": "snapshot_validation_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "valid",
+        "invalid"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
