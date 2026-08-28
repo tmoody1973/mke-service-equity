@@ -16,9 +16,9 @@ Never silently substitute a lower-quality source because it is easier to query.
 
 | Domain | Preferred source | Use |
 |---|---|---|
-| Demographics/economics | Census ACS 5-Year | Equity Baseline |
-| Census geography | Census TIGER/Line | Canonical tract geometry |
-| Health | CDC PLACES | Health subindex |
+| Demographics/economics | 2024 Census ACS 5-Year Detailed Tables | Equity Baseline v1 |
+| Census geography | 2020 Census TIGER/Line tracts | Canonical tract geometry |
+| Health | CDC PLACES December 2025 release | Health subindex v1; 2023 BRFSS crude prevalence |
 | Food access benchmark | USDA 2025 SRAM | Retail access |
 | SNAP retailers | USDA retailer data | Retail inventory |
 | Transit | MCTS GTFS | Stops/routes/frequency |
