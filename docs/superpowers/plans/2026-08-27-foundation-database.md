@@ -1345,7 +1345,7 @@ git log --oneline main..HEAD
 
 Expected: no prohibited dependency/feature or domain migration is present; allowed prose references are inspected rather than blindly accepted; diff check is clean; commits are independently understandable.
 
-- [ ] **Step 9: Commit evidence, push, and verify the final documentation SHA**
+- [x] **Step 9: Commit evidence, push, and verify the final documentation SHA**
 
 ```bash
 git add docs/verification/plan-1-foundation-database.md
@@ -1356,7 +1356,7 @@ gh pr checks --watch
 
 Expected: the evidence file records the verified implementation SHA and external URLs; the final evidence commit also receives passing GitHub Actions checks. Record that final run URL in Linear because writing it back into the same file would create an endless evidence-commit cycle.
 
-- [ ] **Step 10: Close Linear with proof and stop**
+- [x] **Step 10: Close Linear with proof and stop**
 
 Post a MOO-750 comment containing the final commit range, CI URL, Vercel preview URL, Neon development branch identifier, migration/PostGIS evidence, test counts, five responsive widths, accessibility result, reviewer disposition, and unresolved issues. Move MOO-750 to Done only if every acceptance and verification item passes. Do not start MOO-751 or Plan 2.
 
@@ -1381,7 +1381,7 @@ Post a MOO-750 comment containing the final commit range, CI URL, Vercel preview
 - [x] GitHub Actions web and Python jobs pass on the branch.
 - [x] Vercel preview renders the shell at mobile and desktop widths.
 - [x] README, setup, environment, database, deployment, repository, and verification documentation match reality.
-- [ ] Linear evidence comment is posted and MOO-750 is Done only after proof.
+- [x] Linear evidence comment is posted and MOO-750 is Done only after proof.
 - [x] Work stops before MOO-751 / Plan 2.
 
 ## Plan Self-Review Record
