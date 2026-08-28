@@ -1,0 +1,334 @@
+methodology_version = "equity-baseline-v1"
+expected_indicator_count = 13
+completeness_rule = "all_required"
+tie_method = "average"
+single_geography_percentile = "50"
+
+[geography]
+source = "tiger"
+vintage = "2020 TIGER/Line census tracts"
+state_fips = "55"
+county_fips = "079"
+population_variable = "B01003_001E"
+positive_population_status = "eligible"
+zero_population_status = "ineligible"
+missing_population_status = "insufficient_data"
+
+[acs_reliability]
+reliable_max_cv = "15"
+caution_max_cv = "30"
+zero_estimate_status = "cv_not_computable"
+excludes_from_scoring = false
+
+[domain_weights]
+demographic = "0.3333333333333333333333333333"
+socioeconomic = "0.3333333333333333333333333333"
+health = "0.3333333333333333333333333333"
+
+[[sources]]
+key = "tiger"
+name = "Census TIGER/Line census tracts"
+vintage = "2020"
+dataset_identifier = "tl_2020_55_tract"
+license_notes = "United States Census Bureau public data; preserve source attribution."
+
+[[sources]]
+key = "acs"
+name = "American Community Survey 5-year estimates"
+vintage = "2024 ACS 5-year"
+dataset_identifier = "acs/acs5"
+license_notes = "United States Census Bureau public data; preserve source attribution."
+
+[[sources]]
+key = "places"
+name = "CDC PLACES census tract data"
+vintage = "December 2025 PLACES release (2023 estimates)"
+dataset_identifier = "cwsq-ngmh"
+license_notes = "Centers for Disease Control and Prevention public data; preserve attribution."
+
+[[bands]]
+label = "Very Low"
+minimum = "0"
+maximum = "20"
+includes_maximum = false
+
+[[bands]]
+label = "Low"
+minimum = "20"
+maximum = "40"
+includes_maximum = false
+
+[[bands]]
+label = "Moderate"
+minimum = "40"
+maximum = "60"
+includes_maximum = false
+
+[[bands]]
+label = "High"
+minimum = "60"
+maximum = "80"
+includes_maximum = false
+
+[[bands]]
+label = "Very High"
+minimum = "80"
+maximum = "100"
+includes_maximum = true
+
+[[indicators]]
+slug = "people_of_color"
+name = "People of color"
+domain = "demographic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.3333333333333333333333333333"
+
+[indicators.formula]
+type = "difference_ratio"
+numerator = ["B03002_001E"]
+numerator_subtract = ["B03002_003E"]
+denominator = ["B03002_001E"]
+
+[[indicators]]
+slug = "limited_english_proficiency"
+name = "Limited English proficiency"
+domain = "demographic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.3333333333333333333333333333"
+
+[indicators.formula]
+type = "sum_ratio"
+numerator = [
+  "C16001_005E",
+  "C16001_008E",
+  "C16001_011E",
+  "C16001_014E",
+  "C16001_017E",
+  "C16001_020E",
+  "C16001_023E",
+  "C16001_026E",
+  "C16001_029E",
+  "C16001_032E",
+  "C16001_035E",
+  "C16001_038E",
+]
+denominator = ["C16001_001E"]
+
+[[indicators]]
+slug = "foreign_born"
+name = "Foreign born"
+domain = "demographic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.3333333333333333333333333333"
+
+[indicators.formula]
+type = "ratio"
+numerator = ["B05002_013E"]
+denominator = ["B05002_001E"]
+
+[[indicators]]
+slug = "below_200_percent_fpl"
+name = "Population below 200 percent of the federal poverty level"
+domain = "socioeconomic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.25"
+
+[indicators.formula]
+type = "sum_ratio"
+numerator = [
+  "C17002_002E",
+  "C17002_003E",
+  "C17002_004E",
+  "C17002_005E",
+  "C17002_006E",
+  "C17002_007E",
+]
+denominator = ["C17002_001E"]
+
+[[indicators]]
+slug = "unemployment"
+name = "Unemployment"
+domain = "socioeconomic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.25"
+
+[indicators.formula]
+type = "ratio"
+numerator = ["B23025_005E"]
+denominator = ["B23025_003E"]
+
+[[indicators]]
+slug = "less_than_high_school"
+name = "Less than high school education"
+domain = "socioeconomic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.25"
+
+[indicators.formula]
+type = "sum_ratio"
+numerator = [
+  "B15003_002E",
+  "B15003_003E",
+  "B15003_004E",
+  "B15003_005E",
+  "B15003_006E",
+  "B15003_007E",
+  "B15003_008E",
+  "B15003_009E",
+  "B15003_010E",
+  "B15003_011E",
+  "B15003_012E",
+  "B15003_013E",
+  "B15003_014E",
+  "B15003_015E",
+  "B15003_016E",
+]
+denominator = ["B15003_001E"]
+
+[[indicators]]
+slug = "housing_cost_burden"
+name = "Housing cost burden"
+domain = "socioeconomic"
+source = "acs"
+vintage = "2024 ACS 5-year"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.25"
+
+[indicators.formula]
+type = "sum_ratio"
+numerator = [
+  "B25106_006E",
+  "B25106_010E",
+  "B25106_014E",
+  "B25106_018E",
+  "B25106_022E",
+  "B25106_028E",
+  "B25106_032E",
+  "B25106_036E",
+  "B25106_040E",
+  "B25106_044E",
+]
+denominator = ["B25106_001E"]
+denominator_subtract = ["B25106_023E", "B25106_045E"]
+
+[[indicators]]
+slug = "diagnosed_diabetes"
+name = "Diagnosed diabetes"
+domain = "health"
+source = "places"
+vintage = "December 2025 PLACES release (2023 estimates)"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.1666666666666666666666666667"
+
+[indicators.formula]
+type = "places_measure"
+measure_id = "DIABETES"
+data_value_type_id = "CrdPrv"
+
+[[indicators]]
+slug = "obesity"
+name = "Obesity"
+domain = "health"
+source = "places"
+vintage = "December 2025 PLACES release (2023 estimates)"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.1666666666666666666666666667"
+
+[indicators.formula]
+type = "places_measure"
+measure_id = "OBESITY"
+data_value_type_id = "CrdPrv"
+
+[[indicators]]
+slug = "current_asthma"
+name = "Current asthma"
+domain = "health"
+source = "places"
+vintage = "December 2025 PLACES release (2023 estimates)"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.1666666666666666666666666667"
+
+[indicators.formula]
+type = "places_measure"
+measure_id = "CASTHMA"
+data_value_type_id = "CrdPrv"
+
+[[indicators]]
+slug = "any_disability"
+name = "Any disability"
+domain = "health"
+source = "places"
+vintage = "December 2025 PLACES release (2023 estimates)"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.1666666666666666666666666667"
+
+[indicators.formula]
+type = "places_measure"
+measure_id = "DISABILITY"
+data_value_type_id = "CrdPrv"
+
+[[indicators]]
+slug = "frequent_mental_distress"
+name = "Frequent mental distress"
+domain = "health"
+source = "places"
+vintage = "December 2025 PLACES release (2023 estimates)"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.1666666666666666666666666667"
+
+[indicators.formula]
+type = "places_measure"
+measure_id = "MHLTH"
+data_value_type_id = "CrdPrv"
+
+[[indicators]]
+slug = "no_leisure_time_physical_activity"
+name = "No leisure-time physical activity"
+domain = "health"
+source = "places"
+vintage = "December 2025 PLACES release (2023 estimates)"
+unit = "percent"
+higher_is_worse = true
+baseline_included = true
+within_domain_weight = "0.1666666666666666666666666667"
+
+[indicators.formula]
+type = "places_measure"
+measure_id = "LPA"
+data_value_type_id = "CrdPrv"

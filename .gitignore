@@ -38,8 +38,11 @@ __pycache__/
 data/raw/
 data/interim/
 data/processed/
+data/normalized/
+data/reports/
 data/generated/
 data/downloads/
 data/cache/
 data/artifacts/
+!data/manifests/
 !data/README.md
