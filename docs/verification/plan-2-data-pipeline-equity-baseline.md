@@ -6,7 +6,7 @@
 
 **Offline gate date:** 2026-08-28
 
-**Live run status:** Pending isolated Task 10 execution
+**Live run status:** Passed on isolated `moo-751-equity-baseline` branch, 2026-08-28
 
 ## Scope and evidence boundary
 
@@ -30,7 +30,7 @@ Run from the MOO-751 worktree with the locked Node.js 24 and Python 3.13 environ
 | `uv run ruff check pipelines tests/data` | passed |
 | `uv run ruff format --check pipelines tests/data` | 30 files already formatted |
 | `uv run mypy pipelines` | success across 19 source files |
-| `uv run pytest tests/data -q` | 182 passed, 2 integration tests deselected |
+| `uv run pytest tests/data -q` | 184 passed, 2 integration tests deselected |
 | `npm run lint` | passed |
 | `npm run typecheck` | all workspaces passed |
 | `npm run test` | 9 files / 30 tests passed across workspaces |
@@ -70,76 +70,95 @@ The complete formulas and weights remain in the approved
 [methodology](../methodology/equity-baseline.md) and executable registry; this evidence record
 does not redefine them.
 
-## Authoritative live-run checklist — pending
+## Authoritative live-run checklist — passed
 
-Record sanitized facts only after the isolated run succeeds.
+Only sanitized facts are recorded. Raw source files, normalized outputs, reports, and credentials
+remain ignored local artifacts.
 
 ### Environment identity
 
-- [ ] Personal Neon project confirmed; project ID recorded without a connection string
-- [ ] Branch `moo-751-equity-baseline` confirmed non-default and `development-only`
-- [ ] Parent `moo-750-foundation` confirmed
-- [ ] Seven-day expiry confirmed
-- [ ] Database, role, branch ID, and `NEON_BRANCH` match confirmed
-- [ ] `CENSUS_API_KEY` presence confirmed without printing it
+- [x] Personal Neon project `wispy-glitter-41930798` confirmed without recording a connection
+  string
+- [x] Branch `moo-751-equity-baseline` / `br-damp-math-a5e3wtpa` confirmed non-default,
+  non-primary, and `development-only`
+- [x] Parent `moo-750-foundation` / `br-dark-dew-a5x4dxm6` confirmed
+- [x] Seven-day expiry `2026-09-04T09:24:21Z` confirmed
+- [x] Database `neondb`, role `neondb_owner`, local branch link, and branch ID confirmed
+- [x] `CENSUS_API_KEY` presence confirmed without printing it
 
 ### Migration proof
 
-- [ ] PostGIS enabled
-- [ ] Eight Plan 2 tables present
-- [ ] Named spatial, lifecycle, uniqueness, and foreign-key constraints verified
-- [ ] Database package integration tests passed
-- [ ] Python integration tests passed against the disposable branch
-- [ ] Zero published or superseded runs before ingestion
+- [x] PostGIS 3.6.0 enabled
+- [x] Eight Plan 2 tables present
+- [x] Named spatial, lifecycle, uniqueness, and foreign-key constraints verified
+- [x] Database package integration test passed
+- [x] Two Python integration tests passed against the disposable branch
+- [x] Zero published or superseded runs before ingestion
+
+The first live load exposed that 4,242 individually awaited parameterized inserts could outlast a
+direct Neon session. The failed transaction rolled back to zero base and analytical rows. Psycopg
+pipeline mode now batches those commands while preserving one atomic transaction; the corrected
+load completed successfully, and rollback behavior remains covered by unit and integration tests.
 
 ### Source and normalization reconciliation
 
 | Evidence | TIGER | ACS | PLACES |
 |---|---:|---:|---:|
-| Dataset version | pending | pending | pending |
-| Snapshot SHA-256 | pending | pending | pending |
-| Retrieved at | pending | pending | pending |
-| Rows/features | pending | pending | pending |
-| Schema fingerprint | pending | pending | pending |
-| Canonical/matched GEOIDs | pending | pending | pending |
-| Missing/unmatched/duplicate records | pending | pending | pending |
+| Dataset version | 2020 | 2024 ACS 5-year | December 2025 release; 2023 estimates |
+| Snapshot SHA-256 | `154481f2…545834` | eight group hashes below | `0579e47c…aa8e2` |
+| Retrieved at | 2026-08-28 09:38:43Z | 2026-08-28 09:52:26–32Z | 2026-08-28 09:52:33Z |
+| Rows/features | 1,542 statewide features | 302 rows in each of eight groups | 1,800 measure rows |
+| Schema fingerprint | `9df96b3b…0106` | eight group schemas in manifests | `ab30102d…3589` |
+| Canonical/matched GEOIDs | 302 Milwaukee tracts | 302 in every group | 300 positive-population tracts |
+| Missing/unmatched/duplicate records | 0 / 0 / 0 | 14 explicit missing values on two zero-population tracts; 0 unmatched/duplicate GEOIDs | two zero-population tracts excluded by contract; 0 unmatched/duplicate GEOIDs |
 
-- [ ] TIGER GEOIDs unique, Milwaukee FIPS-contained, valid/non-empty SRID 4326 geometry and
+ACS group snapshot hashes:
+
+- `B01003`: `06ed1f4b09eaa029a4adb98b76a47aa4f5f833ad542ad4ab2084321e87620eaa`
+- `B03002`: `a80b10c6b7ac2a3b7c15085bc3b95ad5d29029f3b8deaa1372e59c68832257f8`
+- `C16001`: `62d61e22a1dcade21a68f38c5ddfb7608e12b206174348d0bd26fe5190758ee1`
+- `B05002`: `a18916ca24248294a101d08fffcc214c6ede9a34fe748a96f8e9d70b51a7a3c2`
+- `C17002`: `d5244a0038df2cbb566a6ff3da23b5f66147538b008aff764ecadac108542ba5`
+- `B23025`: `bd840d814c23ad4da79599d93e3e0d5dce7eab3018bae5a423121157c46dbc73`
+- `B15003`: `5e0a245842fe5fb50e1c307e82c112383e35f183ce0780add135648dd0f2dddb`
+- `B25106`: `650bcb965d60bb7739d5405bfa2a363d1149bf3526c46870de37a9d7b83b124f`
+
+- [x] TIGER GEOIDs unique, Milwaukee FIPS-contained, valid/non-empty SRID 4326 geometry and
   centroid counts reconciled
-- [ ] ACS required groups/variables, population, annotation, missingness, and reliability counts
+- [x] ACS required groups/variables, population, annotation, missingness, and reliability counts
   reconciled
-- [ ] PLACES six measures, crude value type, footnotes, missing tracts, and unmatched GEOIDs
+- [x] PLACES six measures, crude value type, footnotes, missing tracts, and unmatched GEOIDs
   reconciled
-- [ ] Every sanitized manifest retains version, request, checksum, size, count, schema, license,
+- [x] Every sanitized manifest retains version, request, checksum, size, count, schema, license,
   and methodology provenance
 
 ### Run reconciliation
 
 | Field | Authoritative value |
 |---|---|
-| Run ID | pending |
-| Methodology version | pending |
-| Registry hash | pending |
-| Input-manifest hash | pending |
-| Run fingerprint | pending |
-| Output hash | pending |
-| Git commit | pending |
-| Complete scores | pending |
-| Insufficient-data scores | pending |
-| Zero-population scores | pending |
-| Component rows | pending |
-| Indicator-value rows | pending |
-| Orphan rows | pending |
-| Final status | pending |
-| Published/superseded runs | pending; must be 0 |
+| Run ID | `502e2a04-b013-53cd-8b09-c9144862701a` |
+| Methodology version | `equity-baseline-v1` |
+| Registry hash | `8e31bf6f2d89963d24bb76f2074cafc8848a69ca147e6015cc83716ce5fcbfc2` |
+| Input-manifest hash | `b34eaa2dcbc823ae2e145467e95de2b175066eeceac2dd7ccded4f06cdea6b8d` |
+| Run fingerprint | `125f23262552c9179d6dae2be69b44b30042ee5bdfdc9c5188087d73b6d531e8` |
+| Output hash | `19069c257e8f51fb4370b1ec8d04c6f823bd85e133846cf504866404c2c4e946` |
+| Git commit | `af32c1df7e679320cb341a36044b107a7a072300` |
+| Complete scores | 300 |
+| Insufficient-data scores | 0 |
+| Zero-population scores | 2 |
+| Component rows | 3,900 |
+| Indicator-value rows | 3,914 |
+| Orphan rows | 0 |
+| Final status | `validated` |
+| Published/superseded runs | 0 |
 
-- [ ] Separate `fetch`, `validate`, `normalize`, `load`, `score`, and `validate-run` commands
+- [x] Separate `fetch`, `validate`, `normalize`, `load`, `score`, and `validate-run` commands
   succeeded
-- [ ] One validated run exists with no partial analytical rows
-- [ ] `run --through validated --verify-existing` reused the run ID and fingerprint
-- [ ] Independently recomputed output hash matched
-- [ ] Repeat execution created no duplicate source, value, component, or score rows
-- [ ] All evidence and committed manifests passed a credential and absolute-path review
+- [x] One validated run exists with no partial analytical rows
+- [x] `run --through validated --verify-existing` reused the run ID and fingerprint
+- [x] Independently recomputed output hash matched
+- [x] Repeat execution created no duplicate source, value, component, or score rows
+- [x] All evidence and committed manifests passed a credential and absolute-path review
 
 ## Failure recovery
 
