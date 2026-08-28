@@ -7,3 +7,23 @@ class EquityBaselineError(Exception):
 
 class RegistryValidationError(EquityBaselineError, ValueError):
     """Raised when the committed methodology registry is invalid."""
+
+
+class ArtifactError(EquityBaselineError):
+    """Base error for immutable snapshot and manifest operations."""
+
+
+class ArtifactWriteError(ArtifactError):
+    """Raised when an artifact cannot be written atomically."""
+
+
+class ArtifactCollisionError(ArtifactError):
+    """Raised when a content-addressed target contains unexpected bytes."""
+
+
+class HttpFetchError(EquityBaselineError):
+    """Raised when a bounded HTTP fetch cannot complete."""
+
+
+class ResponseSchemaError(EquityBaselineError, ValueError):
+    """Raised when fetched bytes do not match the required response schema."""
