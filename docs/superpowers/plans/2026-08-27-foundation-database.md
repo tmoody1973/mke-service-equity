@@ -278,8 +278,13 @@ Create the root manifest exactly as follows:
     "@heroui/styles": "3.2.4",
     "@react-aria/utils": "3.34.1",
     "motion": "13.1.1",
+    "react": "19.2.8",
     "react-aria-components": "1.20.0",
-    "tailwind-variants": "3.3.1"
+    "react-dom": "19.2.8",
+    "react-resizable-panels": "4.12.3",
+    "tailwind-merge": "3.6.0",
+    "tailwind-variants": "3.3.1",
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
@@ -296,7 +301,7 @@ Create the root manifest exactly as follows:
 }
 ```
 
-`next` is also declared at the repository root so the root-hoisted `eslint-config-next` can resolve its bundled parser consistently after a fresh npm install on Linux CI; the web workspace keeps the same exact runtime version.
+`next` is also declared at the repository root so the root-hoisted `eslint-config-next` can resolve its bundled parser consistently after a fresh npm install on Linux CI; the web workspace keeps the same exact runtime version. The root dependency boundary also pins the core peers reported by `heroui-pro install --dry-run --yes react`, preventing a hoisted Pro package from resolving peers outside the repository.
 
 Create workspace manifests with version `0.0.0`, `private: true`, `type: "module"`, and these exact boundaries:
 
