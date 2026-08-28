@@ -160,6 +160,36 @@ comparison set. `score_components` records the exact value, percentile, and effe
 used by a run. Food access and Food Equity Priority are added only by their later approved
 plans.
 
+## Plan 2 integrity and lifecycle
+
+Migration `0001_equity_baseline.sql` creates eight approved tables: `data_sources`,
+`source_snapshots`, `geographies`, `indicator_definitions`, `indicator_values`, `score_runs`,
+`score_components`, and `scores`. Foreign keys prevent orphan analytical rows, and unique
+constraints make source snapshots, normalized values, and run fingerprints idempotent.
+
+Geography is database-checked as an 11-digit tract GEOID with matching state/county FIPS,
+non-empty valid `MultiPolygon` geometry and non-empty `Point` centroid, both at SRID 4326.
+Indicator value and score constraints preserve the distinction between a usable value and a
+missing-quality state. An incomplete or zero-population score row must have every numerical
+score and band set to null.
+
+The Plan 2 lifecycle trigger permits only:
+
+```text
+draft -> validated
+draft -> failed
+```
+
+It rejects inserts or transitions to `published` and `superseded`, plus every other status
+transition. A validated run requires a 64-character lowercase output hash and validation result;
+a failed run requires completion and failure metadata but no output hash. Later publication work
+must introduce its own reviewed lifecycle migration rather than bypass this trigger.
+
+`run_fingerprint` identifies the methodology, registry, input manifests, implementation, and
+other deterministic inputs for one run. `output_hash` identifies the canonical scored output.
+An existing fingerprint is reused; `--verify-existing` also requires a matching independently
+recomputed output hash.
+
 ## public_investments
 
 - id

@@ -56,3 +56,29 @@ Each source record should support:
 - methodology_url
 - status
 - notes
+
+## Equity Baseline v1 lock
+
+The executable registry is
+[`pipelines/equity_baseline/registry.toml`](../../pipelines/equity_baseline/registry.toml). Its
+canonical SHA-256 is part of every run identity. Changing a source, formula, weight, band,
+completeness rule, or reliability threshold requires methodology documentation and tests; do not
+edit the registry as an operational shortcut.
+
+The v1 source identifiers are:
+
+| Key | Dataset version | Structured source |
+|---|---|---|
+| `tiger` | 2020 | Census `tl_2020_55_tract` TIGER/Line ZIP |
+| `acs` | 2024 ACS 5-Year | Census Data API `acs/acs5` approved groups |
+| `places` | December 2025 release, 2023 estimates | CDC PLACES Socrata dataset `cwsq-ngmh` |
+
+ACS manifests record group and geography query metadata but redact the API key. PLACES is
+restricted to the six approved crude-prevalence measures and retains confidence limits and
+footnotes. TIGER is read as statewide Wisconsin tract geography and filtered to Milwaukee County
+only after authoritative source validation.
+
+Every committed manifest must retain publisher, dataset version, retrieval timestamp, source
+URL without credentials, checksum, byte size, row/feature count, schema fingerprint, license,
+methodology reference, and sanitized request metadata. Raw responses and normalized records are
+not source-registry documentation and must remain ignored.
