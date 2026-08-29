@@ -314,7 +314,7 @@ Use frozen dataclasses, `Decimal`, closed enums, manual validation, and exact re
 hashing. Keep methodology data declarative and non-executable. Preserve compatibility for all
 Plan 2 imports and behavior.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 uv run pytest tests/data/equity_baseline tests/data/food_equity/test_registry.py tests/data/food_equity/test_artifacts.py -q
