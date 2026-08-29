@@ -1,0 +1,58 @@
+[
+  [
+    "NAME",
+    "B08201_001E",
+    "B08201_001M",
+    "B08201_001EA",
+    "B08201_001MA",
+    "B08201_002E",
+    "B08201_002M",
+    "B08201_002EA",
+    "B08201_002MA",
+    "state",
+    "county",
+    "tract"
+  ],
+  [
+    "Census Tract 3; Milwaukee County; Wisconsin",
+    "80",
+    "8",
+    null,
+    null,
+    "0",
+    "2",
+    null,
+    null,
+    "55",
+    "079",
+    "000300"
+  ],
+  [
+    "Census Tract 1; Milwaukee County; Wisconsin",
+    "100",
+    "10",
+    null,
+    null,
+    "20",
+    "4",
+    null,
+    null,
+    "55",
+    "079",
+    "000100"
+  ],
+  [
+    "Census Tract 2; Milwaukee County; Wisconsin",
+    "100",
+    "10",
+    null,
+    null,
+    "50",
+    "1",
+    null,
+    null,
+    "55",
+    "079",
+    "000200"
+  ]
+]
