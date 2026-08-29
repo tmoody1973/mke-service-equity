@@ -72,3 +72,55 @@ describe("Plan 2 equity-baseline migration scope", () => {
     expect(migration).toMatch(/CREATE TRIGGER score_runs_plan2_transition_trigger/i);
   });
 });
+
+describe("Plan 3 food-equity migration scope", () => {
+  it("creates exactly the approved food-equity tables", async () => {
+    const migrationDirectory = fileURLToPath(new URL("../drizzle", import.meta.url));
+    const migrationName = (await readdir(migrationDirectory)).find((name) =>
+      name.endsWith("_food_equity.sql"),
+    );
+
+    expect(migrationName).toBeDefined();
+    const migration = await readFile(`${migrationDirectory}/${migrationName}`, "utf8");
+    const tableNames = [...migration.matchAll(/CREATE TABLE "([a-z_]+)"/g)].map(
+      ([, tableName]) => tableName,
+    );
+
+    expect(tableNames.sort()).toEqual([
+      "food_access_metric_snapshots",
+      "food_access_metric_values",
+      "food_resource_versions",
+      "food_resources",
+      "food_score_components",
+      "food_score_runs",
+      "food_scores",
+    ]);
+    expect(migration).not.toMatch(/CREATE TABLE "public_investments"/i);
+  });
+
+  it("enforces lineage, geometry, output, and closed lifecycle invariants", async () => {
+    const migrationDirectory = fileURLToPath(new URL("../drizzle", import.meta.url));
+    const migrationName = (await readdir(migrationDirectory)).find((name) =>
+      name.endsWith("_food_equity.sql"),
+    );
+
+    expect(migrationName).toBeDefined();
+    const migration = await readFile(`${migrationDirectory}/${migrationName}`, "utf8");
+
+    expect(migration).toMatch(/geometry\(point,4326\)/i);
+    expect(migration).toContain("food_resource_versions_geometry_gist");
+    expect(migration).toContain("food_resource_versions_geometry_srid_check");
+    expect(migration).toContain("food_resource_versions_geometry_not_empty_check");
+    expect(migration).toContain("food_access_metric_values_value_state_check");
+    expect(migration).toContain("food_access_metric_values_quality_check");
+    expect(migration).toContain("food_score_runs_equity_baseline_run_id_score_runs_id_fk");
+    expect(migration).toContain("food_score_components_metric_value_geography_fk");
+    expect(migration).toContain("food_scores_equity_baseline_score_geography_fk");
+    expect(migration).toContain("food_scores_output_quality_check");
+    expect(migration).toMatch(/CREATE OR REPLACE FUNCTION enforce_plan3_food_score_run_transition/i);
+    expect(migration).toMatch(/TG_OP = 'INSERT'.*NEW\.status <> 'draft'/s);
+    expect(migration).toMatch(/OLD\.status = 'draft'.*NEW\.status IN \('validated', 'failed'\)/s);
+    expect(migration).not.toMatch(/food_score_run_status[^;]*(published|superseded)/i);
+    expect(migration).not.toMatch(/public[_ ]investment/i);
+  });
+});

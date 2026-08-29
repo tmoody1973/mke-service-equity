@@ -6,8 +6,8 @@
   "exports": {"./server": "./src/server.ts"},
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --exclude **/*.integration.test.ts",
-    "test:integration": "vitest run tests/health.integration.test.ts",
+    "test": "vitest run --exclude '**/*.integration.test.ts'",
+    "test:integration": "vitest run tests/*.integration.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
