@@ -525,7 +525,7 @@ git commit -m "feat(data): normalize emergency food resources (MOO-753)"
 - Consumes: exact MCTS GTFS ZIP and approved analysis service window.
 - Produces: validated stops/routes/trips/service calendars and scheduled-frequency summaries.
 
-- [ ] **Step 1: Write failing GTFS contract tests**
+- [x] **Step 1: Write failing GTFS contract tests**
 
 Cover required files/columns, feed metadata/version, agency, unique IDs, foreign keys, valid
 coordinates, Milwaukee bounds, time values beyond 24:00, calendar/calendar_dates resolution,
@@ -538,13 +538,13 @@ uv run pytest tests/data/food_equity/test_gtfs.py -q
 
 Expected RED: GTFS adapter is missing.
 
-- [ ] **Step 2: Integrate the approved validator and typed normalization**
+- [x] **Step 2: Integrate the approved validator and typed normalization**
 
 Run the pinned recognized validator against the preserved ZIP, retain a sanitized report, and
 independently enforce the subset of constraints relied on by calculations. Record MCTS feed
 update/attribution metadata. Do not implement real-time ingestion or transit travel-time routing.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_gtfs.py -q
