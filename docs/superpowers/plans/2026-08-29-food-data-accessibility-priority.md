@@ -483,7 +483,7 @@ git commit -m "feat(data): classify food retailers with evidence (MOO-753)"
 - Consumes: approved partner export or structured source snapshot.
 - Produces: pantry, meal, mobile, and other approved records with verification and hours states.
 
-- [ ] **Step 1: Write failing partner-source tests**
+- [x] **Step 1: Write failing partner-source tests**
 
 Cover exact schema/version, stable source IDs, allowed categories, coordinates/bounds, duplicate
 records, active/verification dates, stale thresholds, hours versus missing hours, eligibility
@@ -496,12 +496,12 @@ uv run pytest tests/data/food_equity/test_emergency_food.py -q
 
 Expected RED: emergency-food adapter is missing.
 
-- [ ] **Step 2: Implement source-specific normalization**
+- [x] **Step 2: Implement source-specific normalization**
 
 Preserve partner fields and terms. Do not geocode, classify, or create hours unless the approved
 design names the source and method. Separate operating availability from resource counts.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_emergency_food.py -q
