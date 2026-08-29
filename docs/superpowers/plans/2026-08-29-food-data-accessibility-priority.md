@@ -398,7 +398,7 @@ git commit -m "feat(database): add food equity schema (MOO-753)"
 - Consumes: exact approved 2025 SRAM structured artifact and documentation.
 - Produces: canonical Milwaukee tract benchmark records with source-defined quality metadata.
 
-- [ ] **Step 1: Write failing source-contract tests**
+- [x] **Step 1: Write failing source-contract tests**
 
 Cover archive/member names, schema/version fingerprint, 2020 tract GEOIDs, Wisconsin/Milwaukee
 filtering, required variables, source sentinel/no-data states, duplicate/missing/extra GEOIDs,
@@ -411,13 +411,13 @@ uv run pytest tests/data/food_equity/test_sram.py -q
 
 Expected RED: SRAM adapter is missing.
 
-- [ ] **Step 2: Implement bounded fetch and normalization**
+- [x] **Step 2: Implement bounded fetch and normalization**
 
 Preserve the exact source artifact before transformation. Parse only the approved member/table
 and fields, validate documentation/version metadata, reconcile to the 302 canonical tracts, and
 return typed sorted records. Keep source sentinel values explicit; never convert them to zero.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_sram.py -q
