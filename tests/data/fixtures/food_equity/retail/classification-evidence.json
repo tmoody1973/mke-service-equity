@@ -1,0 +1,22 @@
+[
+  {
+    "resource_id": "R-102",
+    "asserted_classification": "full_service_grocery",
+    "evidence_type": "manual_verification",
+    "evidence_url": "https://data.milwaukee.gov/fixture/open-super-center",
+    "partner_document_reference": null,
+    "verifier": "Reviewed fixture verifier",
+    "verified_at": "2025-12-15T18:30:00Z",
+    "notes": "Verified open to the general public without paid membership or restricted eligibility."
+  },
+  {
+    "resource_id": "R-103",
+    "asserted_classification": "candidate_full_service",
+    "evidence_type": "partner_provided_classification",
+    "evidence_url": null,
+    "partner_document_reference": "fixture-partner-export:members-club:R-103",
+    "verifier": "Reviewed fixture partner",
+    "verified_at": "2025-12-16T16:00:00Z",
+    "notes": "Paid membership is required, so the candidate is not full service for v1."
+  }
+]
