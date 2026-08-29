@@ -153,7 +153,8 @@ substring matching, brand lists, coordinates, or an LLM are prohibited evidence.
 | Coverage | Milwaukee County points |
 | Fields | name, address, city, ZIP, phone, type, notes, website, service area, point geometry |
 | Published types | `Food Bank`, `Food Pantry`, `Food Pantry and Recovery`, `Meal Program` |
-| Layer edit date | 2024-08-27T15:25:33Z |
+| Data last edited | 2024-08-07T21:12:52.607Z |
+| Schema / overall layer edit | 2024-08-27T15:25:31.116Z / 2024-08-27T15:25:33.257Z |
 | Item metadata modified | 2025-07-09T18:44:48Z |
 | Service terms | Public query access; item metadata contains no license or attribution terms |
 

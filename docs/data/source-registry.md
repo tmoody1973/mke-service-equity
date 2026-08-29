@@ -131,7 +131,7 @@ accepted silently.
 
 | Key | Publisher and version | Structured artifact | Status and use |
 |---|---|---|---|
-| `emergency_food_context` | Milwaukee Food Council/Data You Can Use `EmergencyFood_MKE_2024`; layer records edited 2024-08-27 | `https://services5.arcgis.com/3kr3fkJcIf6EOY6g/ArcGIS/rest/services/EmergencyFood_MKE/FeatureServer/0` | `stale_unverified_context` in non-public development only; no score effect; public redistribution blocked pending partner-confirmed terms and freshness |
+| `emergency_food_context` | Milwaukee Food Council/Data You Can Use `EmergencyFood_MKE_2024`; data edited 2024-08-07, schema/layer edited 2024-08-27 | `https://services5.arcgis.com/3kr3fkJcIf6EOY6g/ArcGIS/rest/services/EmergencyFood_MKE/FeatureServer/0` | `stale_unverified_context` in non-public development only; no score effect; public redistribution blocked pending partner-confirmed terms and freshness |
 
 Emergency-food and public-investment artifacts are outside the Food score-input fingerprint.
 They cannot change the Food Access Need score, band, or Food Equity Priority. Missing hours remain

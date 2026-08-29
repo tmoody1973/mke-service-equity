@@ -139,7 +139,7 @@ immutable = true
 [[sources]]
 key = "emergency_food_context"
 name = "Milwaukee Food Council and Data You Can Use emergency-food layer"
-vintage = "records edited 2024-08-27"
+vintage = "data edited 2024-08-07; schema/layer edited 2024-08-27"
 dataset_identifier = "303b7e4385a6450fa7d36d76a1ba5a67/0"
 source_url = "https://services5.arcgis.com/3kr3fkJcIf6EOY6g/ArcGIS/rest/services/EmergencyFood_MKE/FeatureServer/0"
 methodology_url = "https://www.mkefoodcouncil.org/mapping"

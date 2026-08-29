@@ -48,6 +48,9 @@ def test_registry_locks_the_approved_sources_and_roles() -> None:
     assert sources["walking_network"].published_checksum == ("md5:87c18ce0608499afd91ed0f2a5ee8eef")
     assert sources["mcts_gtfs"].freshness_policy == "service_dates"
     assert sources["emergency_food_context"].role is SourceRole.CONTEXTUAL
+    assert sources["emergency_food_context"].vintage == (
+        "data edited 2024-08-07; schema/layer edited 2024-08-27"
+    )
     assert sources["emergency_food_context"].max_age_days == 90
     assert all(
         source.role is SourceRole.SCORING
