@@ -248,7 +248,7 @@ the full design. Do not create schema, registry, adapters, or scoring code befor
 Approval recorded: Tarik replied `approve methodology` on 2026-08-29. No in-scope concerns were
 raised at the approval gate.
 
-- [ ] **Step 7: Commit the approved design**
+- [x] **Step 7: Commit the approved design**
 
 ```bash
 git add docs/methodology/food-equity.md docs/data/source-registry.md docs/superpowers/specs/2026-08-29-moo-753-food-equity-design.md
