@@ -661,7 +661,7 @@ git commit -m "feat(data): normalize vehicle access constraints (MOO-753)"
 - Consumes: approved scoring metrics, canonical eligibility, approved Equity Baseline score/band.
 - Produces: components, dimensions, Food Access Need score/band, Priority, exclusions, output hash.
 
-- [ ] **Step 1: Write scoring tests before implementation**
+- [x] **Step 1: Write scoring tests before implementation**
 
 Test exact direction normalization, average-rank or approved tie behavior, all-equal/singleton
 cases, completeness, no weight redistribution, dimension aggregation, fixed bands, every
@@ -676,20 +676,20 @@ uv run pytest tests/data/food_equity/test_scoring.py -q
 
 Expected RED: scorer is missing.
 
-- [ ] **Step 2: Implement the pure deterministic scorer**
+- [x] **Step 2: Implement the pure deterministic scorer**
 
 Use `Decimal` source values and exact rational intermediates where ranks/weights require them.
 Quantize only at the persistence boundary. Sort by GEOID and registry order; hash canonical JSON
 without timestamps or database ordering. Resolve the approved Equity Baseline by pinned run ID,
 not by “latest” or browser state.
 
-- [ ] **Step 3: Review and freeze golden traces**
+- [x] **Step 3: Review and freeze golden traces**
 
 Manually trace retail/access inputs, metric percentiles, dimensions, Food Access Need, Equity
 Baseline matrix lookup, final Priority, and exclusions for complete, tied, missing, stale,
 zero-population, and disconnected-network fixtures.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_scoring.py -q
