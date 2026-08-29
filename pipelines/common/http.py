@@ -27,7 +27,7 @@ class ReadableResponse(Protocol):
 
     def __exit__(self, *args: object) -> object: ...
 
-    def read(self) -> bytes: ...
+    def read(self, amount: int = -1) -> bytes: ...
 
 
 Opener = Callable[[Request], ReadableResponse]
@@ -46,18 +46,23 @@ def fetch_bytes(
     sleeper: Sleeper = time.sleep,
     validator: Validator | None = None,
     retries: int = MAX_RETRIES,
+    max_bytes: int | None = None,
 ) -> bytes:
     """Fetch exact response bytes with at most three transient retries."""
 
     if retries < 0 or retries > MAX_RETRIES:
         raise ValueError(f"retries must be between 0 and {MAX_RETRIES}")
+    if max_bytes is not None and max_bytes <= 0:
+        raise ValueError("max_bytes must be positive when provided")
     safe_url = sanitize_url(url)
     request = Request(url, headers={"User-Agent": "mke-service-equity/1"})
     last_error: OSError | None = None
     for attempt in range(retries + 1):
         try:
             with opener(request) as response:
-                content = response.read()
+                content = response.read() if max_bytes is None else response.read(max_bytes + 1)
+            if max_bytes is not None and len(content) > max_bytes:
+                raise HttpFetchError(f"response exceeds {max_bytes} bytes for {safe_url}")
             if validator is not None:
                 validator(content)
             return content

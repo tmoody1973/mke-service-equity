@@ -1,0 +1,4 @@
+stop_id,stop_name,stop_lat,stop_lon
+S3,Synthetic Outer Stop,43.1200,-88.0300
+S1,Synthetic First Stop,43.0400,-87.9200
+S2,Synthetic Second Stop,43.0500,-87.9300
