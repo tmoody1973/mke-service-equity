@@ -619,7 +619,7 @@ git commit -m "feat(data): calculate walking and transit access (MOO-753)"
 - Consumes: exact approved ACS group/variables and 302 canonical tract GEOIDs.
 - Produces: source-backed tract observations with MOE and reliability state.
 
-- [ ] **Step 1: Write failing formula/source tests**
+- [x] **Step 1: Write failing formula/source tests**
 
 Cover exact headers/variables/vintage, formula and denominator, ACS annotations/jam values,
 MOE propagation, CV thresholds, missing/nonpositive denominators, numeric bounds, duplicate/
@@ -632,12 +632,12 @@ uv run pytest tests/data/food_equity/test_vehicle_access.py -q
 
 Expected RED: vehicle-access adapter is missing.
 
-- [ ] **Step 2: Implement bounded ACS normalization**
+- [x] **Step 2: Implement bounded ACS normalization**
 
 Reuse the Plan 2 credential-safe Census request/snapshot boundary without modifying its approved
 registry or output. Return one explicit observation per canonical tract.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_vehicle_access.py -q
