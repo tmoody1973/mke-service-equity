@@ -280,7 +280,7 @@ migration, or source artifact.
 - Consumes: approved Task 1 design.
 - Produces: immutable typed Plan 3 registry, canonical SHA-256, shared secret-safe snapshots.
 
-- [ ] **Step 1: Write failing registry and shared-boundary tests**
+- [x] **Step 1: Write failing registry and shared-boundary tests**
 
 Assert the exact approved sources, taxonomy, metric definitions, thresholds, directions, weights,
 completeness, ties, bands, matrix cells, freshness rules, and contextual/scoring flags. Add
@@ -297,7 +297,7 @@ uv run pytest tests/data/food_equity/test_registry.py tests/data/food_equity/tes
 
 Expected RED: `pipelines.food_equity` does not exist.
 
-- [ ] **Step 2: Pin only approved dependencies**
+- [x] **Step 2: Pin only approved dependencies**
 
 Add the Task 1 approved GTFS/network packages with exact versions, regenerate `uv.lock`, and
 document any required external validator binary/version. Do not add a routing package that
@@ -308,7 +308,7 @@ uv lock
 uv sync --locked
 ```
 
-- [ ] **Step 3: Implement typed registry and common primitives**
+- [x] **Step 3: Implement typed registry and common primitives**
 
 Use frozen dataclasses, `Decimal`, closed enums, manual validation, and exact registry-byte
 hashing. Keep methodology data declarative and non-executable. Preserve compatibility for all

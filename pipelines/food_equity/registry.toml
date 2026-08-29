@@ -1,0 +1,453 @@
+methodology_version = "food-equity-v1"
+expected_scoring_metric_count = 4
+completeness_rule = "all_required"
+tie_method = "average"
+single_geography_percentile = "50"
+
+[domain_weights]
+retail_access = "0.5"
+transportation_constraint = "0.5"
+
+[access]
+origin_source = "tract_origins"
+projected_crs = "EPSG:3071"
+review_buffer_miles = "2"
+snap_tolerance_m = "200"
+walk_speed_m_per_minute = "80.4672"
+walk_threshold_minutes = [10, 15, 20]
+transit_window_start = "10:00:00"
+transit_window_end = "14:00:00"
+transit_weekdays = ["tuesday", "saturday"]
+transit_stop_threshold_minutes = 10
+inaccessible_ranking = "above_finite_tied"
+
+[[sources]]
+key = "sram"
+name = "USDA ERS SNAP-authorized Retailer Access Map"
+vintage = "2025 SRAM updated 2026-07-27"
+dataset_identifier = "2025-sram"
+source_url = "https://www.ers.usda.gov/media/29395/2025-snap-authorized-retailer-access-map-sram-data.zip?v=81233"
+methodology_url = "https://www.ers.usda.gov/data-products/food-access-research-atlas/documentation"
+license_notes = "USDA public data; preserve source and reference-guide attribution."
+role = "scoring"
+freshness_policy = "pinned_vintage"
+immutable = false
+
+[[sources]]
+key = "snap_retailers"
+name = "USDA FNS historical SNAP retailer locator"
+vintage = "current through 2025-12-31"
+dataset_identifier = "snap-retailer-locator-data2005-2025"
+source_url = "https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-retailer-locator-data2005-2025.zip"
+methodology_url = "https://fns-prod.azureedge.us/snap/store-definitions"
+license_notes = "USDA public administrative data; preserve source and snapshot-date attribution."
+role = "scoring"
+freshness_policy = "pinned_vintage"
+immutable = true
+
+[[sources]]
+key = "acs_vehicle"
+name = "2024 ACS 5-Year Detailed Tables vehicle availability"
+vintage = "2024 ACS 5-year"
+dataset_identifier = "acs/acs5/B08201"
+source_url = "https://api.census.gov/data/2024/acs/acs5"
+methodology_url = "https://www.census.gov/data/developers/data-sets/acs-5year/2024.html"
+license_notes = "United States Census Bureau public data; preserve source attribution."
+role = "scoring"
+freshness_policy = "pinned_vintage"
+immutable = false
+
+[[sources]]
+key = "tract_origins"
+name = "2020 Census tract mean centers of population for Wisconsin"
+vintage = "2020 Census"
+dataset_identifier = "CenPop2020_Mean_TR55"
+source_url = "https://www2.census.gov/geo/docs/reference/cenpop2020/tract/CenPop2020_Mean_TR55.txt"
+methodology_url = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.html"
+license_notes = "United States Census Bureau public data; preserve source attribution."
+role = "scoring"
+freshness_policy = "pinned_vintage"
+immutable = true
+
+[[sources]]
+key = "mcts_gtfs"
+name = "Milwaukee County Transit System static GTFS"
+vintage = "snapshot at execution"
+dataset_identifier = "google_transit"
+source_url = "https://kamino.mcts.org/gtfs/google_transit.zip"
+methodology_url = "https://www.ridemcts.com/policies/developer-terms"
+license_notes = "MCTS developer terms require not-sponsored wording and last-updated and valid-through dates."
+role = "scoring"
+freshness_policy = "service_dates"
+immutable = false
+
+[[sources]]
+key = "walking_network"
+name = "Geofabrik Wisconsin OpenStreetMap PBF"
+vintage = "2026-08-27"
+dataset_identifier = "wisconsin-260827.osm.pbf"
+source_url = "https://download.geofabrik.de/north-america/us/wisconsin-260827.osm.pbf"
+methodology_url = "https://download.geofabrik.de/north-america/us/wisconsin.html"
+license_notes = "ODbL 1.0; attribute OpenStreetMap contributors and Geofabrik and preserve derived-database obligations."
+role = "scoring"
+freshness_policy = "pinned_vintage"
+immutable = true
+published_checksum = "md5:87c18ce0608499afd91ed0f2a5ee8eef"
+
+[[sources]]
+key = "equity_baseline"
+name = "Approved Equity Baseline v1 development run"
+vintage = "validated verified unpublished"
+dataset_identifier = "502e2a04-b013-53cd-8b09-c9144862701a"
+source_url = "database:equity-score-run"
+methodology_url = "docs/methodology/equity-baseline.md"
+license_notes = "Internal deterministic derived data; preserve complete source and methodology lineage."
+role = "scoring"
+freshness_policy = "pinned_run"
+immutable = true
+
+[[sources]]
+key = "emergency_food_context"
+name = "Milwaukee Food Council and Data You Can Use emergency-food layer"
+vintage = "records edited 2024-08-27"
+dataset_identifier = "303b7e4385a6450fa7d36d76a1ba5a67/0"
+source_url = "https://services5.arcgis.com/3kr3fkJcIf6EOY6g/ArcGIS/rest/services/EmergencyFood_MKE/FeatureServer/0"
+methodology_url = "https://www.mkefoodcouncil.org/mapping"
+license_notes = "Public query access but no published reuse terms; non-public stale development context only."
+role = "contextual"
+freshness_policy = "verified_within_days"
+max_age_days = 90
+immutable = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Supermarket"
+category = "full_service_grocery"
+scoring_eligible = true
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Large Grocery Store"
+category = "full_service_grocery"
+scoring_eligible = true
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Super Store/Chain Store"
+category = "candidate_full_service"
+scoring_eligible = false
+requires_override = true
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Medium Grocery Store"
+category = "grocery_other"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Small Grocery Store"
+category = "grocery_other"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Convenience Store"
+category = "convenience"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Combination Grocery/Other"
+category = "combination_grocery_other"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Specialty Food Store - Bakery/Bread"
+category = "specialty_bakery"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Specialty Food Store - Fruits/Vegetables"
+category = "specialty_produce"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Specialty Food Store - Meat/Poultry Products"
+category = "specialty_meat"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Specialty Food Store - Seafood Products"
+category = "specialty_seafood"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Farmers’ Market"
+category = "seasonal_or_direct"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Direct Marketing Farmer"
+category = "seasonal_or_direct"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Military Commissary"
+category = "restricted_access"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Internet Retailer"
+category = "non_fixed_or_online"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Delivery Route"
+category = "non_fixed_or_online"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "emergency_food_context"
+source_value = "Food Bank"
+category = "emergency_food_bank"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "emergency_food_context"
+source_value = "Food Pantry"
+category = "emergency_food_pantry"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "emergency_food_context"
+source_value = "Food Pantry and Recovery"
+category = "emergency_pantry_recovery"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "emergency_food_context"
+source_value = "Meal Program"
+category = "emergency_meal_program"
+scoring_eligible = false
+requires_override = false
+
+[[metrics]]
+slug = "sram_snap_low_access_share_1mi"
+name = "Population beyond one driving mile from any SNAP-authorized retailer"
+treatment = "scoring"
+domain = "retail_access"
+source = "sram"
+source_fields = ["CensusTract20", "DD_SRAM_lapop1", "DD_SRAM_lapop1share"]
+unit = "percent"
+higher_is_worse = true
+weight = "0.5"
+
+[[metrics]]
+slug = "full_service_grocery_walk_access"
+name = "Walking-network access to nearest full-service grocery"
+treatment = "scoring"
+domain = "retail_access"
+source = "snap_retailers"
+source_fields = ["Record ID", "Store Type", "Latitude", "Longitude", "Authorization Date", "End Date"]
+unit = "ordered_reachability_and_minutes"
+higher_is_worse = true
+weight = "0.5"
+
+[[metrics]]
+slug = "households_no_vehicle"
+name = "Households with no vehicle available"
+treatment = "scoring"
+domain = "transportation_constraint"
+source = "acs_vehicle"
+source_fields = ["B08201_001E", "B08201_001M", "B08201_002E", "B08201_002M"]
+unit = "percent"
+higher_is_worse = true
+weight = "0.5"
+
+[[metrics]]
+slug = "scheduled_transit_service_intensity"
+name = "Scheduled transit service reachable within a ten-minute walk"
+treatment = "scoring"
+domain = "transportation_constraint"
+source = "mcts_gtfs"
+source_fields = ["stops.txt", "trips.txt", "stop_times.txt", "calendar.txt", "calendar_dates.txt"]
+unit = "unique_trips_per_hour"
+higher_is_worse = false
+weight = "0.5"
+
+[[metrics]]
+slug = "full_service_grocery_counts_context"
+name = "Full-service grocery counts within walking thresholds"
+treatment = "contextual"
+source = "snap_retailers"
+source_fields = ["Record ID", "Store Type", "Latitude", "Longitude"]
+unit = "count"
+higher_is_worse = false
+
+[[metrics]]
+slug = "emergency_food_access_context"
+name = "Emergency-food resources and walking access"
+treatment = "contextual"
+source = "emergency_food_context"
+source_fields = ["ObjectID", "USER_Type", "USER_Notes", "geometry"]
+unit = "count_and_quality_state"
+higher_is_worse = false
+
+[[bands]]
+label = "Very Low"
+minimum = "0"
+maximum = "20"
+includes_maximum = false
+
+[[bands]]
+label = "Low"
+minimum = "20"
+maximum = "40"
+includes_maximum = false
+
+[[bands]]
+label = "Moderate"
+minimum = "40"
+maximum = "60"
+includes_maximum = false
+
+[[bands]]
+label = "High"
+minimum = "60"
+maximum = "80"
+includes_maximum = false
+
+[[bands]]
+label = "Very High"
+minimum = "80"
+maximum = "100"
+includes_maximum = true
+
+[[priority_matrix]]
+equity_band = "Very Low"
+food_need_band = "Very Low"
+priority = 5
+[[priority_matrix]]
+equity_band = "Very Low"
+food_need_band = "Low"
+priority = 4
+[[priority_matrix]]
+equity_band = "Very Low"
+food_need_band = "Moderate"
+priority = 4
+[[priority_matrix]]
+equity_band = "Very Low"
+food_need_band = "High"
+priority = 3
+[[priority_matrix]]
+equity_band = "Very Low"
+food_need_band = "Very High"
+priority = 3
+[[priority_matrix]]
+equity_band = "Low"
+food_need_band = "Very Low"
+priority = 4
+[[priority_matrix]]
+equity_band = "Low"
+food_need_band = "Low"
+priority = 4
+[[priority_matrix]]
+equity_band = "Low"
+food_need_band = "Moderate"
+priority = 3
+[[priority_matrix]]
+equity_band = "Low"
+food_need_band = "High"
+priority = 3
+[[priority_matrix]]
+equity_band = "Low"
+food_need_band = "Very High"
+priority = 2
+[[priority_matrix]]
+equity_band = "Moderate"
+food_need_band = "Very Low"
+priority = 4
+[[priority_matrix]]
+equity_band = "Moderate"
+food_need_band = "Low"
+priority = 3
+[[priority_matrix]]
+equity_band = "Moderate"
+food_need_band = "Moderate"
+priority = 3
+[[priority_matrix]]
+equity_band = "Moderate"
+food_need_band = "High"
+priority = 2
+[[priority_matrix]]
+equity_band = "Moderate"
+food_need_band = "Very High"
+priority = 2
+[[priority_matrix]]
+equity_band = "High"
+food_need_band = "Very Low"
+priority = 3
+[[priority_matrix]]
+equity_band = "High"
+food_need_band = "Low"
+priority = 3
+[[priority_matrix]]
+equity_band = "High"
+food_need_band = "Moderate"
+priority = 2
+[[priority_matrix]]
+equity_band = "High"
+food_need_band = "High"
+priority = 2
+[[priority_matrix]]
+equity_band = "High"
+food_need_band = "Very High"
+priority = 1
+[[priority_matrix]]
+equity_band = "Very High"
+food_need_band = "Very Low"
+priority = 3
+[[priority_matrix]]
+equity_band = "Very High"
+food_need_band = "Low"
+priority = 2
+[[priority_matrix]]
+equity_band = "Very High"
+food_need_band = "Moderate"
+priority = 2
+[[priority_matrix]]
+equity_band = "Very High"
+food_need_band = "High"
+priority = 1
+[[priority_matrix]]
+equity_band = "Very High"
+food_need_band = "Very High"
+priority = 1
