@@ -569,7 +569,7 @@ git commit -m "feat(data): validate MCTS scheduled transit (MOO-753)"
 - Consumes: approved network snapshot, canonical tracts/origins, classified resources, GTFS stops.
 - Produces: versioned walking/proximity, resource-count, and scheduled-transit metrics.
 
-- [ ] **Step 1: Write failing network and spatial tests**
+- [x] **Step 1: Write failing network and spatial tests**
 
 Use a tiny directed synthetic network to cover pedestrian edge filters, one-way foot rules,
 impassable edges, disconnected components, graph snapping tolerance, deterministic shortest
@@ -583,19 +583,19 @@ uv run pytest tests/data/food_equity/test_walking_network.py tests/data/food_equ
 
 Expected RED: network/accessibility modules are missing.
 
-- [ ] **Step 2: Parse the immutable network snapshot**
+- [x] **Step 2: Parse the immutable network snapshot**
 
 Apply only approved pedestrian tags/filters and projected distance CRS. Store or hash the
 normalized graph deterministically. Never fetch network edges during a route calculation.
 
-- [ ] **Step 3: Implement versioned access metrics**
+- [x] **Step 3: Implement versioned access metrics**
 
 Calculate approved nearest paths, threshold counts, and stop/frequency metrics with explicit
 origins, categories, units, threshold definitions, contributing resource IDs, and quality states.
 Use PostGIS for containment/intersection/reconciliation and Python for graph routing. Keep
 straight-line diagnostics separate from official network outputs.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_walking_network.py tests/data/food_equity/test_accessibility.py -q
