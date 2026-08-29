@@ -296,6 +296,31 @@ meters; zero, negative, missing, or non-finite lengths fail graph validation. Pa
 retained with stable OSM identifiers. Adjacency, source nodes, and resources are sorted by stable
 IDs before graph construction and tie resolution.
 
+For v1, generic vehicle `oneway=*` does not restrict pedestrian routing. `oneway:foot=yes`
+allows only the OSM way's forward direction, `oneway:foot=-1` only its reverse direction, and
+`oneway:foot=no` both directions. `foot:forward=no|private` and
+`foot:backward=no|private` prohibit their named direction; explicit
+`yes|designated|permissive` permits it. The authoritative PostGIS handoff supplies an inclusive
+projected county-buffer predicate. A source segment is retained only when both original OSM
+endpoints are inside or on that boundary; the pipeline never invents synthetic boundary nodes.
+
+The approved snapshot is exactly 292,160,666 bytes with published MD5
+`87c18ce0608499afd91ed0f2a5ee8eef` and computed SHA-256
+`3e4a59bae5e7eb0f6f175a8645b3b2be16c276a5082f3732566d4e3aeaee6842`. The normalized graph
+hash uses sorted records and exact normalized decimal strings, so equivalent decimal spellings
+hash identically without rounding away meaningful precision. Routing, snapping, and walk-minute
+conversion use a module-owned 50-digit, round-half-even decimal context and therefore do not
+inherit a caller's ambient decimal precision.
+
+The accepted 2026-08-29 production verification parsed the pinned file twice to the same
+normalized graph: 623,268 nodes, 1,557,006 directed edges, and SHA-256
+`a7e4bf2230e4b38cc5126d45c16f96270814bfd48caa15f698c81d5d580e17fa`. Three reviewed route
+pairs in downtown Milwaukee, the north side, and West Allis snapped within tolerance and
+returned positive directed network paths. The compact evidence fixture retains their inputs,
+snap nodes, distances, and edge counts without redistributing the licensed source database.
+Production access calculations reject any graph that has not passed the exact approved source,
+node-count, edge-count, and normalized-hash gate.
+
 This is legal/encoded walking connectivity, not sidewalk quality, personal safety, snow
 clearance, slope, wheelchair access, or an ADA route. Those limitations are explicit.
 
@@ -343,6 +368,11 @@ For each tract:
    opportunity.
 4. Divide the unique departure count by four hours.
 5. Set `scheduled_service_intensity` to the lower of Tuesday and Saturday departures per hour.
+
+Projected stop coordinates are derived inside the calculation boundary from every stop in the
+validated `NormalizedGtfs` feed using the pinned `EPSG:3071` transform. Callers cannot provide a
+partial or repositioned stop collection. Outputs retain both the source archive SHA-256 and a
+versioned projected-stop SHA-256.
 
 No reachable stop is a valid observed value of zero. Missing/invalid GTFS, an uncovered analysis
 date, an unsnapped origin, or a failed calendar join is missing, not zero. The measure does not

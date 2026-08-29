@@ -44,6 +44,17 @@ per-hour display conversion. Ten-, fifteen-, and twenty-minute thresholds are in
 is no straight-line fallback. A validly snapped origin in a component without a grocery is
 `unreachable` and ranks above all finite distances without inventing a numeric distance.
 
+Only pedestrian-specific direction tags affect walking direction in v1: `oneway:foot` and the
+directional `foot:forward` / `foot:backward` restrictions. Generic vehicle `oneway` tags do not.
+The PostGIS county-plus-two-mile boundary predicate is inclusive; a source segment is retained
+only when both original OSM endpoints pass it, and no synthetic boundary nodes are created. The
+approved file is 292,160,666 bytes, MD5 `87c18ce0608499afd91ed0f2a5ee8eef`, SHA-256
+`3e4a59bae5e7eb0f6f175a8645b3b2be16c276a5082f3732566d4e3aeaee6842`.
+All route arithmetic uses a fixed 50-digit decimal context. Scoring calculations accept only the
+approved normalized graph topology and an explicit validated resource-snapshot identity, even
+when that resource inventory contains zero qualifying stores. Inactive or upstream-ineligible
+stores are excluded with evidence rather than routed as scoring destinations.
+
 ### Transportation Constraint
 
 1. 2024 ACS 5-Year share of households with no vehicle available:
@@ -55,6 +66,10 @@ hour from 10 a.m. inclusive to 2 p.m. exclusive. Trips reachable at multiple sto
 once by `trip_id`. Analysis dates belong to the first complete service week on or after feed
 retrieval and are included in provenance. Static GTFS measures scheduled availability, not
 reliability, travel time to groceries, or real-time service.
+
+All validated GTFS stops are projected internally to `EPSG:3071`; a caller cannot substitute a
+partial or repositioned stop list. The projected-stop fingerprint and projection version are
+retained alongside the GTFS archive fingerprint.
 
 Transit frequency is an explicitly approved transportation access-gap input. It is not an
 investment or performance score.
@@ -69,7 +84,8 @@ Access Need would double-weight economic vulnerability in Food Equity Priority.
 
 Food banks, pantries, pantry/recovery programs, meal programs, farmers markets, small and
 specialty groceries, convenience stores, and operating availability are contextual. Their
-presence does not reduce Food Access Need.
+presence does not reduce Food Access Need. Context-snapshot quality is retained independently of
+resource rows, so an empty stale or unverified inventory cannot become a verified zero.
 
 The Milwaukee Food Council/Data You Can Use ArcGIS emergency-food layer is structured but stale
 and has no published reuse terms. It may be evaluated as `stale_unverified_context` in
