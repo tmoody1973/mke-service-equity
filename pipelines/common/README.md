@@ -1,6 +1,11 @@
 # Common Pipeline Workspace
 
-Plan 1 defines only the importable shared Python workspace marker.
+This package contains deterministic infrastructure shared by analytical pipelines:
 
-Pandas, GeoPandas, ingestion, normalization, spatial preprocessing, and scoring begin in Plan 2
-and are intentionally absent from Plan 1.
+- pipeline-scoped immutable snapshot and manifest storage;
+- secret-safe, bounded HTTP acquisition;
+- run hashing, idempotency, redaction, and timestamp primitives.
+
+Domain-specific source validation, normalization, spatial calculations, and scoring remain in
+their owning pipeline. A shared primitive cannot select a source, change methodology, or silently
+move artifacts between pipeline namespaces.
