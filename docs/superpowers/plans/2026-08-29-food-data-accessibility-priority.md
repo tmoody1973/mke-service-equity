@@ -182,7 +182,7 @@ Expected: only the reviewed plan is committed.
 - Consumes: official source documentation/terms, approved Equity Baseline v1, MOO-753 contract.
 - Produces: the exact non-executable methodology and source contract implemented by later tasks.
 
-- [ ] **Step 1: Resolve exact authoritative artifacts and coverage**
+- [x] **Step 1: Resolve exact authoritative artifacts and coverage**
 
 Document exact URL, publisher, release/vintage, geography, fields, license/terms, update cadence,
 coverage, and known limitations for:
@@ -201,21 +201,21 @@ coverage, and known limitations for:
 Expected: every required input has an approved structured artifact or is explicitly marked
 blocked/limited. No authoritative snapshot or database write occurs in this step.
 
-- [ ] **Step 2: Freeze resource taxonomy and classification**
+- [x] **Step 2: Freeze resource taxonomy and classification**
 
 Define allowed retail and emergency-resource categories, `full_service_grocery` evidence rules,
 SNAP status semantics, ambiguous/unverified handling, duplicate identity, active/freshness rules,
 coordinate quality, missing-hours behavior, and manual-verification provenance. Prohibit name-only
 classification.
 
-- [ ] **Step 3: Freeze accessibility calculations**
+- [x] **Step 3: Freeze accessibility calculations**
 
 Define origins, pedestrian network filters, snap tolerances, path impedance, walk speed if time
 is reported, nearest-distance behavior, 10/15/20-minute or approved distance thresholds,
 boundary/tie behavior, inaccessible routes, resource categories, GTFS service date and time
 window, stop-walk threshold, scheduled frequency formula, and uncertainty/quality states.
 
-- [ ] **Step 4: Resolve scoring versus contextual evidence**
+- [x] **Step 4: Resolve scoring versus contextual evidence**
 
 For each retail, walking, transit, vehicle, economic, emergency-food, and resource-availability
 metric, state whether it is:
@@ -227,7 +227,7 @@ metric, state whether it is:
 Document overlap with Equity Baseline indicators. Public investment is always contextual and
 must be absent from the run fingerprint, score components, and Priority calculation.
 
-- [ ] **Step 5: Freeze Food Access Need and Priority**
+- [x] **Step 5: Freeze Food Access Need and Priority**
 
 Document exact dimensions, indicator directions, within-dimension weights, dimension weights,
 eligible comparison set, minimum completeness, no-redistribution rule, percentile/tie method,
@@ -235,7 +235,7 @@ bands, insufficient-data behavior, and every cell of the Equity Baseline × Food
 Priority matrix. Define how a validated-but-unpublished approved Equity Baseline run is pinned in
 development.
 
-- [ ] **Step 6: Present the load-bearing methodology diff for explicit approval**
+- [x] **Step 6: Present the load-bearing methodology diff for explicit approval**
 
 Ask:
 
@@ -244,6 +244,9 @@ Ask:
 
 Record the response and resolve every in-scope concern. Stop here until Tarik explicitly approves
 the full design. Do not create schema, registry, adapters, or scoring code before approval.
+
+Approval recorded: Tarik replied `approve methodology` on 2026-08-29. No in-scope concerns were
+raised at the approval gate.
 
 - [ ] **Step 7: Commit the approved design**
 
