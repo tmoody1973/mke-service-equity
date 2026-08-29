@@ -1,0 +1,61 @@
+{
+  "score_input_fingerprint": "ed964e5c21ddac0006957d356fe3593c1eaad45a16b5109c29f1d0edd344dfc9",
+  "canonical_output_hash": "09504cfe62bb076e2c9d9c9d78922d6fc7d35c8a922c517e77cbc4bfaa139878",
+  "component_count": 20,
+  "complete": {
+    "55079000100": {
+      "indicator_percentile": "0.000000000000",
+      "retail_access": "0.000000000000",
+      "transportation_constraint": "0.000000000000",
+      "raw_food_access_need": "0.000000000000",
+      "food_access_need_percentile": "0.000000000000",
+      "food_access_need_band": "Very Low",
+      "equity_baseline_band": "Very Low",
+      "priority": 5
+    },
+    "55079000200": {
+      "indicator_percentile": "37.500000000000",
+      "retail_access": "37.500000000000",
+      "transportation_constraint": "37.500000000000",
+      "raw_food_access_need": "37.500000000000",
+      "food_access_need_percentile": "37.500000000000",
+      "food_access_need_band": "Low",
+      "equity_baseline_band": "Moderate",
+      "priority": 3
+    },
+    "55079000300": {
+      "indicator_percentile": "37.500000000000",
+      "retail_access": "37.500000000000",
+      "transportation_constraint": "37.500000000000",
+      "raw_food_access_need": "37.500000000000",
+      "food_access_need_percentile": "37.500000000000",
+      "food_access_need_band": "Low",
+      "equity_baseline_band": "High",
+      "priority": 3
+    },
+    "55079000500": {
+      "indicator_percentile": "75.000000000000",
+      "retail_access": "75.000000000000",
+      "transportation_constraint": "75.000000000000",
+      "raw_food_access_need": "75.000000000000",
+      "food_access_need_percentile": "75.000000000000",
+      "food_access_need_band": "High",
+      "equity_baseline_band": "Very High",
+      "priority": 1
+    },
+    "55079000700": {
+      "indicator_percentile": "100.000000000000",
+      "retail_access": "100.000000000000",
+      "transportation_constraint": "100.000000000000",
+      "raw_food_access_need": "100.000000000000",
+      "food_access_need_percentile": "100.000000000000",
+      "food_access_need_band": "Very High",
+      "equity_baseline_band": "Very High",
+      "priority": 1
+    }
+  },
+  "excluded": {
+    "55079000400": ["missing_metric:scheduled_transit_service_intensity"],
+    "55079000600": ["ineligible_zero_population"]
+  }
+}
