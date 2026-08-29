@@ -440,7 +440,7 @@ git commit -m "feat(data): normalize USDA food access benchmark (MOO-753)"
 - Consumes: approved USDA FNS retailer artifact plus approved classification evidence.
 - Produces: source-backed retail records with SNAP and full-service states kept separate.
 
-- [ ] **Step 1: Write failing retail/classification tests**
+- [x] **Step 1: Write failing retail/classification tests**
 
 Cover source schema/version, authorization dates/status, retailer types, coordinates/bounds,
 duplicate identity, closed/inactive records, farmers markets/delivery routes, missing location,
@@ -454,13 +454,13 @@ uv run pytest tests/data/food_equity/test_retail.py -q
 
 Expected RED: retail adapter is missing.
 
-- [ ] **Step 2: Implement deterministic normalization and classification**
+- [x] **Step 2: Implement deterministic normalization and classification**
 
 Use only approved structured fields and versioned classification tables/rules. Preserve source
 record IDs and every decision reason. Records without enough evidence remain
 `unverified`/`ambiguous`; they are not silently excluded or promoted.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_retail.py -q
