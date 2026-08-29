@@ -345,7 +345,7 @@ Expected: Plan 2 and focused Plan 3 tests pass; no raw data is staged.
 - Consumes: approved registry and Plan 2 provenance/geography/run keys.
 - Produces: constrained resource, access-metric, Food Access Need, Priority, and run tables.
 
-- [ ] **Step 1: Write failing schema and migration-scope tests**
+- [x] **Step 1: Write failing schema and migration-scope tests**
 
 Assert only the approved Plan 3 tables, enum additions, keys, geometry/SRID/GiST constraints,
 source-snapshot lineage, resource identity/version rules, access-metric units/quality, unique run
@@ -358,7 +358,7 @@ npm test --workspace @mke/database
 
 Expected RED: Plan 3 schema/migration is missing.
 
-- [ ] **Step 2: Declare schema using the approved Task 1 design**
+- [x] **Step 2: Declare schema using the approved Task 1 design**
 
 Prefer new Plan 3 tables rather than widening Plan 2 analytical enums or redefining existing
 scores. Reuse `data_sources`, `source_snapshots`, and canonical `geographies` through foreign
@@ -366,7 +366,7 @@ keys. Use PostGIS point/network geometry only where the approved design requires
 geometry. Every non-null analytical value must have a unit, calculation/registry version, and
 usable quality state; missing-quality rows must have null values.
 
-- [ ] **Step 3: Generate and review migration**
+- [x] **Step 3: Generate and review migration**
 
 ```bash
 npm run db:generate --workspace @mke/database -- --name food_equity
@@ -375,7 +375,7 @@ npm run db:generate --workspace @mke/database -- --name food_equity
 Append reviewed custom SQL only for PostGIS/lifecycle constraints Drizzle cannot express. Do not
 modify `0000` or `0001` and do not loosen Plan 2 triggers.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 npm test --workspace @mke/database
