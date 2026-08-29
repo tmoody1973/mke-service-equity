@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tomllib
 from decimal import Decimal
 from pathlib import Path
 
@@ -41,6 +42,9 @@ def test_registry_locks_the_approved_sources_and_roles() -> None:
     }
     assert sources["sram"].dataset_identifier == "2025-sram"
     assert sources["snap_retailers"].vintage == "current through 2025-12-31"
+    assert sources["snap_retailers"].published_checksum == (
+        "sha256:872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce"
+    )
     assert sources["walking_network"].published_checksum == ("md5:87c18ce0608499afd91ed0f2a5ee8eef")
     assert sources["mcts_gtfs"].freshness_policy == "service_dates"
     assert sources["emergency_food_context"].role is SourceRole.CONTEXTUAL
@@ -81,8 +85,96 @@ def test_registry_locks_taxonomy_metrics_weights_and_directions() -> None:
     assert classifications["Large Grocery Store"].category is (
         ResourceCategory.FULL_SERVICE_GROCERY
     )
-    assert classifications["Super Store/Chain Store"].requires_override is True
+    assert classifications["Super Store"].requires_override is True
     assert classifications["Military Commissary"].scoring_eligible is False
+
+
+def test_registry_locks_exact_fns_artifact_and_historical_identity_contract() -> None:
+    raw = tomllib.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    source = next(item for item in raw["sources"] if item["key"] == "snap_retailers")
+
+    assert source["artifact_name"] == "snap-retailer-locator-data2005-2025.zip"
+    assert source["archive_member"] == ("Historical SNAP Retailer Locator Data 2005-2025.csv")
+    assert source["archive_sha256"] == (
+        "872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce"
+    )
+    assert source["member_sha256"] == (
+        "4af9a16811b7d906a2ad077eb59d3f1c7e99a32a87d2bca0900f8d14033c7b9e"
+    )
+    assert source["header_sha256"] == (
+        "026cbfcafecc45d3159fa2e3f6d4b47da276d1f3cbd77419bc3187f1ee344aaa"
+    )
+    assert source["encoding"] == "utf-8-sig"
+    assert source["bom_hex"] == "efbbbf"
+    assert source["row_count"] == 703_441
+    assert source["snapshot_date"] == "2025-12-31"
+    assert source["header"] == [
+        "Record ID",
+        "Store Name",
+        "Store Type",
+        "Street Number",
+        "Street Name",
+        "Additional Address",
+        "City",
+        "State",
+        "Zip Code",
+        "Zip4",
+        "County",
+        "Latitude",
+        "Longitude",
+        "Authorization Date",
+        "End Date",
+    ]
+    assert source["record_identity_fields"] == ["Record ID"]
+    assert source["version_identity_fields"] == [
+        "Record ID",
+        "Authorization Date",
+        "End Date",
+    ]
+    assert source["duplicate_version_policy"] == "fail"
+
+
+def test_registry_maps_exact_observed_fns_store_type_values() -> None:
+    classifications = {
+        item.source_value: item
+        for item in load_registry().classifications
+        if item.source == "snap_retailers"
+    }
+
+    assert set(classifications) == {
+        "Bakery Specialty",
+        "Combination Grocery/Other",
+        "Convenience Store",
+        "Delivery Route",
+        "Farmers' Market",
+        "Food Buying Co-op",
+        "Fruits/Veg Specialty",
+        "Large Grocery Store",
+        "Meat/Poultry Specialty",
+        "Medium Grocery Store",
+        "Military Commissary",
+        "Seafood Specialty",
+        "Small Grocery Store",
+        "Super Store",
+        "Supermarket",
+        "Unknown",
+        "Wholesaler",
+    }
+    assert classifications["Supermarket"].category is ResourceCategory.FULL_SERVICE_GROCERY
+    assert classifications["Large Grocery Store"].category is (
+        ResourceCategory.FULL_SERVICE_GROCERY
+    )
+    assert classifications["Super Store"].category is ResourceCategory.CANDIDATE_FULL_SERVICE
+    assert classifications["Super Store"].requires_override is True
+    assert classifications["Bakery Specialty"].category is ResourceCategory.SPECIALTY_BAKERY
+    assert classifications["Fruits/Veg Specialty"].category is ResourceCategory.SPECIALTY_PRODUCE
+    assert classifications["Meat/Poultry Specialty"].category is ResourceCategory.SPECIALTY_MEAT
+    assert classifications["Seafood Specialty"].category is ResourceCategory.SPECIALTY_SEAFOOD
+    assert classifications["Farmers' Market"].category is ResourceCategory.SEASONAL_OR_DIRECT
+    for source_value in ("Food Buying Co-op", "Wholesaler", "Unknown"):
+        assert classifications[source_value].category is ResourceCategory.UNVERIFIED
+        assert classifications[source_value].scoring_eligible is False
+        assert classifications[source_value].requires_override is False
 
 
 def test_registry_locks_access_completeness_bands_and_priority_matrix() -> None:

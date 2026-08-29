@@ -23,9 +23,20 @@ Food Access Need uses two equally weighted domains and four equally weighted ind
    explicitly classified full-service grocery.
 
 SNAP authorization is not full-service grocery evidence. FNS `Supermarket` and `Large Grocery
-Store` qualify. `Super Store/Chain Store` requires dated evidence that access is neither
+Store` qualify. `Super Store` requires dated evidence that access is neither
 membership-based nor restricted. Other types remain contextual. Store-name inference is
 prohibited.
+
+The pinned FNS input is the sole CSV member `Historical SNAP Retailer Locator Data 2005-2025.csv`
+from `snap-retailer-locator-data2005-2025.zip`, current as of 2025-12-31. Validation requires the
+approved archive and member SHA-256 values, exact 15-column header/order, UTF-8 BOM, and 703,441
+data rows. `Record ID` is stable retailer identity, while (`Record ID`, `Authorization Date`,
+`End Date`) identifies a historical version; duplicate version keys fail validation.
+
+The exact observed specialty values are `Bakery Specialty`, `Fruits/Veg Specialty`,
+`Meat/Poultry Specialty`, and `Seafood Specialty`; `Farmers' Market` uses the ASCII apostrophe.
+`Food Buying Co-op`, `Wholesaler`, and `Unknown` remain explicitly unverified, contextual, and
+non-scoring. No unobserved source-label alias is silently accepted.
 
 The walking calculation uses the immutable Geofabrik Wisconsin 2026-08-27 OSM PBF, a documented
 pedestrian filter, a 200-meter snap tolerance, weighted network distance, and a fixed three-mile-

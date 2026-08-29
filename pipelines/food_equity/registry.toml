@@ -44,6 +44,36 @@ license_notes = "USDA public administrative data; preserve source and snapshot-d
 role = "scoring"
 freshness_policy = "pinned_vintage"
 immutable = true
+published_checksum = "sha256:872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce"
+artifact_name = "snap-retailer-locator-data2005-2025.zip"
+archive_member = "Historical SNAP Retailer Locator Data 2005-2025.csv"
+archive_sha256 = "872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce"
+member_sha256 = "4af9a16811b7d906a2ad077eb59d3f1c7e99a32a87d2bca0900f8d14033c7b9e"
+header_sha256 = "026cbfcafecc45d3159fa2e3f6d4b47da276d1f3cbd77419bc3187f1ee344aaa"
+encoding = "utf-8-sig"
+bom_hex = "efbbbf"
+row_count = 703441
+snapshot_date = "2025-12-31"
+header = [
+  "Record ID",
+  "Store Name",
+  "Store Type",
+  "Street Number",
+  "Street Name",
+  "Additional Address",
+  "City",
+  "State",
+  "Zip Code",
+  "Zip4",
+  "County",
+  "Latitude",
+  "Longitude",
+  "Authorization Date",
+  "End Date",
+]
+record_identity_fields = ["Record ID"]
+version_identity_fields = ["Record ID", "Authorization Date", "End Date"]
+duplicate_version_policy = "fail"
 
 [[sources]]
 key = "acs_vehicle"
@@ -135,7 +165,7 @@ requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Super Store/Chain Store"
+source_value = "Super Store"
 category = "candidate_full_service"
 scoring_eligible = false
 requires_override = true
@@ -170,43 +200,43 @@ requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Specialty Food Store - Bakery/Bread"
+source_value = "Bakery Specialty"
 category = "specialty_bakery"
 scoring_eligible = false
 requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Specialty Food Store - Fruits/Vegetables"
+source_value = "Fruits/Veg Specialty"
 category = "specialty_produce"
 scoring_eligible = false
 requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Specialty Food Store - Meat/Poultry Products"
+source_value = "Meat/Poultry Specialty"
 category = "specialty_meat"
 scoring_eligible = false
 requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Specialty Food Store - Seafood Products"
+source_value = "Seafood Specialty"
 category = "specialty_seafood"
 scoring_eligible = false
 requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Farmers’ Market"
+source_value = "Farmers' Market"
 category = "seasonal_or_direct"
 scoring_eligible = false
 requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Direct Marketing Farmer"
-category = "seasonal_or_direct"
+source_value = "Food Buying Co-op"
+category = "unverified"
 scoring_eligible = false
 requires_override = false
 
@@ -219,8 +249,8 @@ requires_override = false
 
 [[classifications]]
 source = "snap_retailers"
-source_value = "Internet Retailer"
-category = "non_fixed_or_online"
+source_value = "Wholesaler"
+category = "unverified"
 scoring_eligible = false
 requires_override = false
 
@@ -228,6 +258,13 @@ requires_override = false
 source = "snap_retailers"
 source_value = "Delivery Route"
 category = "non_fixed_or_online"
+scoring_eligible = false
+requires_override = false
+
+[[classifications]]
+source = "snap_retailers"
+source_value = "Unknown"
+category = "unverified"
 scoring_eligible = false
 requires_override = false
 

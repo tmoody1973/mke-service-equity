@@ -107,8 +107,25 @@ is `19293ddd9b6f954f216d4f12054bd8a3232921751c4484339e339764a91000e2`. Walking-n
 processing pins `osmium==4.3.1` and `networkx==3.6.1`.
 
 `snap_retailers` is not a complete inventory of non-SNAP food retail. FNS `Supermarket` and
-`Large Grocery Store` qualify as full-service in v1. `Super Store/Chain Store` requires a recorded
+`Large Grocery Store` qualify as full-service in v1. `Super Store` requires a recorded
 non-membership/non-restricted evidence override. No store is classified by name alone.
+
+The pinned FNS archive contract is exact:
+
+- archive `snap-retailer-locator-data2005-2025.zip`, SHA-256
+  `872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce`;
+- sole member `Historical SNAP Retailer Locator Data 2005-2025.csv`, SHA-256
+  `4af9a16811b7d906a2ad077eb59d3f1c7e99a32a87d2bca0900f8d14033c7b9e`;
+- UTF-8 BOM, exact 15-field registry header/order, 703,441 data rows, and snapshot date
+  2025-12-31;
+- `Record ID` as stable retailer identity and (`Record ID`, `Authorization Date`, `End Date`) as
+  historical version identity; duplicate version keys fail validation.
+
+The classification registry uses only exact values observed in that member. This includes
+`Super Store`, `Bakery Specialty`, `Fruits/Veg Specialty`, `Meat/Poultry Specialty`,
+`Seafood Specialty`, and ASCII `Farmers' Market`. `Food Buying Co-op`, `Wholesaler`, and `Unknown`
+are explicitly `unverified`, contextual, and non-scoring. Unobserved source-label aliases are not
+accepted silently.
 
 ### Context-only source
 
@@ -126,7 +143,8 @@ missing; narrative notes are not parsed into operating schedules.
   schema fingerprint, row/feature count, retrieval time, validity interval, and license/terms.
 - SRAM must use `DD_SRAM_lapop1share` as percentage points; its low-income and vehicle-combined
   flags are not v1 scoring inputs.
-- FNS dates and status are parsed strictly. Unknown status never becomes active.
+- FNS dates and status are parsed strictly. Unknown status never becomes active, and duplicate
+  (`Record ID`, `Authorization Date`, `End Date`) version keys fail validation.
 - The OSM artifact is immutable; `wisconsin-latest.osm.pbf` is prohibited.
 - GTFS must pass the pinned validator and cover both explicit analysis dates. MCTS retrieval/last-
   update and valid-through dates must appear with any representation, along with the required

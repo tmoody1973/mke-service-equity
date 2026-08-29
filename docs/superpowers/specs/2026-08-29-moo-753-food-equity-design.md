@@ -84,17 +84,24 @@ it is too old and geographically misaligned for the current local score.
 | Publisher | USDA Food and Nutrition Administration, formerly Food and Nutrition Service |
 | Artifact | `snap-retailer-locator-data2005-2025.zip` |
 | Exact URL | `https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-retailer-locator-data2005-2025.zip` |
+| Archive SHA-256 | `872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce` |
+| Exact member | `Historical SNAP Retailer Locator Data 2005-2025.csv` (the archive contains exactly this one member) |
+| Member SHA-256 | `4af9a16811b7d906a2ad077eb59d3f1c7e99a32a87d2bca0900f8d14033c7b9e` |
+| Encoding and shape | UTF-8 with required BOM (`EF BB BF`); 703,441 data rows |
 | Documentation page | `https://fns-prod.azureedge.us/snap/retailer-locator/data` |
 | Store definitions | `https://fns-prod.azureedge.us/snap/store-definitions` |
 | Snapshot date | Current as of 2025-12-31; archive published 2026-02-10 |
 | Geography | United States; filter to resources within Milwaukee County plus a two-mile review buffer |
-| Required fields | `Record ID`, `Store Name`, `Store Type`, address fields, `County`, `Latitude`, `Longitude`, `Authorization Date`, `End Date` |
+| Exact header/order | `Record ID`, `Store Name`, `Store Type`, `Street Number`, `Street Name`, `Additional Address`, `City`, `State`, `Zip Code`, `Zip4`, `County`, `Latitude`, `Longitude`, `Authorization Date`, `End Date` |
+| Stable record identity | `Record ID` |
+| Historical version identity | (`Record ID`, `Authorization Date`, `End Date`); a duplicate version key fails validation |
 | Update cadence | Historical file is periodic; this v1 methodology pins the named 2005–2025 snapshot |
 | Terms | Public USDA administrative data; preserve source and snapshot-date attribution |
 
 A row is active at the pinned snapshot when its authorization date is on or before 2025-12-31
 and its end date is empty or after 2025-12-31. A malformed date, end date before authorization,
-or ambiguous status produces `status_unknown`; it is never silently treated as active.
+or ambiguous status produces `status_unknown`; it is never silently treated as active. Fields are
+trimmed before blank testing because source blank end dates are represented by whitespace.
 
 This source covers SNAP-authorized retailers. It can miss a full-service grocery that does not
 participate in SNAP. That coverage limitation is accepted for v1 and must be displayed. A newer
@@ -109,22 +116,26 @@ under these rules:
 |---|---|
 | `Supermarket` | `full_service_grocery` |
 | `Large Grocery Store` | `full_service_grocery` |
-| `Super Store/Chain Store` | `candidate_full_service`; requires documented evidence that the location is open to the general public without paid membership or restricted eligibility |
+| `Super Store` | `candidate_full_service`; requires documented evidence that the location is open to the general public without paid membership or restricted eligibility |
 | `Medium Grocery Store` | `grocery_other`, contextual |
 | `Small Grocery Store` | `grocery_other`, contextual |
 | `Convenience Store` | `convenience`, contextual |
 | `Combination Grocery/Other` | `combination_grocery_other`, contextual |
-| Specialty categories | matching `specialty_*` category, contextual |
-| Farmers market / direct marketing farmer | `seasonal_or_direct`, contextual |
+| `Bakery Specialty` | `specialty_bakery`, contextual |
+| `Fruits/Veg Specialty` | `specialty_produce`, contextual |
+| `Meat/Poultry Specialty` | `specialty_meat`, contextual |
+| `Seafood Specialty` | `specialty_seafood`, contextual |
+| `Farmers' Market` | `seasonal_or_direct`, contextual |
 | Military commissary | `restricted_access`, never full service |
-| Internet retailer / delivery route | `non_fixed_or_online`, never used for walking access |
+| `Delivery Route` | `non_fixed_or_online`, never used for walking access |
+| `Food Buying Co-op`, `Wholesaler`, `Unknown` | `unverified`, contextual and non-scoring |
 | Missing or unrecognized | `unverified`, never full service |
 
 FNS defines Large Grocery Store as carrying a wide selection across all four staple-food
 categories and Supermarket as carrying an extensive variety. Medium and small grocery stores
 carry moderate or small selections and therefore do not meet this conservative v1 definition.
 
-Evidence for a Super Store/Chain Store override must include resource ID, asserted
+Evidence for a `Super Store` override must include resource ID, asserted
 classification, evidence type, evidence URL or partner document reference, verifier, verification
 timestamp, and notes. Acceptable evidence is an authoritative structured local category, a
 partner-provided classification, or a dated manual verification record. Store name alone,
@@ -233,11 +244,14 @@ an otherwise valid estimate.
 
 ### Canonical identity and duplicates
 
-- FNS `Record ID` is the primary retailer source ID.
+- FNS `Record ID` is the stable retailer source identity; it may recur across historical
+  authorization intervals.
+- The FNS historical version identity is (`Record ID`, `Authorization Date`, `End Date`). A
+  duplicate version identity in the pinned member fails validation.
 - ArcGIS service item ID + layer ID + `ObjectID` is the emergency-resource source ID.
 - A canonical resource version includes source ID, source-snapshot checksum, classification, and
   validity interval.
-- Exact duplicate source IDs in one snapshot fail validation.
+- Exact duplicate version identities in one snapshot fail validation.
 - Possible cross-source duplicates are linked, not deleted. Matching may propose candidates using
   normalized address and proximity, but a merge requires deterministic evidence or a recorded
   manual decision.
