@@ -79,6 +79,7 @@ const profile: AtlasTractProfile = {
     index,
   )),
   equityDrivers,
+  neighborhoodContext: {state: "unavailable", reason: "snapshot_not_configured"},
   context: {state: "unavailable", reason: "not_pinned_to_run"},
   provenance: [source],
   limitations: ["Tract measures do not describe every person."],
@@ -100,5 +101,31 @@ describe("TractProfileContent", () => {
     expect(screen.getByText(/This does not mean the tract has no resources/i))
       .toBeInTheDocument();
     expect(screen.getByText("American Community Survey 5-year estimates")).toBeInTheDocument();
+  });
+
+  it("explains reportable neighborhood overlaps as area context", () => {
+    render(<TractProfileContent
+      idPrefix="test"
+      profile={{
+        ...profile,
+        neighborhoodContext: {
+          state: "available",
+          labelKind: "spans",
+          cityReferenceCoverage: 0.999,
+          overlaps: [
+            {sourceNeighborhoodId: 1, name: "NORTHRIDGE", coveredAreaShare: 0.428},
+            {sourceNeighborhoodId: 2, name: "NORTHRIDGE LAKES", coveredAreaShare: 0.334},
+          ],
+          otherBoundarySliversShare: 0.008,
+          source,
+          limitation: "This is a City-published reference, not an official boundary.",
+        },
+      }}
+    />);
+
+    expect(screen.getByText(/spans NORTHRIDGE, NORTHRIDGE LAKES/i)).toBeInTheDocument();
+    expect(screen.getByText(/NORTHRIDGE: 42.8% of the covered area/i)).toBeInTheDocument();
+    expect(screen.getByText(/Other boundary slivers: 0.8%/i)).toBeInTheDocument();
+    expect(screen.getByText(/not an official boundary/i)).toBeInTheDocument();
   });
 });

@@ -19,6 +19,10 @@ function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-US", {maximumFractionDigits: 1}).format(value);
 }
 
+function formatAreaShare(value: number): string {
+  return `${formatNumber(value * 100)}%`;
+}
+
 function formatMeasurement(measurement: AtlasMeasurement): string {
   if (measurement.state === "unreachable") {
     return "No walking route was found on the approved street-and-path network";
@@ -135,6 +139,8 @@ function EvidenceList({items, scoreName}: {
 
 export function TractProfileContent({idPrefix, profile}: TractProfileContentProps) {
   const complete = profile.tract.qualityStatus === "complete";
+  const neighborhoodContext = profile.neighborhoodContext
+    ?? {state: "unavailable" as const, reason: "snapshot_not_configured" as const};
 
   return (
     <div className="space-y-6" data-profile-tract={profile.tract.geoid}>
@@ -146,6 +152,57 @@ export function TractProfileContent({idPrefix, profile}: TractProfileContentProp
         <p className="text-xs text-muted">
           The result compares this tract with other Milwaukee County tracts that had enough data to score. It does not describe every resident or recommend a specific action.
         </p>
+      </section>
+
+      <section aria-labelledby={`${idPrefix}-location`} className="space-y-2">
+        <h2 className="text-base font-semibold" id={`${idPrefix}-location`}>
+          Where this tract is
+        </h2>
+        {neighborhoodContext.state === "available" ? (
+          neighborhoodContext.labelKind === "no_reference" ? (
+            <p className="text-sm">No City of Milwaukee neighborhood reference is available for this tract.</p>
+          ) : (
+            <>
+              <p className="text-sm">
+                {neighborhoodContext.labelKind === "mostly_in"
+                  ? `Mostly in ${neighborhoodContext.overlaps[0]?.name}.`
+                  : neighborhoodContext.labelKind === "spans"
+                    ? `This tract spans ${neighborhoodContext.overlaps.map((overlap) => overlap.name).join(", ")}.`
+                    : "Only part of this tract is covered by the City neighborhood reference."}
+              </p>
+              <p className="text-xs text-muted">
+                City reference coverage: {formatAreaShare(neighborhoodContext.cityReferenceCoverage)} of the tract area.
+              </p>
+              <ul className="list-disc space-y-1 ps-5 text-sm">
+                {neighborhoodContext.overlaps.map((overlap) => (
+                  <li key={overlap.sourceNeighborhoodId}>
+                    {overlap.name}: {formatAreaShare(overlap.coveredAreaShare)} of the covered area
+                  </li>
+                ))}
+                {neighborhoodContext.otherBoundarySliversShare > 0 ? (
+                  <li>
+                    Other boundary slivers: {formatAreaShare(neighborhoodContext.otherBoundarySliversShare)}
+                  </li>
+                ) : null}
+              </ul>
+            </>
+          )
+        ) : (
+          <p className="text-sm">Neighborhood context is not available for this data version.</p>
+        )}
+        {neighborhoodContext.state === "available" ? (
+          <p className="text-xs text-muted">
+            {neighborhoodContext.limitation}{" "}
+            <a
+              className="font-medium text-foreground underline underline-offset-2"
+              href={neighborhoodContext.source.sourceUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              View the City source
+            </a>
+          </p>
+        ) : null}
       </section>
 
       {complete ? (

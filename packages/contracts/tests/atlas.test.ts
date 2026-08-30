@@ -1,6 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {
   atlasResponseSchema,
+  atlasNeighborhoodContextSchema,
   atlasTractProfileSchema,
   atlasTractProfileResponseSchema,
   atlasTractPropertiesSchema,
@@ -95,6 +96,56 @@ describe("atlasResponseSchema", () => {
   });
 });
 
+describe("atlasNeighborhoodContextSchema", () => {
+  const source = {
+    sourceName: "Milwaukee Neighborhood Identification Project",
+    publisher: "City of Milwaukee Department of City Development",
+    datasetVersion: "2000 reference; catalog updated January 2007",
+    sourceUrl: "https://milwaukeemaps.milwaukee.gov/arcgis/rest/services/AGO/neighborhoods/MapServer/0",
+    retrievedAt: "2026-08-30T12:00:00.000Z",
+    validFrom: null,
+    validTo: null,
+    methodologyUrl: "https://city.milwaukee.gov/mapmilwaukee/DownloadMapData3497",
+    limitation: "This is a City-published reference, not an official boundary.",
+  } as const;
+
+  it.each([
+    ["mostly_in", 0.9, [{sourceNeighborhoodId: 1, name: "Example", coveredAreaShare: 0.7}]],
+    ["spans", 0.9, [
+      {sourceNeighborhoodId: 1, name: "North", coveredAreaShare: 0.49},
+      {sourceNeighborhoodId: 2, name: "South", coveredAreaShare: 0.48},
+    ]],
+    ["partly_covered", 0.4, [{sourceNeighborhoodId: 1, name: "Edge", coveredAreaShare: 1}]],
+    ["no_reference", 0, []],
+  ] as const)("accepts the deterministic %s state", (labelKind, coverage, overlaps) => {
+    const parsed = atlasNeighborhoodContextSchema.parse({
+      state: "available",
+      labelKind,
+      cityReferenceCoverage: coverage,
+      overlaps,
+      otherBoundarySliversShare: 0,
+      source,
+      limitation: "Area shares describe only the tract portion covered by the City reference.",
+    });
+    expect(parsed.state).toBe("available");
+    if (parsed.state === "available") {
+      expect(parsed.labelKind).toBe(labelKind);
+    }
+  });
+
+  it("rejects a mostly-in label without majority coverage and a majority overlap", () => {
+    expect(() => atlasNeighborhoodContextSchema.parse({
+      state: "available",
+      labelKind: "mostly_in",
+      cityReferenceCoverage: 0.4,
+      overlaps: [{sourceNeighborhoodId: 1, name: "Example", coveredAreaShare: 0.4}],
+      otherBoundarySliversShare: 0,
+      source,
+      limitation: "Area shares describe only the tract portion covered by the City reference.",
+    })).toThrow();
+  });
+});
+
 describe("atlasTractPropertiesSchema", () => {
   it("preserves an observed zero without converting it to missing", () => {
     expect(atlasTractPropertiesSchema.parse({
@@ -180,6 +231,7 @@ describe("atlasTractProfileSchema", () => {
     },
     foodComponents: evidence,
     equityDrivers: drivers,
+    neighborhoodContext: {state: "unavailable", reason: "snapshot_not_configured"},
     context: {state: "unavailable", reason: "not_pinned_to_run"},
     provenance: [provenance],
     limitations: ["These tract-level measures do not describe every person in the tract."],

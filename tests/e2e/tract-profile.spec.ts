@@ -42,6 +42,7 @@ test("renders the plain-language tract profile at the configured width", async (
   const profile = page.locator("[data-profile-tract='55079000101']:visible");
   await expect(profile).toBeVisible();
   await expect(profile.getByRole("heading", {name: "What this means"})).toBeVisible();
+  await expect(profile.getByRole("heading", {name: "Where this tract is"})).toBeVisible();
   await expect(profile.getByRole("heading", {name: "Why this result"})).toBeVisible();
   await expect(profile.getByRole("heading", {name: "Food access evidence"})).toBeVisible();
   await expect(profile.getByRole("heading", {name: "Community context"})).toBeVisible();
@@ -50,6 +51,11 @@ test("renders the plain-language tract profile at the configured width", async (
   await expect(profile.getByText("Speaks English less than ‘very well,’ age 5+", {exact: true})).toBeVisible();
   await expect(profile.getByText(/English-language access, not literacy/i)).toBeVisible();
   await expect(profile.getByText(/not raw percentages, changes over time, causes, or recommendations/i)).toBeVisible();
+  await expect(profile.getByText(/spans NORTHRIDGE, NORTHRIDGE LAKES, RIDGEVIEW, HILLTOP PARISH/i))
+    .toBeVisible();
+  await expect(profile.getByText(/NORTHRIDGE: 42.8% of the covered area/i)).toBeVisible();
+  await expect(profile.getByText(/not an official City or neighborhood-association boundary/i))
+    .toBeVisible();
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
     await page.evaluate(() => window.innerWidth),

@@ -12,6 +12,11 @@ export {
 export type {AtlasRepositoryClient} from "./atlas/atlas-repository";
 export {parseAtlasMultiPolygon, serializedGeoJsonBytes} from "./atlas/geometry";
 export {
+  buildNeighborhoodContext,
+  loadNeighborhoodContext,
+  NeighborhoodContextIntegrityError,
+} from "./atlas/neighborhood-context";
+export {
   AtlasProfileDataIntegrityError,
   buildAtlasTractProfile,
   loadAtlasTractProfile,

@@ -2,6 +2,7 @@ import {
   atlasTractProfileSchema,
   type AtlasEvidenceItem,
   type AtlasMeasurement,
+  type AtlasNeighborhoodContext,
   type AtlasNearestResource,
   type AtlasProvenanceItem,
   type AtlasTractProfile,
@@ -12,6 +13,7 @@ import {sql} from "drizzle-orm";
 import {createDatabaseClient} from "../client";
 import {readRuntimeDatabaseUrl} from "../env";
 import {MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE} from "./atlas-repository";
+import {loadNeighborhoodContext} from "./neighborhood-context";
 import type {SelectedAtlasRun} from "./run-selector";
 
 type AtlasEnvironment = Record<string, string | undefined>;
@@ -26,6 +28,7 @@ type AtlasProfileBuildOptions = {
   foodRunId: string;
   equityBaselineRunId: string;
   geoid: string;
+  neighborhoodContext?: AtlasNeighborhoodContext;
 };
 
 type FoodMetricSpec = {
@@ -525,6 +528,8 @@ export function buildAtlasTractProfile(
     },
     foodComponents,
     equityDrivers,
+    neighborhoodContext: options.neighborhoodContext
+      ?? {state: "unavailable", reason: "snapshot_not_configured"},
     context: {state: "unavailable", reason: "not_pinned_to_run"},
     provenance: [...provenanceByKey.values()].sort(
       (left, right) => provenanceKey(left).localeCompare(provenanceKey(right)),
@@ -592,12 +597,19 @@ export async function loadAtlasTractProfile(
   if (headerResult.rows.length !== 1) {
     return fail("profile_header_count_mismatch");
   }
+  const neighborhoodContext = await loadNeighborhoodContext(
+    client,
+    selectedRun,
+    geoid,
+    environment,
+  );
   const qualityStatus = headerResult.rows[0]?.food_quality_status;
   if (qualityStatus !== "complete") {
     return buildAtlasTractProfile(headerResult.rows, [], [], {
       foodRunId: selectedRun.run.id,
       equityBaselineRunId: selectedRun.equityBaselineRunId,
       geoid,
+      neighborhoodContext,
     });
   }
 
@@ -717,5 +729,6 @@ export async function loadAtlasTractProfile(
     foodRunId: selectedRun.run.id,
     equityBaselineRunId: selectedRun.equityBaselineRunId,
     geoid,
+    neighborhoodContext,
   });
 }

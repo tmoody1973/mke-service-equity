@@ -84,6 +84,7 @@ const profile: AtlasTractProfile = {
     ...evidence(`equity-${index}`, index),
     domain: "demographic",
   })),
+  neighborhoodContext: {state: "unavailable", reason: "snapshot_not_configured"},
   context: {state: "unavailable", reason: "not_pinned_to_run"},
   provenance: [source],
   limitations: ["Tract measures do not describe every person."],

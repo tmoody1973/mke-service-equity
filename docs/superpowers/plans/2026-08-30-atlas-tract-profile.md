@@ -349,7 +349,7 @@ git commit -m "test: verify MOO-754 first atlas slice"
   and City-only limitations recorded.
 - [x] Approve deterministic PostGIS tract-overlap, coverage, display-threshold, ordering, and
   plain-language labeling rules without centroid or ZIP inference.
-- [ ] Ingest, manifest, validate, and persist the approved neighborhood snapshot and overlap audit
+- [x] Ingest, manifest, validate, and persist the approved neighborhood snapshot and overlap audit
   rows before enabling neighborhood search or labels.
 - [ ] Document address-provider terms, privacy, limits, attribution, production suitability, and
   failure behavior; obtain approval before sending user queries externally.

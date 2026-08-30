@@ -142,8 +142,28 @@ passes with zero browser console errors.
 ## Remaining MOO-754 work
 
 The City of Milwaukee DCD neighborhood reference and deterministic tract-overlap rule were
-explicitly approved on 2026-08-30. Snapshot ingestion, lineage validation, server-side overlap
-materialization, neighborhood search/UI, authoritative tract/ZCTA/municipality search, address
-authority, approved contextual resource layers, final performance hardening, and the load-bearing
-completion review remain. The approval does not make the mutable live service a production
-dependency and does not imply deployment or publication.
+explicitly approved on 2026-08-30. Neighborhood search, authoritative tract/ZCTA/municipality
+search, address authority, approved contextual resource layers, final performance hardening, and
+the load-bearing completion review remain. The implementation does not make the mutable live
+service a runtime dependency and does not imply deployment or publication.
+
+## Neighborhood reference implementation
+
+The approved City DCD response was preserved as an immutable snapshot with SHA-256
+`4a3bf2c32182b508204dcdfad9904eba3f987f2e2b0720087642c40fbf9862e5` and loaded into the
+disposable validated-preview database as snapshot
+`f3da2bdf-27db-5f41-9338-f95264be0301`. PostGIS reconciliation passed before the snapshot moved
+from `pending` to `valid`:
+
+| Check | Result |
+|---|---:|
+| Source features / persisted versions | 190 / 190 |
+| Canonical tract contexts | 302 |
+| Positive-area audit overlaps | 1,020 |
+| Invalid source geometry | 1 documented exact repair (`NBHD_ID 30`, `LAND BANK`) |
+
+For Census tract `55079000101`, City-reference coverage is 99.9%. No neighborhood has a majority,
+so the deterministic label is **Spans**: Northridge 42.8%, Northridge Lakes 33.4%, Ridgeview 15.6%,
+and Hilltop Parish 7.4% of the covered tract area. Seven sub-1% overlaps remain in audit data and
+are grouped for public display. The profile labels these as area shares, carries the City's
+non-official/staleness limitation, and never changes a score.

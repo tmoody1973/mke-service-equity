@@ -193,6 +193,15 @@ retrieval time, SHA-256, byte size, feature count, schema fingerprint, source co
 attribution, and the source limitation below. A changed feature count, schema, or duplicate/missing
 identifier fails validation until reviewed.
 
+The approved snapshot retrieved on 2026-08-30 has SHA-256
+`4a3bf2c32182b508204dcdfad9904eba3f987f2e2b0720087642c40fbf9862e5`, 496,834 bytes,
+190 features, and schema fingerprint
+`9ffea823c09df86ef74ea05ef6edef87ac84b4b0ded69a23c226cdac60f5719f`. Source feature
+`NBHD_ID 30`, `LAND BANK`, contains one ring self-intersection. Normalization applies Shapely
+`MakeValid` only to that exact feature and only when the output is a valid polygon with area
+preserved within a relative tolerance of `1e-9`; any other invalid geometry or a changed repair
+result fails validation.
+
 The City says these boundaries were developed using subdivisions, major streets, physical
 barriers, community participation, housing characteristics, historic areas, and residents'
 opinions. The City also says they are not official City boundaries, do not necessarily match
