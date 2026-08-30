@@ -68,6 +68,14 @@ unequal access to public resources. High means more combined barriers than in ma
 County tracts, low means fewer, and moderate means near the county middle. The copy states that the
 comparison describes conditions in a place and does not rate or judge residents.
 
+The Food Equity Priority legend defines all five levels in plain language. Priority 1 is the
+strongest overlap of Food Access Need and other measured barriers; Priority 5 is the weakest
+overlap in that data version, with the middle levels described as progressively smaller or mixed
+overlap. A planning note says Priority 1 and 2 tracts are places to learn more about first, then
+directs the reader to inspect the evidence, compare nearby areas, and talk with residents and local
+groups. It also says the number does not choose a project, prove a cause, or automatically decide
+funding.
+
 Location context may show municipality, Census ZCTA, and the approved City of Milwaukee
 neighborhood reference as separate concepts. When the City reference covers at least half the
 tract and one neighborhood is a majority of the covered area, use “Mostly in {name}” followed by

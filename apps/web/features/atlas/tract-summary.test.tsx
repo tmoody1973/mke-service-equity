@@ -5,6 +5,7 @@ import {render, screen} from "@testing-library/react";
 import {describe, expect, it} from "vitest";
 import {
   explainEquityBaselineBand,
+  explainPriorityLevel,
   explainTractSummary,
   TractSummary,
 } from "./tract-summary";
@@ -24,7 +25,7 @@ const complete: AtlasTractProperties = {
 describe("explainTractSummary", () => {
   it("explains a priority as a relative band combination, not a causal claim", () => {
     expect(explainTractSummary(complete)).toBe(
-      "Priority 1 is based on two measures: Food Access Need is very high, and Equity Baseline is high. Priority 1 is the highest relative priority in this version.",
+      "Priority 1 is based on two measures: Food Access Need is very high, and Equity Baseline is high. Priority 1 means the strongest overlap of food-access need and other measured barriers.",
     );
   });
 
@@ -48,6 +49,16 @@ describe("explainTractSummary", () => {
       qualityStatus: "ineligible_zero_population",
       exclusionReasons: ["zero_population"],
     })).toContain("This is not a score of zero");
+  });
+});
+
+describe("explainPriorityLevel", () => {
+  it("defines all five levels as relative overlap, not an automatic decision", () => {
+    expect(explainPriorityLevel(1)).toContain("strongest overlap");
+    expect(explainPriorityLevel(2)).toContain("strong overlap");
+    expect(explainPriorityLevel(3)).toContain("middle or mixed overlap");
+    expect(explainPriorityLevel(4)).toContain("smaller overlap");
+    expect(explainPriorityLevel(5)).toContain("weakest overlap");
   });
 });
 

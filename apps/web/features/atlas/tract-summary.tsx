@@ -23,6 +23,19 @@ export function explainEquityBaselineBand(value: string | null): string {
   return "The Equity Baseline comparison is not available for this tract.";
 }
 
+export function explainPriorityLevel(value: number | null): string {
+  const explanations: Record<number, string> = {
+    1: "Priority 1 means the strongest overlap of food-access need and other measured barriers.",
+    2: "Priority 2 means a strong overlap, but not as strong as Priority 1.",
+    3: "Priority 3 means a middle or mixed overlap.",
+    4: "Priority 4 means a smaller overlap.",
+    5: "Priority 5 means the weakest overlap in this data version.",
+  };
+  return value === null
+    ? "A priority level is not available for this tract."
+    : explanations[value] ?? "The priority level is outside the supported range.";
+}
+
 export function explainTractSummary(tract: AtlasTractProperties): string {
   if (tract.qualityStatus === "ineligible_zero_population") {
     return "The approved 2020 Census tract data records no residents for this tract, so it is not scored. This is not a score of zero.";
@@ -35,11 +48,7 @@ export function explainTractSummary(tract: AtlasTractProperties): string {
       : "No priority is shown because one or more required measures were unavailable or did not pass the approved data checks. Missing data was not counted as zero.";
   }
 
-  const priorityContext = tract.foodEquityPriority === 1
-    ? "Priority 1 is the highest relative priority in this version."
-    : "A lower number means a higher relative priority in this version.";
-
-  return `Priority ${tract.foodEquityPriority} is based on two measures: Food Access Need is ${bandLabel(tract.foodAccessNeedBand)}, and Equity Baseline is ${bandLabel(tract.equityBaselineBand)}. ${priorityContext}`;
+  return `Priority ${tract.foodEquityPriority} is based on two measures: Food Access Need is ${bandLabel(tract.foodAccessNeedBand)}, and Equity Baseline is ${bandLabel(tract.equityBaselineBand)}. ${explainPriorityLevel(tract.foodEquityPriority)}`;
 }
 
 export function TractSummary({idPrefix = "atlas", tract}: TractSummaryProps) {

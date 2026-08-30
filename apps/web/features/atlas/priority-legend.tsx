@@ -20,6 +20,13 @@ const priorityLabels = {
   4: "4 — Lower",
   5: "5 — Lowest",
 } as const;
+const priorityDescriptions = {
+  1: "Strongest overlap of food-access need and other barriers.",
+  2: "Strong overlap, but not as strong as Priority 1.",
+  3: "Middle or mixed overlap.",
+  4: "Smaller overlap.",
+  5: "Weakest overlap in this data version.",
+} as const;
 const priorities = [1, 2, 3, 4, 5] as const;
 
 export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}: PriorityLegendProps) {
@@ -31,13 +38,18 @@ export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}:
   };
 
   return (
-    <section aria-labelledby={`${idPrefix}-priority-legend-title`} className="space-y-3">
+    <section
+      aria-labelledby={`${idPrefix}-priority-legend-title`}
+      className="space-y-3"
+      data-priority-guide
+    >
       <div>
         <h2 className="text-sm font-semibold" id={`${idPrefix}-priority-legend-title`}>
           Food Equity Priority
         </h2>
         <p className="text-xs text-muted">
-          Compares each tract with other Milwaukee County tracts in this data version.
+          This number combines two questions: Is food harder to reach? Are there other barriers,
+          such as housing, income, or health pressures?
         </p>
       </div>
       <div aria-label="Food Equity Priority filter" className="grid gap-1" role="group">
@@ -53,9 +65,9 @@ export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}:
         {priorities.map(
           (priority) => (
             <Button
-              aria-label={`Show or hide Priority ${priority} tracts`}
+              aria-label={`Show or hide Priority ${priority} tracts. ${priorityDescriptions[priority]}`}
               aria-pressed={activePriorities.includes(priority)}
-              className="h-9 justify-start gap-2 px-2"
+              className="h-auto min-h-11 justify-start gap-2 px-2 py-2 text-left"
               key={priority}
               onPress={() => togglePriority(priority)}
               size="sm"
@@ -66,11 +78,26 @@ export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}:
                 className="size-3 shrink-0 rounded-sm border border-black/20"
                 style={{backgroundColor: PRIORITY_COLORS[priority]}}
               />
-              {priorityLabels[priority]}
+              <span>
+                <span className="block font-medium">{priorityLabels[priority]}</span>
+                <span className="block text-xs font-normal text-muted">
+                  {priorityDescriptions[priority]}
+                </span>
+              </span>
             </Button>
           ),
         )}
       </div>
+      <aside className="space-y-1 rounded-lg border border-divider bg-default p-3 text-xs" role="note">
+        <p className="font-semibold">How to use this for planning</p>
+        <p>
+          Priority 1 and 2 tracts are places to learn more about first. Read the tract details,
+          compare nearby areas, and talk with residents and local groups before choosing an action.
+        </p>
+        <p className="text-muted">
+          The number does not choose a project, prove why a problem exists, or automatically decide funding.
+        </p>
+      </aside>
       <ul aria-label="Other tract states" className="grid gap-2 text-xs text-muted">
         <li className="flex items-center gap-2">
           <span

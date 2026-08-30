@@ -19,6 +19,12 @@ describe("PriorityLegend", () => {
     expect(screen.getByText("3 — Moderate")).toBeInTheDocument();
     expect(screen.getByText("4 — Lower")).toBeInTheDocument();
     expect(screen.getByText("5 — Lowest")).toBeInTheDocument();
+    expect(screen.getByText("Strongest overlap of food-access need and other barriers."))
+      .toBeInTheDocument();
+    expect(screen.getByText("Middle or mixed overlap.")).toBeInTheDocument();
+    expect(screen.getByText("Weakest overlap in this data version.")).toBeInTheDocument();
+    expect(screen.getByText("How to use this for planning")).toBeInTheDocument();
+    expect(screen.getByText(/does not choose a project/i)).toBeInTheDocument();
     expect(screen.getByText("Insufficient data")).toBeInTheDocument();
     expect(screen.getByText("No recorded population — not scored")).toBeInTheDocument();
   });
@@ -28,7 +34,7 @@ describe("PriorityLegend", () => {
     const onChange = vi.fn();
     render(<PriorityLegend activePriorities={[]} onChange={onChange} />);
 
-    await user.click(screen.getByRole("button", {name: "Show or hide Priority 5 tracts"}));
+    await user.click(screen.getByRole("button", {name: /Show or hide Priority 5 tracts/i}));
     expect(onChange).toHaveBeenCalledWith([5]);
   });
 });

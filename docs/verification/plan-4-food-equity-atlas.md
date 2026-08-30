@@ -119,7 +119,7 @@ The final local gate passed:
 
 | Check | Result |
 |---|---|
-| Web unit/component tests | 56 passed |
+| Web unit/component tests | 57 passed |
 | Contracts tests | 30 passed |
 | Database unit tests | 84 passed |
 | Design-system tests | 1 passed |
@@ -188,3 +188,9 @@ Live preview checks returned:
 The selected-tract summary now defines high/low Equity Baseline bands as relative amounts of the
 measured barriers across Milwaukee County tracts and explicitly says the band describes conditions,
 not residents.
+
+The Food Equity Priority guide defines all five levels as the strength of overlap between Food
+Access Need and other measured barriers. Its planning note directs readers to investigate Priority
+1 and 2 tracts first, inspect the evidence, compare nearby areas, and talk with residents and local
+groups. It also states that the number does not choose a project, prove a cause, or automatically
+decide funding. The guide passed the profile Playwright and axe checks at all five required widths.

@@ -57,11 +57,21 @@ test("renders the plain-language tract profile at the configured width", async (
     .toBeVisible();
   await expect(profile.getByText(/does not rate or judge the people who live here/i))
     .toBeVisible();
+  await expect(profile.getByText(/Priority 1 means the strongest overlap/i)).toBeVisible();
   await expect(profile.getByText(/spans NORTHRIDGE, NORTHRIDGE LAKES, RIDGEVIEW, HILLTOP PARISH/i))
     .toBeVisible();
   await expect(profile.getByText(/NORTHRIDGE: 42.8% of the covered area/i)).toBeVisible();
   await expect(profile.getByText(/not an official City or neighborhood-association boundary/i))
     .toBeVisible();
+
+  const priorityGuide = page.locator("[data-priority-guide]:visible");
+  await expect(priorityGuide.getByRole("heading", {name: "Food Equity Priority"})).toBeVisible();
+  await expect(priorityGuide.getByText("Strongest overlap of food-access need and other barriers."))
+    .toBeVisible();
+  await expect(priorityGuide.getByText("Middle or mixed overlap.")).toBeVisible();
+  await expect(priorityGuide.getByText("Weakest overlap in this data version.")).toBeVisible();
+  await expect(priorityGuide.getByText("How to use this for planning")).toBeVisible();
+  await expect(priorityGuide.getByText(/does not choose a project/i)).toBeVisible();
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
     await page.evaluate(() => window.innerWidth),
