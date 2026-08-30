@@ -1,6 +1,12 @@
 import "server-only";
 
 export {checkDatabaseHealth} from "./health";
+export {
+  buildComparisonResponse,
+  ComparisonDataIntegrityError,
+  loadComparison,
+} from "./analyze/compare-repository";
+export type {ComparisonRepositoryClient} from "./analyze/compare-repository";
 export {readAtlasDataMode} from "./atlas/data-mode";
 export {
   AtlasDataIntegrityError,
