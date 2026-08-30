@@ -58,17 +58,52 @@ export const opportunityMatchingAreaSchema = z.strictObject({
   scores: atlasProfileScoreSummarySchema,
 }).superRefine((value, context) => {
   const scores = Object.values(value.scores);
-  if (value.tract.qualityStatus === "complete" && scores.some((score) => score === null)) {
-    context.addIssue({
-      code: "custom",
-      message: "A complete matching area requires every approved summary score.",
-      path: ["scores"],
-    });
+  if (value.tract.qualityStatus === "complete") {
+    if (scores.some((score) => score === null)) {
+      context.addIssue({
+        code: "custom",
+        message: "A complete matching area requires every approved summary score.",
+        path: ["scores"],
+      });
+    }
+    return;
   }
-  if (value.tract.qualityStatus !== "complete" && scores.some((score) => score !== null)) {
+
+  if (value.tract.qualityStatus === "insufficient_data") {
+    if (
+      value.tract.foodAccessNeedBand !== null
+      || value.scores.foodAccessNeedPercentile !== null
+      || value.scores.retailAccessScore !== null
+      || value.scores.transportationConstraintScore !== null
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "An insufficient Food area cannot carry Food Access summary scores or a band.",
+        path: ["scores"],
+      });
+    }
+    const hasEquityBaselineBand = value.tract.equityBaselineBand !== null;
+    const hasEquityBaselinePercentile = value.scores.equityBaselinePercentile !== null;
+    if (hasEquityBaselineBand !== hasEquityBaselinePercentile) {
+      context.addIssue({
+        code: "custom",
+        message: "An insufficient Food area must carry its Equity Baseline band and percentile together or omit both.",
+        path: ["scores", "equityBaselinePercentile"],
+      });
+    }
+    return;
+  }
+
+  if (
+    value.tract.population !== 0
+    || scores.some((score) => score !== null)
+    || value.tract.foodAccessNeedBand !== null
+    || value.tract.equityBaselineBand !== null
+    || value.tract.foodEquityPriority !== null
+  ) {
     context.addIssue({
       code: "custom",
-      message: "An incomplete or zero-population matching area requires null summary scores.",
+      message: "A zero-population matching area requires population zero and null scores, bands, and Priority.",
       path: ["scores"],
     });
   }

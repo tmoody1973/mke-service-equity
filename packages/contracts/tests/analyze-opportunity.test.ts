@@ -125,6 +125,125 @@ describe("opportunityFilterStateSchema", () => {
 });
 
 describe("opportunityResponseSchema", () => {
+  it("preserves supported Equity Baseline evidence for insufficient Food data", () => {
+    const area = matchingArea("55079187200", "Census Tract 1872", 1_234);
+    const insufficient = {
+      ...area,
+      tract: {
+        ...area.tract,
+        foodEquityPriority: null,
+        foodAccessNeedBand: null,
+        equityBaselineBand: "very_low",
+        qualityStatus: "insufficient_data",
+        exclusionReasons: ["origin_unsnapped"],
+      },
+      scores: {
+        foodAccessNeedPercentile: null,
+        equityBaselinePercentile: 12,
+        retailAccessScore: null,
+        transportationConstraintScore: null,
+      },
+    };
+    expect(opportunityResponseSchema.parse({
+      state: "available",
+      mode: "validated_preview",
+      run,
+      filters: {},
+      summary: {
+        matchingTractCount: 1,
+        knownPopulationLivingInMatchingTracts: 1_234,
+        matchingTractsMissingPopulation: 0,
+        excludedForMissingFilterData: 0,
+      },
+      matchingAreas: [insufficient],
+    }).state).toBe("available");
+  });
+
+  it("rejects a one-sided Equity Baseline pair for insufficient Food data", () => {
+    const area = matchingArea("55079187200", "Census Tract 1872", 1_234);
+    const insufficient = {
+      ...area,
+      tract: {
+        ...area.tract,
+        foodEquityPriority: null,
+        foodAccessNeedBand: null,
+        equityBaselineBand: "very_low",
+        qualityStatus: "insufficient_data",
+        exclusionReasons: ["origin_unsnapped"],
+      },
+      scores: {
+        foodAccessNeedPercentile: null,
+        equityBaselinePercentile: null,
+        retailAccessScore: null,
+        transportationConstraintScore: null,
+      },
+    };
+    expect(opportunityResponseSchema.safeParse({
+      state: "available",
+      mode: "validated_preview",
+      run,
+      filters: {},
+      summary: {
+        matchingTractCount: 1,
+        knownPopulationLivingInMatchingTracts: 1_234,
+        matchingTractsMissingPopulation: 0,
+        excludedForMissingFilterData: 0,
+      },
+      matchingAreas: [insufficient],
+    }).success).toBe(false);
+  });
+
+  it("keeps zero-population areas explicitly unscored", () => {
+    const area = matchingArea("55079990000", "Census Tract 9900", 0);
+    const zeroPopulation = {
+      ...area,
+      tract: {
+        ...area.tract,
+        foodEquityPriority: null,
+        foodAccessNeedBand: null,
+        equityBaselineBand: null,
+        qualityStatus: "ineligible_zero_population",
+        exclusionReasons: ["zero_population"],
+      },
+      scores: {
+        foodAccessNeedPercentile: null,
+        equityBaselinePercentile: null,
+        retailAccessScore: null,
+        transportationConstraintScore: null,
+      },
+    };
+    expect(opportunityResponseSchema.parse({
+      state: "available",
+      mode: "validated_preview",
+      run,
+      filters: {},
+      summary: {
+        matchingTractCount: 1,
+        knownPopulationLivingInMatchingTracts: 0,
+        matchingTractsMissingPopulation: 0,
+        excludedForMissingFilterData: 0,
+      },
+      matchingAreas: [zeroPopulation],
+    }).state).toBe("available");
+
+    expect(opportunityResponseSchema.safeParse({
+      state: "available",
+      mode: "validated_preview",
+      run,
+      filters: {},
+      summary: {
+        matchingTractCount: 1,
+        knownPopulationLivingInMatchingTracts: 1,
+        matchingTractsMissingPopulation: 0,
+        excludedForMissingFilterData: 0,
+      },
+      matchingAreas: [{
+        ...zeroPopulation,
+        tract: {...zeroPopulation.tract, population: 1},
+      }],
+    }).success).toBe(false);
+  });
+
   it("accepts ordered matching areas and separates known from missing population", () => {
     const response = opportunityResponseSchema.parse({
       state: "available",
