@@ -23,6 +23,12 @@ export {
 } from "./atlas/profile-repository";
 export type {AtlasProfileRepositoryClient} from "./atlas/profile-repository";
 export {selectAtlasRun} from "./atlas/run-selector";
+export {
+  AtlasSearchIntegrityError,
+  buildAtlasSearchResponse,
+  loadAtlasSearchResults,
+} from "./atlas/search-repository";
+export type {AtlasSearchRepositoryClient} from "./atlas/search-repository";
 export type {
   AtlasRunSelection,
   AtlasRunSelectionClient,

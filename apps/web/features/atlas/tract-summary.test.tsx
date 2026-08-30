@@ -3,7 +3,11 @@
 import type {AtlasTractProperties} from "@mke/contracts";
 import {render, screen} from "@testing-library/react";
 import {describe, expect, it} from "vitest";
-import {explainTractSummary, TractSummary} from "./tract-summary";
+import {
+  explainEquityBaselineBand,
+  explainTractSummary,
+  TractSummary,
+} from "./tract-summary";
 
 const complete: AtlasTractProperties = {
   geoid: "55079000101",
@@ -47,6 +51,13 @@ describe("explainTractSummary", () => {
   });
 });
 
+describe("explainEquityBaselineBand", () => {
+  it("defines high and low as county comparisons of measured barriers", () => {
+    expect(explainEquityBaselineBand("high")).toContain("more of the measured barriers");
+    expect(explainEquityBaselineBand("low")).toContain("fewer of the measured barriers");
+  });
+});
+
 describe("TractSummary", () => {
   it("renders selected tract identity, priority, bands, and population", () => {
     render(<TractSummary tract={complete} />);
@@ -55,5 +66,7 @@ describe("TractSummary", () => {
     expect(screen.getByText("Priority 1")).toBeInTheDocument();
     expect(screen.getByText("Population 2,430")).toBeInTheDocument();
     expect(screen.getByText(/Food Access Need is very high/)).toBeInTheDocument();
+    expect(screen.getByText(/It describes measured conditions, not the people who live here/i))
+      .toBeInTheDocument();
   });
 });

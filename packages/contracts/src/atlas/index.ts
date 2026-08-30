@@ -25,6 +25,7 @@ export const atlasResponseSchema = z.discriminatedUnion("state", [
 
 export * from "./profile";
 export * from "./run";
+export * from "./search";
 export * from "./tract";
 
 export type AtlasAvailableResponse = z.infer<typeof atlasAvailableResponseSchema>;

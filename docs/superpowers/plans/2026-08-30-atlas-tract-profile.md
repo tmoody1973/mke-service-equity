@@ -337,10 +337,11 @@ git commit -m "test: verify MOO-754 first atlas slice"
 
 **Files:** server search repository/route, SearchField UI, tests, documentation.
 
-- [ ] Query current documentation for any new provider/library before implementation.
-- [ ] Build exact/prefix tract GEOID, tract label, authoritative ZIP, and municipality results.
-- [ ] Resolve every result to canonical tract GEOIDs server-side.
-- [ ] Add accessible SearchField keyboard behavior, no-result state, and URL selection.
+- [x] Query current documentation for any new provider/library before implementation.
+- [x] Build exact/prefix tract GEOID and tract-label results against the exact selected run.
+- [ ] Ingest approved authoritative ZCTA and municipality boundaries before adding those results.
+- [x] Resolve every implemented result to canonical tract GEOIDs server-side.
+- [x] Add accessible SearchField keyboard behavior, no-result state, and URL selection.
 
 ### Task 14: Decide and implement address/neighborhood authority
 
@@ -354,7 +355,7 @@ git commit -m "test: verify MOO-754 first atlas slice"
 - [ ] Document address-provider terms, privacy, limits, attribution, production suitability, and
   failure behavior; obtain approval before sending user queries externally.
 - [ ] Use PostGIS containment for an approved geocoded point.
-- [ ] Enable neighborhood search only from the persisted approved snapshot; retain transparent
+- [x] Enable neighborhood search only from the persisted approved snapshot; retain transparent
   unavailable copy if that snapshot or its lineage is not valid.
 
 ### Task 15: Audit and add only approved contextual resource layers

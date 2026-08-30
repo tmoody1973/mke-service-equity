@@ -20,6 +20,19 @@ Map-first.
 - selected tract opens bottom sheet
 - bottom sheet can expand without losing map context
 
+### Search
+
+The current local-preview search accepts a full or partial Census tract ID, tract label, or name
+from the persisted City of Milwaukee neighborhood reference. Every result is resolved by the
+server to a canonical census tract before it can change the shareable `tract` URL state.
+Neighborhood matches at or above the approved 1% display threshold show the tract and area share
+so a neighborhood name never silently chooses one tract. If the exact validated neighborhood
+snapshot is unavailable, tract search remains available and no neighborhood result is invented.
+
+The field says plainly that ZIP and address search are not available yet. ZIP/ZCTA and
+municipality search require approved local boundary snapshots; address search additionally
+requires the separately approved provider, privacy, rate-limit, and PostGIS-containment contract.
+
 ## 2. Tract Profile
 
 Header:
@@ -47,6 +60,11 @@ remains unavailable when its exact snapshot is not tied to the run.
 Public copy uses “Census tract ID,” defines necessary technical terms, and explains that score
 contributions are not raw percentages, changes over time, causes, or recommendations. Compare and
 download controls are later-plan features, not part of the current profile.
+
+The Equity Baseline band is defined beside the result: high means more of the measured barriers
+than many other Milwaukee County tracts, low means fewer, and moderate means near the county
+middle. The copy states that this comparison describes measured conditions and does not judge the
+people who live in the tract.
 
 Location context may show municipality, Census ZCTA, and the approved City of Milwaukee
 neighborhood reference as separate concepts. When the City reference covers at least half the

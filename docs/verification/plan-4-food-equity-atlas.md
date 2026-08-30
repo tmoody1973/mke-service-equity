@@ -119,12 +119,13 @@ The final local gate passed:
 
 | Check | Result |
 |---|---|
-| Web unit/component tests | 47 passed |
-| Contracts tests | 22 passed |
-| Database unit tests | 71 passed |
+| Web unit/component tests | 56 passed |
+| Contracts tests | 30 passed |
+| Database unit tests | 84 passed |
 | Design-system tests | 1 passed |
 | Live profile integration test | passed for complete, insufficient, and zero-population states |
 | Live profile Playwright + axe | 5 passed at the required widths |
+| Live tract/neighborhood search Playwright + axe | 5 passed at the required widths |
 | Public production Playwright + axe | 10 passed, 5 preview-only checks skipped |
 | Workspace typechecks | passed |
 | ESLint | passed with generated MapLibre worker modules excluded |
@@ -142,10 +143,10 @@ passes with zero browser console errors.
 ## Remaining MOO-754 work
 
 The City of Milwaukee DCD neighborhood reference and deterministic tract-overlap rule were
-explicitly approved on 2026-08-30. Neighborhood search, authoritative tract/ZCTA/municipality
-search, address authority, approved contextual resource layers, final performance hardening, and
-the load-bearing completion review remain. The implementation does not make the mutable live
-service a runtime dependency and does not imply deployment or publication.
+explicitly approved on 2026-08-30. Tract and neighborhood search are implemented. Authoritative
+ZCTA/municipality ingestion, address authority, approved contextual resource layers, final
+performance hardening, and the load-bearing completion review remain. The implementation does not
+make the mutable live service a runtime dependency and does not imply deployment or publication.
 
 ## Neighborhood reference implementation
 
@@ -167,3 +168,23 @@ so the deterministic label is **Spans**: Northridge 42.8%, Northridge Lakes 33.4
 and Hilltop Parish 7.4% of the covered tract area. Seven sub-1% overlaps remain in audit data and
 are grouped for public display. The profile labels these as area shares, carries the City's
 non-official/staleness limitation, and never changes a score.
+
+## Tract and neighborhood search verification
+
+The server accepts 2–80 trimmed characters, searches only canonical 2020 Milwaukee County tracts
+that belong to the exact selected Food run, and searches neighborhood names only through snapshot
+`f3da2bdf-27db-5f41-9338-f95264be0301` when that snapshot is still `valid`. SQL parameters remain
+bound, results are capped at 20, and every result carries one canonical 11-digit tract GEOID.
+
+Live preview checks returned:
+
+- `Northridge` → Northridge and Northridge Lakes matches for Census Tract 1.01, with the approved
+  42.8% and 33.4% covered-area shares;
+- `1857` → Census Tract 1857 / GEOID `55079185700`;
+- no neighborhood rows when the exact snapshot pin is missing or invalid, while tract results
+  remain available;
+- explicit UI copy that ZIP and address search are not available yet.
+
+The selected-tract summary now defines high/low Equity Baseline bands as relative amounts of the
+measured barriers across Milwaukee County tracts and explicitly says the band describes conditions,
+not residents.

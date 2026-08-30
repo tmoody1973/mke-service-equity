@@ -10,6 +10,19 @@ function bandLabel(value: string | null): string {
   return value?.replaceAll("_", " ") ?? "not available";
 }
 
+export function explainEquityBaselineBand(value: string | null): string {
+  if (value === "high" || value === "very_high") {
+    return "High means this tract has more of the measured barriers than many other Milwaukee County tracts.";
+  }
+  if (value === "low" || value === "very_low") {
+    return "Low means this tract has fewer of the measured barriers than many other Milwaukee County tracts.";
+  }
+  if (value === "moderate") {
+    return "Moderate means this tract is near the middle of Milwaukee County tracts on the measured barriers.";
+  }
+  return "The Equity Baseline comparison is not available for this tract.";
+}
+
 export function explainTractSummary(tract: AtlasTractProperties): string {
   if (tract.qualityStatus === "ineligible_zero_population") {
     return "The approved 2020 Census tract data records no residents for this tract, so it is not scored. This is not a score of zero.";
@@ -55,16 +68,21 @@ export function TractSummary({idPrefix = "atlas", tract}: TractSummaryProps) {
       <Card.Content className="space-y-3 text-sm">
         <p>{explainTractSummary(tract)}</p>
         {tract.qualityStatus === "complete" ? (
-          <dl className="grid grid-cols-2 gap-2 border-t border-divider pt-3 text-xs">
-            <div>
-              <dt className="text-muted">Food Access Need</dt>
-              <dd className="font-medium capitalize">{bandLabel(tract.foodAccessNeedBand)}</dd>
-            </div>
-            <div>
-              <dt className="text-muted">Equity Baseline</dt>
-              <dd className="font-medium capitalize">{bandLabel(tract.equityBaselineBand)}</dd>
-            </div>
-          </dl>
+          <>
+            <dl className="grid grid-cols-2 gap-2 border-t border-divider pt-3 text-xs">
+              <div>
+                <dt className="text-muted">Food Access Need</dt>
+                <dd className="font-medium capitalize">{bandLabel(tract.foodAccessNeedBand)}</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Equity Baseline</dt>
+                <dd className="font-medium capitalize">{bandLabel(tract.equityBaselineBand)}</dd>
+              </div>
+            </dl>
+            <p className="text-xs text-muted">
+              {explainEquityBaselineBand(tract.equityBaselineBand)} It describes measured conditions, not the people who live here.
+            </p>
+          </>
         ) : null}
       </Card.Content>
     </Card>

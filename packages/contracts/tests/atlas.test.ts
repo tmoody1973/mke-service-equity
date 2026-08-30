@@ -1,5 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {
+  atlasSearchResponseSchema,
   atlasResponseSchema,
   atlasNeighborhoodContextSchema,
   atlasTractProfileSchema,
@@ -36,6 +37,80 @@ const run = {
   completedAt: "2026-08-30T12:00:00.000Z",
   dataVintages: {acs: "2020-2024", foodRetail: "2025"},
 } as const;
+
+describe("atlasSearchResponseSchema", () => {
+  it("accepts bounded tract and City-neighborhood results that resolve to GEOIDs", () => {
+    const response = atlasSearchResponseSchema.parse({
+      state: "available",
+      query: "Northridge",
+      neighborhoodReferenceStatus: "available",
+      results: [
+        {
+          id: "neighborhood:117:55079185700",
+          kind: "neighborhood",
+          geoid: "55079185700",
+          title: "Northridge",
+          subtitle: "Census Tract 1857 · 42.8% of its City-covered area",
+          sourceNeighborhoodId: 117,
+          coveredAreaShare: 0.428,
+        },
+        {
+          id: "tract:55079185700",
+          kind: "tract",
+          geoid: "55079185700",
+          title: "Census Tract 1857",
+          subtitle: "Census tract ID 55079185700",
+        },
+      ],
+    });
+    expect(response.state).toBe("available");
+    if (response.state === "available") {
+      expect(response.results).toHaveLength(2);
+    }
+  });
+
+  it("rejects internal fields, malformed GEOIDs, and more than twenty results", () => {
+    const tractResult = {
+      id: "tract:55079185700",
+      kind: "tract",
+      geoid: "55079185700",
+      title: "Census Tract 1857",
+      subtitle: "Census tract ID 55079185700",
+    } as const;
+
+    expect(atlasSearchResponseSchema.safeParse({
+      state: "available",
+      query: "18",
+      neighborhoodReferenceStatus: "available",
+      results: [{...tractResult, storageUri: "data/raw/private.json"}],
+    }).success).toBe(false);
+    expect(atlasSearchResponseSchema.safeParse({
+      state: "available",
+      query: "18",
+      neighborhoodReferenceStatus: "available",
+      results: [{...tractResult, geoid: "1857"}],
+    }).success).toBe(false);
+    expect(atlasSearchResponseSchema.safeParse({
+      state: "available",
+      query: "18",
+      neighborhoodReferenceStatus: "available",
+      results: Array.from({length: 21}, (_, index) => ({
+        ...tractResult,
+        id: `tract:55079000${String(index).padStart(3, "0")}`,
+        geoid: `55079000${String(index).padStart(3, "0")}`,
+      })),
+    }).success).toBe(false);
+  });
+
+  it("rejects blank or one-character searches", () => {
+    expect(atlasSearchResponseSchema.safeParse({
+      state: "available",
+      query: "n",
+      neighborhoodReferenceStatus: "available",
+      results: [],
+    }).success).toBe(false);
+  });
+});
 
 describe("atlasResponseSchema", () => {
   it("accepts an available validated preview with canonical GeoJSON", () => {

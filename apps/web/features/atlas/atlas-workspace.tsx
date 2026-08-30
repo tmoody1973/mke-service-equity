@@ -7,6 +7,7 @@ import {usePathname, useSearchParams} from "next/navigation";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {MapCanvas} from "../map/map-canvas";
 import {AtlasDataState} from "./atlas-data-state";
+import {AtlasSearch} from "./atlas-search";
 import {PriorityLegend} from "./priority-legend";
 import {TractProfileState} from "./profile/profile-state";
 import {useTractProfile} from "./profile/use-tract-profile";
@@ -99,6 +100,7 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
     >
       {atlas.state === "available" ? (
         <aside className="hidden w-[17rem] shrink-0 flex-col gap-5 overflow-hidden border-r border-divider bg-background p-4 min-[1200px]:flex">
+            <AtlasSearch idPrefix="desktop" onSelect={handleSelectTract} />
             <PriorityLegend
               activePriorities={urlState.priorities}
               idPrefix="desktop"
@@ -161,6 +163,7 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                     </Sheet.Heading>
                   </Sheet.Header>
                   <Sheet.Body className="flex min-h-0 flex-col gap-5 overflow-y-auto pb-6">
+                    <AtlasSearch idPrefix="mobile" onSelect={handleSelectTract} />
                     {selectedFeature ? (
                       <TractProfileState
                         idPrefix="mobile"
