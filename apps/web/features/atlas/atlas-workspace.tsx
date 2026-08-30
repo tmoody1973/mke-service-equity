@@ -24,7 +24,7 @@ type AtlasWorkspaceProps = {
 
 export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
-  const [mobileSnapPoint, setMobileSnapPoint] = useState<string | number | null>("180px");
+  const [mobileSnapPoint, setMobileSnapPoint] = useState<string | number | null>(1);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const availableGeoids = useMemo(() => new Set(
@@ -60,14 +60,23 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
   const handleSelectTract = useCallback((tract: string) => {
     writeUrlState({...urlState, tract});
     if (window.matchMedia?.("(max-width: 768px)").matches) {
+      if (!mobileSheetOpen) {
+        setMobileSnapPoint(0.65);
+      }
       setMobileSheetOpen(true);
-      setMobileSnapPoint("65vh");
     }
-  }, [urlState, writeUrlState]);
+  }, [mobileSheetOpen, urlState, writeUrlState]);
 
   const handlePriorityChange = useCallback((priorities: Array<number>) => {
     writeUrlState({...urlState, priorities});
   }, [urlState, writeUrlState]);
+
+  const handleMobileSheetOpenChange = useCallback((open: boolean) => {
+    if (open) {
+      setMobileSnapPoint(1);
+    }
+    setMobileSheetOpen(open);
+  }, []);
 
   useEffect(() => {
     const normalized = buildAtlasSearchParams(searchParams, urlState);
@@ -79,12 +88,12 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
   return (
     <section
       aria-label="Map workspace"
-      className="relative flex h-[calc(100dvh-3.5rem)] min-h-96 overflow-hidden border-t border-divider bg-default min-[768px]:h-[calc(100dvh-4rem)]"
+      className="relative flex h-[calc(100dvh-3.5rem)] min-h-96 overflow-hidden border-t border-divider bg-default min-[769px]:h-dvh"
       data-selected-tract={urlState.tract ?? ""}
       role="region"
     >
       {atlas.state === "available" ? (
-        <aside className="hidden w-72 shrink-0 flex-col gap-5 overflow-hidden border-r border-divider bg-background p-4 min-[769px]:flex min-[1024px]:w-[17rem]">
+        <aside className="hidden w-[17rem] shrink-0 flex-col gap-5 overflow-hidden border-r border-divider bg-background p-4 min-[1200px]:flex">
             <PriorityLegend
               activePriorities={urlState.priorities}
               idPrefix="desktop"
@@ -109,7 +118,7 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
         {selectedFeature ? (
           <aside
             aria-label="Selected tract summary"
-            className="absolute right-20 top-3 z-10 hidden w-80 min-[769px]:block min-[1024px]:hidden"
+            className="absolute right-20 top-3 z-10 hidden w-80 min-[1200px]:block min-[1280px]:hidden"
           >
             <TractSummary idPrefix="tablet" tract={selectedFeature.properties} />
           </aside>
@@ -119,20 +128,20 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
             isHandleOnly
             activeSnapPoint={mobileSnapPoint}
             isOpen={mobileSheetOpen}
-            snapPoints={["180px", "65vh", 1]}
+            snapPoints={["180px", 0.65, 1]}
             onActiveSnapPointChange={setMobileSnapPoint}
-            onOpenChange={setMobileSheetOpen}
+            onOpenChange={handleMobileSheetOpenChange}
           >
             <Sheet.Trigger>
               <Button
-                className="absolute bottom-4 left-1/2 z-20 min-h-11 -translate-x-1/2 shadow-sm min-[769px]:hidden"
+                className="absolute bottom-4 left-1/2 z-20 min-h-11 -translate-x-1/2 shadow-sm min-[1200px]:hidden"
                 variant="secondary"
               >
                 {selectedFeature ? "View selected tract" : "Browse tracts"}
               </Button>
             </Sheet.Trigger>
             <Sheet.Backdrop variant="transparent">
-              <Sheet.Content className="mx-auto max-w-[42rem] min-[769px]:hidden">
+              <Sheet.Content className="mx-auto max-w-[42rem] min-[1200px]:hidden">
                 <Sheet.Dialog>
                   <Sheet.Handle />
                   <Sheet.CloseTrigger aria-label="Close tract explorer" />
@@ -141,7 +150,7 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                       {selectedFeature?.properties.name ?? "Explore census tracts"}
                     </Sheet.Heading>
                   </Sheet.Header>
-                  <Sheet.Body className="flex min-h-0 flex-col gap-5 pb-6">
+                  <Sheet.Body className="flex min-h-0 flex-col gap-5 overflow-y-auto pb-6">
                     {selectedFeature ? (
                       <TractSummary idPrefix="mobile" tract={selectedFeature.properties} />
                     ) : null}
@@ -164,7 +173,7 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
         ) : null}
       </div>
       {atlas.state === "available" ? (
-        <aside className="hidden w-[22.5rem] shrink-0 overflow-y-auto border-l border-divider bg-background p-4 min-[1024px]:block">
+        <aside className="hidden w-[22.5rem] shrink-0 overflow-y-auto border-l border-divider bg-background p-4 min-[1280px]:block">
           {selectedFeature ? (
             <TractSummary idPrefix="desktop" tract={selectedFeature.properties} />
           ) : (

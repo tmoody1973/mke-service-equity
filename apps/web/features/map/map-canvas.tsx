@@ -8,8 +8,9 @@ import {
   Map,
   type MapLayerMouseEvent,
   NavigationControl,
+  setWorkerUrl,
 } from "maplibre-gl";
-import {useCallback, useEffect, useRef} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {resetMilwaukeeExtent} from "./map-camera";
 import {
   addTractLayers,
@@ -28,6 +29,8 @@ type MapCanvasProps = {
 
 const emptyTracts = {type: "FeatureCollection" as const, features: [] as []};
 
+setWorkerUrl("/vendor/maplibre-gl-worker.mjs");
+
 function featureGeoid(event: MapLayerMouseEvent): string | null {
   const feature = event.features?.[0];
   const candidate = feature?.id ?? feature?.properties?.geoid;
@@ -43,6 +46,7 @@ export function MapCanvas({
   styleUrl,
   tracts,
 }: MapCanvasProps) {
+  const [mapStatus, setMapStatus] = useState<"loading" | "ready" | "error">("loading");
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const appliedSelectedTractRef = useRef<string | null>(null);
@@ -71,6 +75,10 @@ export function MapCanvas({
       new AttributionControl({compact: false, customAttribution: "MapLibre GL JS"}),
       "bottom-right",
     );
+    map.on("error", (event) => {
+      console.error("Atlas MapLibre error", event.error);
+      setMapStatus("error");
+    });
     map.resize();
 
     const handlePointerMove = (event: MapLayerMouseEvent) => {
@@ -110,24 +118,30 @@ export function MapCanvas({
     };
 
     const handleLoad = () => {
-      addTractLayers(map, tractsRef.current ?? emptyTracts);
-      applyTractPriorityFilter(map, prioritiesRef.current);
-      map.on("mousemove", TRACT_FILL_LAYER_ID, handlePointerMove);
-      map.on("mouseleave", TRACT_FILL_LAYER_ID, handlePointerLeave);
-      map.on("click", TRACT_FILL_LAYER_ID, handleSelect);
+      try {
+        addTractLayers(map, tractsRef.current ?? emptyTracts);
+        applyTractPriorityFilter(map, prioritiesRef.current);
+        map.on("mousemove", TRACT_FILL_LAYER_ID, handlePointerMove);
+        map.on("mouseleave", TRACT_FILL_LAYER_ID, handlePointerLeave);
+        map.on("click", TRACT_FILL_LAYER_ID, handleSelect);
 
-      if (selectedTractRef.current) {
-        map.setFeatureState(
-          {source: TRACT_SOURCE_ID, id: selectedTractRef.current},
-          {selected: true},
-        );
-        appliedSelectedTractRef.current = selectedTractRef.current;
-      }
-      if (tractsRef.current) {
-        resetMilwaukeeExtent(
-          map,
-          window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
-        );
+        if (selectedTractRef.current) {
+          map.setFeatureState(
+            {source: TRACT_SOURCE_ID, id: selectedTractRef.current},
+            {selected: true},
+          );
+          appliedSelectedTractRef.current = selectedTractRef.current;
+        }
+        if (tractsRef.current) {
+          resetMilwaukeeExtent(
+            map,
+            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
+          );
+        }
+        map.once("idle", () => setMapStatus("ready"));
+      } catch (error) {
+        console.error("Atlas map layer setup failed", error);
+        setMapStatus("error");
       }
     };
 
@@ -196,9 +210,26 @@ export function MapCanvas({
         aria-label="Interactive map of Milwaukee County census tracts"
         className="absolute inset-0"
         data-map-container
+        data-map-status={mapStatus}
         ref={containerRef}
       />
-      {tracts ? (
+      {mapStatus === "error" ? (
+        <p
+          className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-divider bg-background px-4 py-3 text-sm"
+          role="alert"
+        >
+          The tract map could not be displayed. Use the census tract list to continue.
+        </p>
+      ) : null}
+      {mapStatus === "loading" ? (
+        <p
+          className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-divider bg-background px-4 py-3 text-sm text-muted shadow-sm"
+          role="status"
+        >
+          Loading tract map…
+        </p>
+      ) : null}
+      {tracts && mapStatus === "ready" ? (
         <Button
           className="absolute right-3 top-28 z-10 min-h-11 bg-background shadow-sm"
           onPress={handleReset}

@@ -16,6 +16,7 @@ export default defineConfig([
     "playwright-report/**",
     "test-results/**",
     "artifacts/**",
+    "apps/web/public/vendor/maplibre-gl-*.mjs",
     ".worktrees/**",
     "packages/database/drizzle/meta/**",
   ]),

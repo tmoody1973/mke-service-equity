@@ -21,7 +21,7 @@ export function AtlasDataState({response}: AtlasDataStateProps) {
       : "Atlas data is temporarily unavailable.";
 
   return (
-    <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10 max-w-md sm:inset-x-auto sm:left-4">
+    <div className="pointer-events-none absolute inset-x-3 bottom-20 z-10 max-w-md min-[600px]:inset-x-auto min-[600px]:bottom-3 min-[600px]:left-4">
       <p
         className="rounded-[var(--mke-radius-panel)] border border-divider bg-background px-4 py-3 text-sm text-foreground"
         role={preview || noPublishedRun ? "status" : "alert"}

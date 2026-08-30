@@ -16,6 +16,7 @@ const {
   mapAddSource,
   mapConstructor,
   mapFitBounds,
+  mapOnce,
   mapRemove,
   mapResize,
   mapSetFilter,
@@ -40,6 +41,11 @@ const {
       handlers.set(`${event}:${layerOrHandler}`, handler);
     }
   });
+  const once = vi.fn((event: string, handler: () => void) => {
+    if (event === "idle") {
+      handler();
+    }
+  });
 
   return {
     layerHandlers: handlers,
@@ -56,6 +62,7 @@ const {
         getCanvas: () => ({style: {cursor: ""}}),
         getSource: () => ({setData}),
         on,
+        once,
         remove,
         resize,
         setFilter,
@@ -63,6 +70,7 @@ const {
       };
     }),
     mapFitBounds: fitBounds,
+    mapOnce: once,
     mapRemove: remove,
     mapResize: resize,
     mapSetFilter: setFilter,
@@ -74,6 +82,7 @@ vi.mock("maplibre-gl", () => ({
   AttributionControl: vi.fn(function AttributionControl() {}),
   Map: mapConstructor,
   NavigationControl: vi.fn(function NavigationControl() {}),
+  setWorkerUrl: vi.fn(),
 }));
 
 import {MapShell} from "./map-shell";
@@ -128,6 +137,7 @@ describe("MapShell", () => {
     expect(options?.style).toBe("/fixtures/map-style.json");
     expect(mapAddControl).toHaveBeenCalledTimes(2);
     expect(mapResize).toHaveBeenCalledOnce();
+    expect(mapOnce).toHaveBeenCalledWith("idle", expect.any(Function));
 
     unmount();
     expect(mapRemove).toHaveBeenCalledOnce();
