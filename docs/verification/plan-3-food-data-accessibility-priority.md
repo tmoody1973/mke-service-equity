@@ -234,5 +234,26 @@ describe individual behavior, prove causation, measure literacy or service effec
 a funding recommendation. Raw records, local absolute paths, reports, credentials, and database
 URLs remain uncommitted.
 
-Pending after Task 13 completion: PR URL, CI URLs, and Task 14 load-bearing review. The sanitized
-Task 13 commit is recorded when created.
+### Task 14 review and CI
+
+- Pull request [#3](https://github.com/tmoody1973/mke-service-equity/pull/3) is ready for review,
+  targets `main`, and was mergeable when this evidence was recorded.
+- Clean-history GitHub Actions run
+  [33313898674](https://github.com/tmoody1973/mke-service-equity/actions/runs/33313898674)
+  passed both jobs. Python repeated the locked dependency install, pinned GTFS Validator setup,
+  Ruff check and format check, strict mypy, and 565-test unit gate. Web repeated lint, all workspace
+  typechecks and tests, the production build, Chromium installation, and ten Playwright checks.
+- GitGuardian passed after a test-only `example.test` credential placeholder was constructed at
+  runtime instead of appearing as a password-shaped literal. The placeholder was not a real
+  credential. The feature branch was rewritten with `--force-with-lease` so the detector-triggering
+  literal is absent from every PR commit; the final tree remained byte-for-byte equivalent apart
+  from that already-tested cleanup.
+- The load-bearing review found and corrected one trailing space in a CSV fixture and the scanner
+  false positive above. `git diff --check`, the source-manifest audit, pinned-baseline assertions,
+  candidate-scope reconciliation, exact live-count contract, missing-state contract, local gates,
+  live database integrations, and full replay all passed after the corrections.
+- CodeRabbit reported no code findings because its hosted reviewer skipped the 105 reviewable files,
+  five above its 100-file service limit, and also reported unavailable review capacity. This is a
+  recorded external-review limitation rather than a passing CodeRabbit analysis.
+- The rewritten verification-evidence commit is `b0e7e0c`. MOO-753 remains `In Progress` until the
+  pull request is merged; the authoritative score run remains validated and unpublished.
