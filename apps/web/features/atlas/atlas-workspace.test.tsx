@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
 import type {AtlasResponse} from "@mke/contracts";
-import {render, screen} from "@testing-library/react";
+import {render, screen, within} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import {afterEach, describe, expect, it, vi} from "vitest";
 
 const navigation = vi.hoisted(() => ({
@@ -84,5 +85,17 @@ describe("AtlasWorkspace", () => {
       "data-selected-tract",
       "55079000101",
     );
+  });
+
+  it("opens the HeroUI tract explorer sheet from the mobile map control", async () => {
+    const user = userEvent.setup();
+    render(<AtlasWorkspace atlas={available} styleUrl="/map-style.json" />);
+
+    await user.click(screen.getByRole("button", {name: "Browse tracts"}));
+
+    const dialog = screen.getByRole("dialog");
+    expect(screen.getByRole("heading", {name: "Explore census tracts"})).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", {name: /Census Tract 1.01.*Priority 5/}))
+      .toBeInTheDocument();
   });
 });

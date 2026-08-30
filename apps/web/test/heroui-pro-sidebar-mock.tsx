@@ -1,5 +1,5 @@
-import type {ComponentPropsWithoutRef, ReactNode} from "react";
-import {createContext, useContext, useState} from "react";
+import type {ComponentPropsWithoutRef, ReactElement, ReactNode} from "react";
+import {cloneElement, createContext, useContext, useState} from "react";
 
 type ProviderProps = ComponentPropsWithoutRef<"div"> & {
   children: ReactNode;
@@ -145,4 +145,87 @@ export const Sidebar = Object.assign(SidebarRoot, {
   Mobile,
   Provider,
   Trigger,
+});
+
+type SheetContextValue = {
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
+};
+
+const SheetContext = createContext<SheetContextValue | null>(null);
+
+function useTestSheet() {
+  const value = useContext(SheetContext);
+  if (!value) {
+    throw new Error("Sheet compounds must be rendered inside Sheet");
+  }
+  return value;
+}
+
+function SheetRoot({
+  children,
+  isOpen = false,
+  onOpenChange,
+}: {
+  children: ReactNode;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  [key: string]: unknown;
+}) {
+  return (
+    <SheetContext.Provider value={{
+      isOpen,
+      setOpen: (open) => onOpenChange?.(open),
+    }}>
+      {children}
+    </SheetContext.Provider>
+  );
+}
+
+function SheetTrigger({children}: {children: ReactElement<{onPress?: () => void}>}) {
+  const {setOpen} = useTestSheet();
+  return cloneElement(children, {
+    onPress: () => {
+      children.props.onPress?.();
+      setOpen(true);
+    },
+  });
+}
+
+function SheetBackdrop({children}: {children: ReactNode; variant?: string}) {
+  const {isOpen} = useTestSheet();
+  return isOpen ? <div data-sheet-backdrop>{children}</div> : null;
+}
+
+function SheetCloseTrigger(props: ComponentPropsWithoutRef<"button">) {
+  const {setOpen} = useTestSheet();
+  return <button {...props} onClick={() => setOpen(false)} type="button">×</button>;
+}
+
+function SheetDialog(props: ComponentPropsWithoutRef<"div">) {
+  return <div role="dialog" {...props} />;
+}
+
+function SheetHeading(props: ComponentPropsWithoutRef<"h2">) {
+  return <h2 {...props} />;
+}
+
+function SheetElement(props: ComponentPropsWithoutRef<"div">) {
+  return <div {...props} />;
+}
+
+function SheetHandle() {
+  return <div aria-hidden="true" data-sheet-handle />;
+}
+
+export const Sheet = Object.assign(SheetRoot, {
+  Backdrop: SheetBackdrop,
+  Body: SheetElement,
+  CloseTrigger: SheetCloseTrigger,
+  Content: SheetElement,
+  Dialog: SheetDialog,
+  Handle: SheetHandle,
+  Header: SheetElement,
+  Heading: SheetHeading,
+  Trigger: SheetTrigger,
 });

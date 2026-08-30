@@ -1,8 +1,10 @@
 "use client";
 
 import type {AtlasResponse} from "@mke/contracts";
+import {Sheet} from "@heroui-pro/react";
+import {Button, EmptyState} from "@heroui/react";
 import {usePathname, useSearchParams} from "next/navigation";
-import {useCallback, useEffect, useMemo} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {MapCanvas} from "../map/map-canvas";
 import {AtlasDataState} from "./atlas-data-state";
 import {PriorityLegend} from "./priority-legend";
@@ -21,6 +23,8 @@ type AtlasWorkspaceProps = {
 };
 
 export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [mobileSnapPoint, setMobileSnapPoint] = useState<string | number | null>("180px");
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const availableGeoids = useMemo(() => new Set(
@@ -55,6 +59,10 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
 
   const handleSelectTract = useCallback((tract: string) => {
     writeUrlState({...urlState, tract});
+    if (window.matchMedia?.("(max-width: 768px)").matches) {
+      setMobileSheetOpen(true);
+      setMobileSnapPoint("65vh");
+    }
   }, [urlState, writeUrlState]);
 
   const handlePriorityChange = useCallback((priorities: Array<number>) => {
@@ -71,20 +79,12 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
   return (
     <section
       aria-label="Map workspace"
-      className="relative h-[calc(100dvh-3.5rem)] min-h-96 overflow-hidden border-t border-divider bg-default min-[768px]:h-[calc(100dvh-4rem)]"
+      className="relative flex h-[calc(100dvh-3.5rem)] min-h-96 overflow-hidden border-t border-divider bg-default min-[768px]:h-[calc(100dvh-4rem)]"
       data-selected-tract={urlState.tract ?? ""}
       role="region"
     >
-      <MapCanvas
-        onSelectTract={handleSelectTract}
-        priorities={urlState.priorities}
-        selectedTract={urlState.tract}
-        styleUrl={styleUrl}
-        tracts={atlas.state === "available" ? atlas.tracts : undefined}
-      />
       {atlas.state === "available" ? (
-        <>
-          <aside className="absolute inset-y-3 left-3 z-10 hidden w-72 flex-col gap-5 overflow-hidden rounded-[var(--mke-radius-panel)] border border-divider bg-background p-4 shadow-sm md:flex">
+        <aside className="hidden w-72 shrink-0 flex-col gap-5 overflow-hidden border-r border-divider bg-background p-4 min-[769px]:flex min-[1024px]:w-[17rem]">
             <PriorityLegend
               activePriorities={urlState.priorities}
               idPrefix="desktop"
@@ -96,37 +96,86 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
               selectedTract={urlState.tract}
               tracts={visibleTracts}
             />
+        </aside>
+      ) : null}
+      <div className="relative min-w-0 flex-1">
+        <MapCanvas
+          onSelectTract={handleSelectTract}
+          priorities={urlState.priorities}
+          selectedTract={urlState.tract}
+          styleUrl={styleUrl}
+          tracts={atlas.state === "available" ? atlas.tracts : undefined}
+        />
+        {selectedFeature ? (
+          <aside
+            aria-label="Selected tract summary"
+            className="absolute right-20 top-3 z-10 hidden w-80 min-[769px]:block min-[1024px]:hidden"
+          >
+            <TractSummary idPrefix="tablet" tract={selectedFeature.properties} />
           </aside>
-          <details className="absolute inset-x-3 top-3 z-20 max-h-[70dvh] overflow-auto rounded-[var(--mke-radius-panel)] border border-divider bg-background shadow-sm md:hidden">
-            <summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-semibold">
-              Browse tracts and priority legend
-            </summary>
-            <div className="flex max-h-[calc(70dvh-3rem)] flex-col gap-5 border-t border-divider p-4">
-              <PriorityLegend
-                activePriorities={urlState.priorities}
-                idPrefix="mobile"
-                onChange={handlePriorityChange}
-              />
-              {selectedFeature ? (
-                <TractSummary idPrefix="mobile" tract={selectedFeature.properties} />
-              ) : null}
-              <TractList
-                idPrefix="mobile"
-                onSelect={handleSelectTract}
-                selectedTract={urlState.tract}
-                tracts={visibleTracts}
-              />
-            </div>
-          </details>
+        ) : null}
+        {atlas.state === "available" ? (
+          <Sheet
+            isHandleOnly
+            activeSnapPoint={mobileSnapPoint}
+            isOpen={mobileSheetOpen}
+            snapPoints={["180px", "65vh", 1]}
+            onActiveSnapPointChange={setMobileSnapPoint}
+            onOpenChange={setMobileSheetOpen}
+          >
+            <Sheet.Trigger>
+              <Button
+                className="absolute bottom-4 left-1/2 z-20 min-h-11 -translate-x-1/2 shadow-sm min-[769px]:hidden"
+                variant="secondary"
+              >
+                {selectedFeature ? "View selected tract" : "Browse tracts"}
+              </Button>
+            </Sheet.Trigger>
+            <Sheet.Backdrop variant="transparent">
+              <Sheet.Content className="mx-auto max-w-[42rem] min-[769px]:hidden">
+                <Sheet.Dialog>
+                  <Sheet.Handle />
+                  <Sheet.CloseTrigger aria-label="Close tract explorer" />
+                  <Sheet.Header>
+                    <Sheet.Heading>
+                      {selectedFeature?.properties.name ?? "Explore census tracts"}
+                    </Sheet.Heading>
+                  </Sheet.Header>
+                  <Sheet.Body className="flex min-h-0 flex-col gap-5 pb-6">
+                    {selectedFeature ? (
+                      <TractSummary idPrefix="mobile" tract={selectedFeature.properties} />
+                    ) : null}
+                    <PriorityLegend
+                      activePriorities={urlState.priorities}
+                      idPrefix="mobile"
+                      onChange={handlePriorityChange}
+                    />
+                    <TractList
+                      idPrefix="mobile"
+                      onSelect={handleSelectTract}
+                      selectedTract={urlState.tract}
+                      tracts={visibleTracts}
+                    />
+                  </Sheet.Body>
+                </Sheet.Dialog>
+              </Sheet.Content>
+            </Sheet.Backdrop>
+          </Sheet>
+        ) : null}
+      </div>
+      {atlas.state === "available" ? (
+        <aside className="hidden w-[22.5rem] shrink-0 overflow-y-auto border-l border-divider bg-background p-4 min-[1024px]:block">
           {selectedFeature ? (
-            <aside
-              aria-label="Selected tract summary"
-              className="absolute right-20 top-3 z-10 hidden w-80 lg:block"
-            >
-              <TractSummary idPrefix="desktop" tract={selectedFeature.properties} />
-            </aside>
-          ) : null}
-        </>
+            <TractSummary idPrefix="desktop" tract={selectedFeature.properties} />
+          ) : (
+            <EmptyState className="flex h-full flex-col items-center justify-center gap-2 text-center">
+              <h2 className="text-base font-semibold">Select a census tract</h2>
+              <p className="max-w-64 text-sm text-muted">
+                Choose a tract on the map or in the list to see its Food Equity summary.
+              </p>
+            </EmptyState>
+          )}
+        </aside>
       ) : null}
       <AtlasDataState response={atlas} />
     </section>
