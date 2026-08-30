@@ -2,8 +2,11 @@ import AxeBuilder from "@axe-core/playwright";
 import {expect, test} from "@playwright/test";
 
 const FOOD_SITE_ID = "data-you-can-use:pantries-2026:18";
+const previewRunId = process.env.MKE_ATLAS_PREVIEW_RUN_ID;
 
 test("shows the credited, non-scoring food-site context layer safely", async ({page}, testInfo) => {
+  test.skip(!previewRunId, "Requires the explicit local validated-preview run.");
+
   await page.goto(`/?context=food_sites&site=${encodeURIComponent(FOOD_SITE_ID)}`);
 
   const map = page.locator("[data-map-container]");
