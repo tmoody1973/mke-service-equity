@@ -37,6 +37,31 @@ or:
 
 Quality states are part of the product UI.
 
+## Atlas profile quality boundary
+
+The selected-tract profile is available only when the server proves that the tract and both score
+systems belong to the same selected run lineage. A complete tract must have exactly 13 Equity
+Baseline inputs and 4 Food Access Need inputs with their exact metric, snapshot, and source links.
+Duplicate, missing, or mismatched lineage makes the detailed profile unavailable; the browser does
+not fill the gap.
+
+Each measure carries its own state, quality label, uncertainty, definition, limitation, and source.
+An unavailable Community context section means its snapshot is not tied to the run. It does not
+mean the tract has no resources.
+
+For ACS observations, the profile exposes the persisted coefficient-of-variation state from the
+approved Equity Baseline or Food pipeline. It does not recalculate or relabel reliability in the
+browser. The four states remain `reliable` (CV at or below 15%), `use_with_caution` (above 15% and
+at or below 30%), `high_uncertainty` (above 30%), and `cv_not_computable` for a zero estimate.
+“Verified” and “reliable” answer different questions: verification means lineage and quality
+checks passed, while reliability describes sampling precision.
+
+For reader-facing percent measures with an ACS 90% margin of error, the server presentation layer
+provides a bounded range of `estimate - margin` through `estimate + margin`, clamped to 0–100%.
+This range is explanatory only. It does not change the stored estimate, percentile, score,
+eligibility, or methodology. Percentile copy carries the same caution because the percentile was
+calculated from that estimate.
+
 ## Food Equity quality contract
 
 Food scoring requires one observation for each of the four approved scoring slugs and each
@@ -56,3 +81,16 @@ metadata, primary snapshot, and exact set of contributing source snapshots. Befo
 validate, database reconciliation proves that persisted fingerprints, lineage pairs, components,
 and scores equal the reviewed in-memory write plan. Context metrics may later be displayed with
 their warnings, but are prohibited from the scoring adapter and score-input fingerprint.
+
+## Neighborhood-reference quality boundary
+
+Neighborhood context comes only from a manifested snapshot of the approved City of Milwaukee DCD
+reference. It is not an official City or neighborhood-association boundary, is not maintained on
+an ongoing basis, and does not cover all Milwaukee County municipalities. The UI must carry those
+limitations anywhere the names or boundaries could be interpreted as authoritative jurisdiction.
+
+PostGIS retains exact positive-area overlaps and City-reference coverage. Percentages describe
+polygon area within the portion covered by the City reference, not population, identity,
+membership, or service jurisdiction. Sub-1% boundary slivers may be grouped for display but remain
+auditable. Missing coverage is never converted into a nearest, centroid-selected, or ZIP-inferred
+neighborhood.

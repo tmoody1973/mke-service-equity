@@ -1,0 +1,228 @@
+# Plan 4 Food Equity Atlas and tract-profile verification
+
+## Status
+
+- Linear issue: `MOO-754`
+- Branch: `codex/moo-754-atlas-tract-profile`
+- Verification date: 2026-08-30
+- Current result: the map, selected-tract profile, exact evidence, provenance, tract/neighborhood
+  search, approved food-site context layer, responsive layouts, and plain-language content pass verification
+- Publication state: no Food Equity run is published; governed publication remains tracked by
+  `MOO-768`
+
+This record verifies the public-presentation boundary, map, URL state, priority legend, accessible
+tract list, selected-tract summary, exact score evidence, provenance, and responsive profile. It
+does not claim that validated preview data has been published.
+
+## Data and run boundary
+
+The read-only local preview selected exact validated Food Equity run
+`97bd1cdf-bf96-573f-8fcf-92e8676925d4` on disposable Neon branch
+`moo-753-food-equity`. The server also verified the pinned Equity Baseline run and hashes before
+returning Atlas data. Preview selection requires an exact UUID plus development-only guards;
+production and default public mode cannot fall back to a validated run.
+
+Live repository reconciliation passed:
+
+| Check | Result |
+|---|---:|
+| Canonical 2020 TIGER/Line Milwaukee County tracts | 302 |
+| Complete Food Equity scores | 299 |
+| Insufficient-data scores | 1 |
+| Zero-population, not-scored tracts | 2 |
+| Priority 1 / 2 / 3 / 4 / 5 | 18 / 96 / 136 / 40 / 9 |
+| Valid EPSG:4326 MultiPolygon geometries | 302 |
+| Stable, unique GEOID feature IDs | 302 |
+| Serialized Atlas GeoJSON | 1,052,366 bytes |
+| Enforced payload budget | at most 1,100,000 bytes |
+
+The geography-first repository rejects missing score joins, run mismatches, baseline mismatches,
+invalid geometry, duplicate or missing canonical tracts, and contract-invalid values. Missing,
+insufficient, and zero-population states remain explicit; none are converted to zero.
+
+## Exact selected-tract profile
+
+The profile now carries ACS sampling reliability separately from source verification. For Census
+tract `55079008400`, Housing cost burden remains the stored 61.3% estimate at the 97th county
+percentile with a +3.9-point centered contribution. Its stored `use_with_caution` state and 22.5
+percentage-point margin produce a server-prepared 90% display range of 38.8%–83.8%. The UI states
+that the percentile shares this uncertainty and directs planners to compare nearby tracts and
+confirm with local data and residents. No score or methodology value changed.
+
+The profile route loads only after a tract is selected. The repository requires the selected Food
+Equity run, its pinned Equity Baseline run, the same tract, and exact component-to-snapshot-to-source
+lineage before returning an available profile.
+
+For complete Census Tract 1.01 (`55079000101`), live reconciliation returned exactly 4 Food Access
+Need components and 13 Equity Baseline components. Separate live checks covered insufficient-data
+tract `55079187200` and zero-population tract `55079990000`; neither received inferred components
+or fake zero values. The approved food-site display layer is explicitly separate from those
+results: it is release-pinned context, not a score-run input or analytical proximity result.
+
+The profile explains contribution values as composite-score points relative to the Milwaukee
+County midpoint. It explicitly says these values are not raw percentages, changes over time,
+causes, or recommendations. The Census language measure is labeled “Speaks English less than
+‘very well,’ age 5+” and described as English-language access, not reading or writing literacy.
+
+## Public fail-closed behavior
+
+- Default public mode returns `no_published_run` because no Food Equity run is published.
+- The selector never queries a validated fallback in public mode.
+- Validated preview requires `MKE_ATLAS_DATA_MODE=validated_preview`, the exact preview run UUID,
+  `MKE_PIPELINE_ENV=development`, non-production `NODE_ENV`, and non-production `VERCEL_ENV`.
+- Preview responses are dynamic and are not placed in a shared public cache.
+- The production client bundle scan found no database variable, preview-mode variable, or
+  validated run identifier.
+- Database URLs and other credentials were supplied only to local server processes and were not
+  printed or committed.
+
+## Browser and responsive verification
+
+The same 302-feature response was exercised in Chrome with the local validated preview. MapLibre
+6 loaded its same-origin worker and shared worker module generated from the pinned dependency.
+The map rendered the complete county extent, priority fills, distinct insufficient/zero-population
+treatments, selected outline, reset control, and text legend.
+
+| Viewport | Evidence |
+|---|---|
+| 1440 × 1000 | application nav, Explore panel, usable map, and persistent selected profile |
+| 1024 × 900 | map-first compact workspace and sheet trigger; map retained usable width |
+| 768 × 900 | tablet header, full map, reset control, and sheet trigger |
+| 430 × 900 | full-height HeroUI Pro explorer; tract selection and priority filter succeeded |
+| 375 × 812 | rendered map and controls with `scrollWidth === clientWidth` |
+
+At 430 px, selecting Census Tract 1.02 and filtering to Priority 5 produced the shareable URL
+`?tract=55079000102&priority=5`, retained the full-height explorer, set the filter's pressed state,
+and reduced the semantic tract list to 12 matching or explicitly incomplete tracts. The Sheet has
+180 px, 65%, and full-height stops; the browse trigger opens full-height so all controls remain
+reachable, while a direct map selection may open the 65% summary stop.
+
+The 1024 px review found and corrected an over-constrained four-column layout. The final compact
+layout keeps the map primary until 1200 px, uses an overlay profile at 1200–1279 px, and uses the
+persistent right profile at 1280 px and wider.
+
+## Accessibility, readability, and error-state review
+
+- Axe reported zero WCAG A/AA violations for the complete selected-tract profile at 375, 430, 768,
+  1024, and 1440 px.
+- The production public-mode suite also reported zero axe violations at all five widths.
+- A desktop muted-text contrast failure was corrected in the shared design token, then rescanned.
+- Priority and quality states are labeled in text and do not rely on color.
+- Map selection is mirrored by a semantic button list, so the map is not the only selection path.
+- Map controls and application controls use at least 44 px targets.
+- URL selection supports back/forward state; invalid values normalize without deleting unrelated
+  parameters.
+- MapLibre setup and runtime errors produce a safe alert and leave the tract list available.
+- The loading message remains visible until the GeoJSON source reaches MapLibre idle/ready state.
+- Reduced-motion preference changes map reset duration to zero.
+- Public-facing map, legend, list, summary, loading, error, missing-data, profile, and source copy
+  received a plain-language edit. Technical identifiers are introduced as “Census tract ID,” and
+  technical terms that remain necessary are defined where they appear.
+- The legend now matches the approved method: Priority 1 is Highest and Priority 5 is Lowest.
+
+## Automated verification
+
+The final local gate passed:
+
+| Check | Result |
+|---|---|
+| Web unit/component tests | 59 passed |
+| Contracts tests | 31 passed |
+| Database unit tests | 85 passed |
+| Design-system tests | 1 passed |
+| Live profile integration test | passed for complete, insufficient, and zero-population states |
+| Live profile and uncertainty Playwright + axe | 10 passed at the required widths |
+| Live tract/neighborhood search Playwright + axe | 5 passed at the required widths |
+| Public production Playwright + axe | 10 passed, 15 preview-only checks skipped |
+| Workspace typechecks | passed |
+| ESLint | passed with generated MapLibre worker modules excluded |
+| Next.js production build | passed |
+| Root `npm run verify` | passed |
+| Client bundle preview/secret scan | passed |
+| `git diff --check` | passed |
+
+The validated profile check runs only under the guarded Next development server because the
+application intentionally rejects validated-preview mode when `NODE_ENV=production`. The HeroUI
+Pro Sidebar currently emits a development-renderer-only React Aria ID hydration warning; the
+profile-specific check filters that one known warning. The production suite filters nothing and
+passes with zero browser console errors.
+
+## Remaining MOO-754 work
+
+The City of Milwaukee DCD neighborhood reference and deterministic tract-overlap rule were
+explicitly approved on 2026-08-30. Tract and neighborhood search are implemented. Authoritative
+ZCTA/municipality ingestion, address authority, additional contextual resource layers, final
+performance hardening, and the load-bearing completion review remain. The implementation does not
+make the mutable live service a runtime dependency and does not imply deployment or publication.
+
+## Neighborhood reference implementation
+
+The approved City DCD response was preserved as an immutable snapshot with SHA-256
+`4a3bf2c32182b508204dcdfad9904eba3f987f2e2b0720087642c40fbf9862e5` and loaded into the
+disposable validated-preview database as snapshot
+`f3da2bdf-27db-5f41-9338-f95264be0301`. PostGIS reconciliation passed before the snapshot moved
+from `pending` to `valid`:
+
+| Check | Result |
+|---|---:|
+| Source features / persisted versions | 190 / 190 |
+| Canonical tract contexts | 302 |
+| Positive-area audit overlaps | 1,020 |
+| Invalid source geometry | 1 documented exact repair (`NBHD_ID 30`, `LAND BANK`) |
+
+For Census tract `55079000101`, City-reference coverage is 99.9%. No neighborhood has a majority,
+so the deterministic label is **Spans**: Northridge 42.8%, Northridge Lakes 33.4%, Ridgeview 15.6%,
+and Hilltop Parish 7.4% of the covered tract area. Seven sub-1% overlaps remain in audit data and
+are grouped for public display. The profile labels these as area shares, carries the City's
+non-official/staleness limitation, and never changes a score.
+
+## Tract and neighborhood search verification
+
+The server accepts 2–80 trimmed characters, searches only canonical 2020 Milwaukee County tracts
+that belong to the exact selected Food run, and searches neighborhood names only through snapshot
+`f3da2bdf-27db-5f41-9338-f95264be0301` when that snapshot is still `valid`. SQL parameters remain
+bound, results are capped at 20, and every result carries one canonical 11-digit tract GEOID.
+
+Live preview checks returned:
+
+- `Northridge` → Northridge and Northridge Lakes matches for Census Tract 1.01, with the approved
+  42.8% and 33.4% covered-area shares;
+- `1857` → Census Tract 1857 / GEOID `55079185700`;
+- no neighborhood rows when the exact snapshot pin is missing or invalid, while tract results
+  remain available;
+- explicit UI copy that ZIP and address search are not available yet.
+
+The selected-tract summary now defines high/low Equity Baseline bands as relative amounts of the
+measured barriers across Milwaukee County tracts and explicitly says the band describes conditions,
+not residents.
+
+The Food Equity Priority guide defines all five levels as the strength of overlap between Food
+Access Need and other measured barriers. Its planning note directs readers to investigate Priority
+1 and 2 tracts first, inspect the evidence, compare nearby areas, and talk with residents and local
+groups. It also states that the number does not choose a project, prove a cause, or automatically
+decide funding. The guide passed the profile Playwright and axe checks at all five required widths.
+
+## Approved food-site context layer
+
+Tarik approved use of the public Data You Can Use/Milwaukee Food Council `Pantries 2026` layer on
+2026-08-30 with credit and citation. The strict Python adapter validated and normalized one exact
+89-feature ArcGIS GeoJSON response with SHA-256
+`5b86d359dd55e008836dfba4f4bde45d0561567bcce9d346882392a744e77f94`. The browser-safe
+artifact contains 86 food pantries, two meal programs, and one food bank. All 89 rows retain a
+name, type, address, and source coordinate; two lack a phone, 17 lack a website, 19 lack a source
+note, and 61 lack a source-listed service area. Missing fields remain null.
+
+The layer contract requires `affectsScores: false` and
+`display_context_only_not_part_of_score_run`. MapLibre performs display and selection only. The
+source has no independently verified active/current field, so the control and every selected-site
+card say **Check before visiting**, describe notes as source notes, and link available provider
+contact information. The app credits Data You Can Use, Milwaukee Food Council, and UWM Institute
+for Systems Change and Peacebuilding and links to the original Milwaukee Food Environment Map in
+the layer control, selected-site card, and map attribution.
+
+Dedicated Playwright and axe checks passed at 375, 430, 768, 1024, and 1440 px with the layer on
+and a deep-linked site selected. All five reached MapLibre `ready`, rendered 89 points, preserved
+the shareable `context` and stable `site` URL values, had no horizontal page overflow, and reported
+zero WCAG A/AA violations. The production build passed. Offline suites passed 68 web tests, 32
+contract tests, 85 database tests, one design-system test, and 590 Python tests; 12 external
+integration tests remained intentionally deselected.

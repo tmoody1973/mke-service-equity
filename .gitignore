@@ -24,6 +24,9 @@ test-results/
 artifacts/
 *.tsbuildinfo
 
+# Generated browser worker modules copied from the pinned MapLibre dependency.
+apps/web/public/vendor/maplibre-gl-*.mjs
+
 # Python and uv
 .venv/
 venv/

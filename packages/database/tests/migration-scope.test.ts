@@ -164,6 +164,43 @@ describe("Plan 3 food-equity contract amendment", () => {
       {idx: 1, tag: "0001_equity_baseline"},
       {idx: 2, tag: "0002_food_equity"},
       {idx: 3, tag: "0003_food_equity_contract_amendment"},
+      {idx: 4, tag: "0004_atlas_neighborhood_context"},
     ]);
+  });
+});
+
+describe("MOO-754 Atlas neighborhood context migration", () => {
+  it("creates only the approved source-version and tract-overlap tables", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0004_atlas_neighborhood_context.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+    const tableNames = [...migration.matchAll(/CREATE TABLE "([a-z_]+)"/g)].map(
+      ([, tableName]) => tableName,
+    );
+
+    expect(tableNames.sort()).toEqual([
+      "neighborhood_versions",
+      "neighborhoods",
+      "tract_neighborhood_contexts",
+      "tract_neighborhood_overlaps",
+    ]);
+    expect(migration).not.toMatch(/ALTER TABLE "(?:food_|score|indicator)/i);
+    expect(migration).not.toMatch(/\b(priority|percentile|funding|recommendation)\b/i);
+  });
+
+  it("enforces immutable snapshot lineage, valid geometry, and bounded area shares", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0004_atlas_neighborhood_context.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+
+    expect(migration).toContain("geometry(MultiPolygon,4326)");
+    expect(migration).toContain("neighborhood_versions_geometry_gist");
+    expect(migration).toContain("neighborhood_versions_geometry_valid_check");
+    expect(migration).toContain("tract_neighborhood_overlaps_context_fk");
+    expect(migration).toContain("tract_neighborhood_overlaps_version_snapshot_fk");
+    expect(migration).toContain("tract_neighborhood_contexts_coverage_check");
+    expect(migration).toContain("tract_neighborhood_overlaps_share_check");
   });
 });

@@ -53,6 +53,17 @@ Every primary workflow must work at:
 
 Mobile behavior is part of acceptance criteria, not a later optimization.
 
+## Atlas web experience
+
+The Atlas uses a MapLibre map plus a full non-map census-tract list. Selecting a tract opens the
+same evidence on desktop, tablet, and mobile: its Food Equity Priority, the measures behind that
+result, data-quality limits, and exact sources. The interface uses plain language, keeps missing
+information explicit, and explains that score contributions are comparisons with the Milwaukee
+County midpoint—not causes or policy recommendations.
+
+The public app reads only a published score run. A guarded local development preview may read one
+exact validated run for review, but it cannot turn that run into published data.
+
 ## Development foundation
 
 Plan 1 establishes the repository, application, database, Python, testing, and

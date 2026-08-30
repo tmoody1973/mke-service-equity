@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare:maplibre-worker": "node scripts/prepare-maplibre-worker.mjs",
+    "predev": "npm run prepare:maplibre-worker",
     "dev": "next dev",
+    "prebuild": "npm run prepare:maplibre-worker",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",

@@ -57,7 +57,7 @@ test("meets the accessibility contract at the configured width", async ({page}, 
 
   await expect(page.getByRole("main")).toHaveCount(1);
 
-  const skipLink = page.getByRole("link", {name: "Skip to map workspace"});
+  const skipLink = page.getByRole("link", {name: "Skip to the Food Equity Atlas"});
   await page.keyboard.press("Tab");
   await expect(skipLink).toBeFocused();
   expect(await hasVisibleFocusIndicator(skipLink)).toBe(true);

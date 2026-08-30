@@ -79,6 +79,11 @@ Use Client Components only where browser interaction requires them.
 
 The browser visualizes evidence. It does not reproduce the analytical engine.
 
+The Atlas sends a bounded tract map payload first. When a person selects a tract, a server route
+loads the exact Food and Equity inputs, uncertainty, limitations, and source lineage for that same
+run and geography. If those joins cannot be proven, the route returns an explicit unavailable
+state instead of partial or inferred evidence.
+
 ## Deployment
 
 Code:

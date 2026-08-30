@@ -1,0 +1,2168 @@
+{
+  "state": "available",
+  "layerId": "food_sites",
+  "title": "Food pantries and meal sites",
+  "description": "Community food sites listed in the Milwaukee Food Environment Map. Call or check the provider website before visiting.",
+  "affectsScores": false,
+  "qualityStatus": "source_listed_check_before_visiting",
+  "scoreRunRelationship": "display_context_only_not_part_of_score_run",
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:1",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.2489020322901,
+            42.9897450063065
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:1",
+          "name": "Food Pantry of Waukesha County",
+          "siteType": "food_pantry",
+          "address": "1301 Sentry Dr",
+          "city": "Waukesha",
+          "zipCode": "53186",
+          "phone": "262-542-5300",
+          "website": "https://www.waukeshafoodpantry.org/",
+          "details": "Drive-thru and indoor shopping: Monday - Friday 1pm - 3pm, Monday 6pm - 8pm, Saturday 9:30am - 11:30am; No Contact Scheduled Pick Up Monday - Friday 11:15am - 12:12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:2",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0234689862553,
+            43.0015010033067
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:2",
+          "name": "Aurora West Allis Food Pantry & Resource Center at Allis Medical Center",
+          "siteType": "food_pantry",
+          "address": "8901 W Lincoln Ave",
+          "city": "West Allis",
+          "zipCode": "53227",
+          "phone": null,
+          "website": null,
+          "details": "Every 3rd and 4th Monday 4pm - 6pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:3",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9121009862382,
+            43.0659119893048
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:3",
+          "name": "All Peoples Gathering Church",
+          "siteType": "food_pantry",
+          "address": "2600 N 2nd",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-264-1616",
+          "website": "https://www.allpeoplesgathering.org/ministries/isaiah-55",
+          "details": "Wednesdays 11-1",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:4",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9331750182415,
+            43.0542510023052
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:4",
+          "name": "Cross Lutheran Church Milwaukee",
+          "siteType": "food_pantry",
+          "address": "1821 N 16th Street",
+          "city": "Milwaukee",
+          "zipCode": "53205",
+          "phone": "414-344-1746",
+          "website": "https://crosslutheranmke.org/food-pantry/",
+          "details": "2nd and 4th Wednesdays, 11 am to 1:30 pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:5",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.2553750412912,
+            43.0235749963052
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:5",
+          "name": "Friends with Food",
+          "siteType": "food_pantry",
+          "address": "713 N Grandview Blvd",
+          "city": "Waukesha",
+          "zipCode": "53188",
+          "phone": "262-409-9282",
+          "website": "https://friendswithfoodwi.org/weekly-food-registration/",
+          "details": "No appointment needed Tuesdays 11am - 11:45am, Thursdays 4pm - 4:45pm, Saturdays 11am - 11:45am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:7",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9099569792376,
+            42.973122016308
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:7",
+          "name": "Hanan Refugees Relief Group",
+          "siteType": "food_pantry",
+          "address": "3927 S. Howell Ave",
+          "city": "Milwaukee",
+          "zipCode": "53207",
+          "phone": "414-800-4168",
+          "website": "https://hananrrg.org/",
+          "details": "Fridays. 9am to 1pm",
+          "serviceArea": "53221 | 53207 | 53215 | 53204 | 53209",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:8",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9915220332504,
+            43.0164170193063
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:8",
+          "name": "Milwaukee Homeless Veterans Initiative Emergency Food Pantry",
+          "siteType": "food_pantry",
+          "address": "6300 W National Ave",
+          "city": "West Allis",
+          "zipCode": "53214",
+          "phone": "414-257-4111",
+          "website": "https://www.wisconsinvets.org/emergency-food-program",
+          "details": "Monday, Wednesday, Thursday, Friday 9:00 am - 3:00 pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:9",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.002470857252,
+            43.0144295623063
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:9",
+          "name": "Holy Assumption Food Pantry",
+          "siteType": "food_pantry",
+          "address": "1526 S 72nd St",
+          "city": "West Allis",
+          "zipCode": "53214",
+          "phone": "414-744-3010",
+          "website": null,
+          "details": "Tuesday 1pm - 4pm, Friday 1pm - 3pm",
+          "serviceArea": "53214 | 53219",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:10",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9303239972411,
+            43.087336008304
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:10",
+          "name": "Saint Mark's Quality of Life Center II Food Pantry",
+          "siteType": "food_pantry",
+          "address": "1530 W Atkinson Ave",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-562-8030",
+          "website": "https://www.interchangefoodpantry.org/hours-locations",
+          "details": "Every 2nd and 4th Sunday 12:30pm - 2pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:11",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9555709602452,
+            43.1284530153025
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:11",
+          "name": "Miracle on 35th St",
+          "siteType": "food_pantry",
+          "address": "6098 N 35 St",
+          "city": "Milwaukee",
+          "zipCode": "53209",
+          "phone": "414-206-9126",
+          "website": null,
+          "details": "Friday 4-6pm , Saturday 10-12pm",
+          "serviceArea": "53209 | 53216 | 53218",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:13",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9194870352393,
+            43.0474280073054
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:13",
+          "name": "Vivent Health",
+          "siteType": "food_pantry",
+          "address": "1311 N 6th St",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-225-1526",
+          "website": "https://viventhealth.org/health-and-wellness/",
+          "details": "M, W-F: 8am-5 pm Tuesdays 12pm-5pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:14",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.892367698235,
+            42.9885992443075
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:14",
+          "name": "Bay View Community Center",
+          "siteType": "food_pantry",
+          "address": "1320 E. Oklahoma Ave",
+          "city": "Milwaukee",
+          "zipCode": "53207",
+          "phone": "414-482-1000",
+          "website": "https://bayviewcenter.org/food-pantry/",
+          "details": "Mondays 4pm - 6pm, Wednesdays 4pm - 6pm, Saturdays 11am - 1:30pm",
+          "serviceArea": "53207 | 53215 | 53221 | 53235",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:15",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9614543632458,
+            43.0572781963049
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:15",
+          "name": "Bethany Lutheran Church",
+          "siteType": "food_pantry",
+          "address": "2031 N. 38th St.",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-444-3131",
+          "website": "https://bethanylutheranchurchmke.com/?page_id=170",
+          "details": "Pantry and Meal: Last two Wednesdays of the month, 11:30am - 1pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:16",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9462719462436,
+            43.0788960043042
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:16",
+          "name": "Bethel CME Church",
+          "siteType": "food_pantry",
+          "address": "3281 N 26th St.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-442-8970",
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:18",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9451832112434,
+            43.0907783723039
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:18",
+          "name": "All Saints Catholic Church",
+          "siteType": "food_pantry",
+          "address": "4060 N. 26th St.",
+          "city": "Milwaukee",
+          "zipCode": "53209",
+          "phone": "414-444-5610",
+          "website": "https://allsaintsmke.org/outreach-ministries/",
+          "details": "Pantry: Tuesdays and Thursdays 9:30am - 12pm; Meals: Tuesday and Thursdays 5pm - 6pm",
+          "serviceArea": "53206 | 53209 | 53210 | 53216",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:19",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9377429782422,
+            43.0719456923045
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:19",
+          "name": "Bethesda Baptist Church",
+          "siteType": "food_pantry",
+          "address": "2909 N 20th St.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-442-1323",
+          "website": "https://bethesdabaptistchurchbbc.weebly.com",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:20",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9445320552433,
+            43.0718864243045
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:20",
+          "name": "Amani Community Food Pantry",
+          "siteType": "food_pantry",
+          "address": "2480 W Locust Street",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-442-1886",
+          "website": null,
+          "details": null,
+          "serviceArea": "53206",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:21",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9345061632417,
+            43.0530320533052
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:21",
+          "name": "Capuchin Community Services - House of Peace",
+          "siteType": "food_pantry",
+          "address": "1702 West Walnut St.",
+          "city": "Milwaukee",
+          "zipCode": "53205",
+          "phone": "414-271-0135",
+          "website": "https://www.capuchincommunityservices.org/en/services/food-pantry/",
+          "details": "Monday through Friday, 8:30am - 12pm, 12pm - 3:15pm",
+          "serviceArea": "53205 | 53206 | 53233",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:22",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9393661252424,
+            43.0452041593054
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:22",
+          "name": "Casa Maria Hospitality House",
+          "siteType": "food_pantry",
+          "address": "1131 N. 21st St.",
+          "city": "Milwaukee",
+          "zipCode": "53233",
+          "phone": "414-344-5745",
+          "website": "http://casamariacatholicworker.weebly.com/",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:23",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.92409184724,
+            43.0438218523055
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:23",
+          "name": "Capuchin Community Services - St. Bens Community Meal",
+          "siteType": "meal_program",
+          "address": "930 W State St.",
+          "city": "Milwaukee",
+          "zipCode": "53233",
+          "phone": "414-271-0135",
+          "website": "https://www.capuchincommunityservices.org/en/services/meal/",
+          "details": "Hot meals: Sunday, Monday, Tuesday, Wednesday, Thursday 5:15pm - 6:30pm. Bagged food: Fridays 1pm - 4pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:24",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9967540192514,
+            43.0751557273042
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:24",
+          "name": "City of Light Church",
+          "siteType": "food_pantry",
+          "address": "6725 W. Burleigh St.",
+          "city": "Milwaukee",
+          "zipCode": "53210",
+          "phone": null,
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:25",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9757726192483,
+            43.1627604193013
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:25",
+          "name": "City of Praise",
+          "siteType": "food_pantry",
+          "address": "5214 W Luebbe Ln.",
+          "city": "Milwaukee",
+          "zipCode": "53223",
+          "phone": "206-972-1544",
+          "website": "https://thecoponline.org/",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:26",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9413301332428,
+            43.0757148973044
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:26",
+          "name": "COA Goldin Center",
+          "siteType": "food_pantry",
+          "address": "2320 W Burleigh St.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-265-7696",
+          "website": "https://www.coa-yfc.org/gill-family-resource-center",
+          "details": "Wednesday 3pm - 6pm, Saturday 9am - 12pm; closed on the 5th Saturday of the month.",
+          "serviceArea": "53206",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:28",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9370237012421,
+            43.0681050403047
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:28",
+          "name": "Ebenezer Stone Ministries - North Pop-Up",
+          "siteType": "food_pantry",
+          "address": "1902 W Center St",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-488-8070",
+          "website": "https://ebenezerstoneministries.org/programs/",
+          "details": "Two times per month on Saturdays 1pm - 3pm, when weather permits",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:29",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9351923782419,
+            43.1146013433031
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:29",
+          "name": "Eastbrook Church",
+          "siteType": "food_pantry",
+          "address": "5353 N. Green Bay Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53209",
+          "phone": "414-228-5220",
+          "website": "https://eastbrook.org/ministries/missions/food-pantry/",
+          "details": "Monday 6:30pm - 8:30pm, Satuday 9am - 11am",
+          "serviceArea": "53209",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:30",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9826521112491,
+            43.0751237613043
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:30",
+          "name": "Family Life Center",
+          "siteType": "food_pantry",
+          "address": "5511 W Burleigh St.",
+          "city": "Milwaukee",
+          "zipCode": "53210",
+          "phone": "414-755-9696",
+          "website": "https://lifecentermke.churchcenter.com/registrations/events/1904323",
+          "details": "Typically the 1st, 3rd, 4th, and 5th Saturday of each month; Drive-thru 12pm - 2:30pm; Walk-up 1:30pm - 2:15pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:31",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9329415862414,
+            43.0574728173051
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:31",
+          "name": "Feeding America Eastern Wisconsin - Milwaukee",
+          "siteType": "food_bank",
+          "address": "1700 W Fond Du Lac Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53205",
+          "phone": "414-204-2373",
+          "website": "https://feedingamericawi.org/",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:32",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.979763786249,
+            43.1478344973018
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:32",
+          "name": "El Bethel Church of God In Christ",
+          "siteType": "food_pantry",
+          "address": "5401 Good Hope Rd.",
+          "city": "Milwaukee",
+          "zipCode": "53223",
+          "phone": "414-378-0551",
+          "website": "https://ebcmke.org/",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:34",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9129727332382,
+            43.0159059663066
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:34",
+          "name": "Nourish MKE – Orchard St.",
+          "siteType": "food_pantry",
+          "address": "209 West Orchard St.",
+          "city": "Milwaukee",
+          "zipCode": "53204",
+          "phone": "414-289-6030",
+          "website": "https://www.nourishmke.org/find-food/#FondDuLac",
+          "details": "Tuesday and Thursday 12:30pm - 2:30pm; visits are limited to once per month",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:35",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9790776462486,
+            43.0755782173043
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:35",
+          "name": "Good Samaritan COGIC",
+          "siteType": "food_pantry",
+          "address": "5226 West Burleigh St.",
+          "city": "Milwaukee",
+          "zipCode": "53210",
+          "phone": "414-444-0896",
+          "website": null,
+          "details": "Tuesday 10am - 12pm, Wednesday 1pm - 3pm",
+          "serviceArea": "53210, 53216",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:36",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0394307932581,
+            43.1398228603019
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:36",
+          "name": "Nourish MKE – Fond du Lac",
+          "siteType": "food_pantry",
+          "address": "10230 West Fond du Lac Ave",
+          "city": "Milwaukee",
+          "zipCode": "53224",
+          "phone": "414-289-6030",
+          "website": "https://www.nourishmke.org/find-food/#FondDuLac",
+          "details": "Tuesday 5pm - 7pm, Saturday 10am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:37",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9599528972457,
+            43.1039531143033
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:37",
+          "name": "Great Faith Progressive Missionary Baptist Church",
+          "siteType": "food_pantry",
+          "address": "4767 North Hopkins St.",
+          "city": "Milwaukee",
+          "zipCode": "53209",
+          "phone": "414-873-2484",
+          "website": null,
+          "details": "Tuesday 11am - 1pm, Saturday 9am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:38",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9412228132426,
+            43.0137569753065
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:38",
+          "name": "Nourish MKE – Mitchell St.",
+          "siteType": "food_pantry",
+          "address": "1615 S 22nd St.",
+          "city": "Milwaukee",
+          "zipCode": "53204",
+          "phone": "414-289-6030",
+          "website": "https://www.nourishmke.org/find-food/#FondDuLac",
+          "details": "Saturday 10am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:39",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9580297962452,
+            43.0193634133063
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:39",
+          "name": "Ebenezer Stone Ministries - West Pantry",
+          "siteType": "food_pantry",
+          "address": "1127 S 35th St",
+          "city": "Milwaukee",
+          "zipCode": "53215",
+          "phone": "414-488-8070",
+          "website": "https://ebenezerstoneministries.org/programs/",
+          "details": "Wednesdays and Saturdays 9am - 11am; Hot meal and bagged lunches served on Wednesdays; Breakfast served Saturdays 9am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:40",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9445320552433,
+            43.0718864243045
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:40",
+          "name": "Greater Little Hill COGIC",
+          "siteType": "food_pantry",
+          "address": "2480 West Locust St.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-442-1886",
+          "website": "https://greaterlittlehillcogic.webs.com/about-this-house",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:41",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9869354082496,
+            43.0103214963065
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:41",
+          "name": "Good Samaritan Outreach Center",
+          "siteType": "food_pantry",
+          "address": "5916 W Burnham St.",
+          "city": "Milwaukee",
+          "zipCode": "53219",
+          "phone": "414-541-7668",
+          "website": null,
+          "details": "Wednesday and Thursday 10:30am - 12:30am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:42",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0145579962542,
+            43.1185080083027
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:42",
+          "name": "Greater New Birth Church",
+          "siteType": "food_pantry",
+          "address": "8237 W Silver Spring Dr.",
+          "city": "Milwaukee",
+          "zipCode": "53218",
+          "phone": "414-264-5683",
+          "website": "https://www.greaternewbirthchurch.org/?fbclid=IwAR0aLcufXEpTn4d92zwAZOtcMU5SqMLP1LpskR6bQoflsfdqquW4SVQrZB0",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:43",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9615629492458,
+            43.0490454263053
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:43",
+          "name": "Hmong American Friendship Association",
+          "siteType": "food_pantry",
+          "address": "3824 W Vliet St.",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-344-6575",
+          "website": "https://hmongfriendship.org/services/",
+          "details": "Tuesday 10am - 1pm, Friday 12pm - 3pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:44",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9182034812392,
+            43.0786309113044
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:44",
+          "name": "Holy Ghost Lutheran Church",
+          "siteType": "food_pantry",
+          "address": "541 W Concordia Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-510-7808",
+          "website": null,
+          "details": null,
+          "serviceArea": "53212",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:45",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9581300792453,
+            43.0449562433054
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:45",
+          "name": "Hope Lutheran Church",
+          "siteType": "food_pantry",
+          "address": "1115 N. 35th St.",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-342-0471",
+          "website": "https://www.hopeluthmke.com/ministries",
+          "details": "Thursday 9:30am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:46",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9505672792442,
+            43.0684344243046
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:46",
+          "name": "Jewish Community Center",
+          "siteType": "food_pantry",
+          "address": "2930 W. Center St.",
+          "city": "Milwaukee",
+          "zipCode": "53210",
+          "phone": "414-967-8353",
+          "website": "https://www.jccmilwaukee.org/program/jewish-community-pantry/",
+          "details": "Tuesday 4pm - 6pm, Thursday 9am - 12pm",
+          "serviceArea": "53210 | 53216",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:47",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9857107052498,
+            43.1155195993029
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:47",
+          "name": "Greater Mount Sinai COGIC",
+          "siteType": "food_pantry",
+          "address": "5385 North 60th St.",
+          "city": "Milwaukee",
+          "zipCode": "53218",
+          "phone": "414-539-3978",
+          "website": null,
+          "details": "Third and fourth Thursday, 5pm - 6:15pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:48",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9121090382382,
+            43.0461130383055
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:48",
+          "name": "Interchange Food Pantry",
+          "siteType": "food_pantry",
+          "address": "130 E Juneau Ave",
+          "city": "Milwaukee",
+          "zipCode": "53202",
+          "phone": "414-551-2184",
+          "website": "https://www.interchangefoodpantry.org/",
+          "details": "Tuesday 2pm - 4pm, Wednesday 4pm - 6pm, Thursday 9:30am - 11:30am, Saturday 9:30am - 11:30am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:49",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9440059272432,
+            43.0676659183046
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:49",
+          "name": "Maccanon Brown Homeless Sanctuary",
+          "siteType": "food_pantry",
+          "address": "2461 W. Center St.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-404-0600",
+          "website": "https://www.mbsanctuary.org/our_services/",
+          "details": "Tuesday 11am - 1:30pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:51",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9352178752418,
+            43.0717018053045
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:51",
+          "name": "Maccanon Brown Homeless Sanctuary - Hephatha Lutheran Church",
+          "siteType": "meal_program",
+          "address": "1720 W. Locust St.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-404-0600",
+          "website": "https://www.mbsanctuary.org/our_services/",
+          "details": "Hot meal: Friday 12pm - 2pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:52",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9296764892408,
+            43.0229555603063
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:52",
+          "name": "Milwaukee Community Crossroads",
+          "siteType": "food_pantry",
+          "address": "807 S. 14th St.",
+          "city": "Milwaukee",
+          "zipCode": "53204",
+          "phone": "414-902-5391",
+          "website": "https://mccwi.org/what-we-do/emergency-food-pantry/",
+          "details": "Monday - Thursday 1pm - 3pm",
+          "serviceArea": "53204",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:53",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9431868852431,
+            43.060108881305
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:53",
+          "name": "Monumental Baptist Church",
+          "siteType": "food_pantry",
+          "address": "2407 W. North Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53205",
+          "phone": "414-933-2443",
+          "website": "https://www.monumentalbcmke.org/",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:54",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.8881673232345,
+            43.0760805603045
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:54",
+          "name": "Milwaukee Synagogue for Russian Jews",
+          "siteType": "food_pantry",
+          "address": "3213 N. Oakland Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53211",
+          "phone": "414-961-0234",
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:55",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.949545761244,
+            43.0424999313055
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:55",
+          "name": "Neighborhood House of Milwaukee",
+          "siteType": "food_pantry",
+          "address": "2819 W. Richardson Pl.",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-933-6161",
+          "website": "https://neighborhoodhousemke.org/programs/food-pantry-2/",
+          "details": null,
+          "serviceArea": "53208 | 53233",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:56",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9337132162417,
+            43.1058892303034
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:56",
+          "name": "Northside Church of God",
+          "siteType": "food_pantry",
+          "address": "4858 N. 19th St.",
+          "city": "Milwaukee",
+          "zipCode": "53209",
+          "phone": "414-372-6612",
+          "website": "https://www.northsidemilwaukee.org/",
+          "details": "Wednesday 10:30am - 1pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:57",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.8585216152296,
+            42.9603112873086
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:57",
+          "name": "Project Concern of Cudahy St Francis Food Pantry",
+          "siteType": "food_pantry",
+          "address": "3658 E Plankinton Ave",
+          "city": "Cudahy",
+          "zipCode": "53110",
+          "phone": "414-744-0645",
+          "website": "https://projectconcerncudahy.org/",
+          "details": "Monday 9am - 12pm 3pm - 6pm, Wednesday and Friday 9am - 12pm, 1st Saturday of each month 9am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:58",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9885035162501,
+            43.0895974873038
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:58",
+          "name": "Praise Temple Church",
+          "siteType": "food_pantry",
+          "address": "6103 W. Capitol Dr.",
+          "city": "Milwaukee",
+          "zipCode": "53216",
+          "phone": "414-763-5000",
+          "website": null,
+          "details": "Tuesdays 10am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:59",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9607165542457,
+            43.055306448305
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:59",
+          "name": "Restoration Church",
+          "siteType": "food_pantry",
+          "address": "3722 W. Lisbon Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-449-9664",
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:60",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0103772632531,
+            42.9728455933078
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:60",
+          "name": "Redeemer Evangelical Free Church",
+          "siteType": "food_pantry",
+          "address": "7735 W Howard Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53220",
+          "phone": "414-541-5580",
+          "website": "https://redeemerefc.com/home/food-pantry",
+          "details": "Monday 9am - 12pm, Saturday 8am - 10am",
+          "serviceArea": "53129 | 53130 | 53219 | 53220 | 53227 | 53228",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:61",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.937013805242,
+            43.0382593383057
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:61",
+          "name": "Project Lunch Box Food Pantry",
+          "siteType": "food_pantry",
+          "address": "1905 W Wisconsin Ave",
+          "city": "Milwaukee",
+          "zipCode": "53233",
+          "phone": "414-933-7004",
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:62",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0288539132567,
+            43.1771616973007
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:62",
+          "name": "Risen Savior Lutheran",
+          "siteType": "food_pantry",
+          "address": "9505 W. Brown Deer Rd.",
+          "city": "Milwaukee",
+          "zipCode": "53224",
+          "phone": "414-354-7320",
+          "website": "https://www.risensaviormilwaukee.com/page/food-clothing-etc",
+          "details": "Second and fourth Saturday from 11:45am - 1:30pm",
+          "serviceArea": "53224 | 53223 | 53225",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:63",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9846365632496,
+            43.1245421813026
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:63",
+          "name": "Salvation Army - 60th St.",
+          "siteType": "food_pantry",
+          "address": "5880 N. 60th St.",
+          "city": "Milwaukee",
+          "zipCode": "53218",
+          "phone": "414-464-2940",
+          "website": "https://centralusa.salvationarmy.org/milwaukee/food-pantry/",
+          "details": "Monday 11am - 3pm, Tuesday 11am - 3pm, Wednesday 12:30pm - 3pm, Thursday 11am - 3pm, Friday 9am - 12pm",
+          "serviceArea": "53216 | 53218 | 53223 | 53224 | 53225",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:64",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9641243672464,
+            43.1115112953031
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:64",
+          "name": "Salvation Army - Citadel Corps",
+          "siteType": "food_pantry",
+          "address": "4129 W. Villard Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53209",
+          "phone": "414-463-3300",
+          "website": "https://centralusa.salvationarmy.org/milwaukee/food-pantry/",
+          "details": "Thursday 10am - 12pm, Friday 10am - 2pm",
+          "serviceArea": "53209 | 53216 | 53218 | 53222 | 53223 | 53224 | 53225",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:65",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.962842164246,
+            43.0557529493051
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:65",
+          "name": "Rooted & Rising - Washington Park",
+          "siteType": "food_pantry",
+          "address": "3940 W. Lisbon Ave",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-344-1818",
+          "website": "https://www.rootedandrisingwp.org/community-food-center",
+          "details": "Monday and Wednesday 12pm - 4pm; one visit every 30 days",
+          "serviceArea": "53208 | 53210",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:67",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9509236392439,
+            42.9670760383082
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:67",
+          "name": "Salvation Army - Cold Spring Corps Worship & Community Center",
+          "siteType": "food_pantry",
+          "address": "2900 W Cold Spring Rd.",
+          "city": "Greenfield",
+          "zipCode": "53221",
+          "phone": "414-762-3993",
+          "website": "https://centralusa.salvationarmy.org/milwaukee/food-pantry/",
+          "details": "Tuesday 10am - 12pm, Thursday 10am - 12pm",
+          "serviceArea": "53220 | 53221",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:68",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9456813932434,
+            43.0523337013052
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:68",
+          "name": "Salvation Army - West Corps",
+          "siteType": "food_pantry",
+          "address": "1645 N. 25th St.",
+          "city": "Milwaukee",
+          "zipCode": "53205",
+          "phone": "414-831-1156",
+          "website": "https://centralusa.salvationarmy.org/milwaukee/food-pantry/",
+          "details": "Tuesday 10am - 12pm 1pm - 3pm, Wednesday 10am - 12pm 1pm - 3pm, Thursday 10am - 12pm 1pm - 3pm",
+          "serviceArea": "53205 | 53208",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:69",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9904012892505,
+            43.1174156523028
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:69",
+          "name": "Silver Spring Neighborhood Center",
+          "siteType": "food_pantry",
+          "address": "5460 N. 64th St.",
+          "city": "Milwaukee",
+          "zipCode": "53218",
+          "phone": "414-485-7842",
+          "website": "https://www.ssnc-milw.org/programs/family",
+          "details": "Mon, Wed, Fri 11am-2pm & Tue, Thurs 4pm-6pm",
+          "serviceArea": "53225 | 53218 | 53209",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:70",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9129501552379,
+            42.8835265913113
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:70",
+          "name": "Salvation Army - Oak Creek Corps Worship & Community Center",
+          "siteType": "food_pantry",
+          "address": "8853 S. Howell Ave.",
+          "city": "Oak Creek",
+          "zipCode": "53154",
+          "phone": "414-763-9797",
+          "website": "https://centralusa.salvationarmy.org/milwaukee/food-pantry/",
+          "details": "Wednesday 9am - 12pm, Thursday 9am - 12pm",
+          "serviceArea": "53129 | 53130 | 53132 | 53154",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:71",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9668024952467,
+            43.0795846093042
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:71",
+          "name": "Sherman Park Food Pantry Good Shepherd Trinity Gathering Space",
+          "siteType": "food_pantry",
+          "address": "3302 N Sherman Blvd",
+          "city": "Milwaukee",
+          "zipCode": "53216",
+          "phone": "414-871-9440",
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:72",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9163159032389,
+            43.0784790183044
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:72",
+          "name": "Solomon Community Temple United Methodist Church",
+          "siteType": "food_pantry",
+          "address": "3295 N. Dr Martin Luther King Jr Dr.",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-372-2101",
+          "website": "https://solomoncommunitytemple.org/",
+          "details": "Thursday 1pm - 3pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:73",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.929685626241,
+            43.0684754653047
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:73",
+          "name": "Scott Christian Youth and Family Center",
+          "siteType": "food_pantry",
+          "address": "2741 N. Tentonia Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-374-3923",
+          "website": "https://www.scottchristianyouthandfamilycenter.com/",
+          "details": "Pantry: Monday through Friday, 10am - 4pm; Meals: Breakfast 10:30am -11:30am, Dinner 3pm - 4pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:74",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.8715261112317,
+            42.9852235633077
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:74",
+          "name": "St Francis Convent",
+          "siteType": "food_pantry",
+          "address": "3221 S Lake Dr",
+          "city": "Milwaukee",
+          "zipCode": "53235",
+          "phone": "414-744-1160",
+          "website": null,
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:75",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9384954532419,
+            42.9077833653103
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:75",
+          "name": "St James Catholic Church Food Pantry",
+          "siteType": "food_pantry",
+          "address": "7219 S 27th St",
+          "city": "Franklin",
+          "zipCode": "53132",
+          "phone": "414-761-0480",
+          "website": "https://www.stjames-franklin.org/svdp-food-pantry",
+          "details": "Every Friday 9am - 11am, Third Friday of every month 4pm - 6pm, First Saturday of every month 9am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:76",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0594984392606,
+            42.9013806643102
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:76",
+          "name": "St Martin Of Tours Food Pantry",
+          "siteType": "food_pantry",
+          "address": "7963 S 116th St",
+          "city": "Franklin",
+          "zipCode": "53132",
+          "phone": "414-425-1114",
+          "website": "https://www.stmoftours.org/food-pantry",
+          "details": "Tuesday 10am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:77",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.8624502992301,
+            42.9105226393104
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:77",
+          "name": "South Milwaukee Human Concerns",
+          "siteType": "food_pantry",
+          "address": "1029 Milwaukee Ave.",
+          "city": "South Milwaukee",
+          "zipCode": "53172",
+          "phone": "414-764-5340",
+          "website": "https://smhumanconcerns.org/location/",
+          "details": "Monday 12pm - 3pm, Wednesday 3pm - 6pm, Friday 9am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:79",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9780832012484,
+            43.0673572733046
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:79",
+          "name": "St. Catherine Parish",
+          "siteType": "food_pantry",
+          "address": "5101 W. Center St.",
+          "city": "Milwaukee",
+          "zipCode": "53210",
+          "phone": "414-445-5115",
+          "website": "https://saintcatherine51.org/?page_id=137",
+          "details": "Second and fouth Saturday of the month, 9am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:80",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9889415852499,
+            42.9874778173074
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:80",
+          "name": "St. Gregory the Great Parish",
+          "siteType": "food_pantry",
+          "address": "3160 S. 63rd St.",
+          "city": "Milwaukee",
+          "zipCode": "53219",
+          "phone": "414-491-9768",
+          "website": "https://stgregsmil.org/st-vincent-de-paul-society",
+          "details": "First and third Saturday of the month, 10am - 12pm; serves school families",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:81",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9302982112409,
+            43.0069296393068
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:81",
+          "name": "People's Table Food Pantry",
+          "siteType": "food_pantry",
+          "address": "1414 W. Becher St.",
+          "city": "Milwaukee",
+          "zipCode": "53215",
+          "phone": "414-909-9223",
+          "website": "https://peoples-table.org/",
+          "details": "Tuesday 12:30pm - 2:30pm, Wednesday 4pm - 6pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:82",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9120562322382,
+            43.0752914543045
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:82",
+          "name": "St. Martin de Porres Catholic Church",
+          "siteType": "food_pantry",
+          "address": "128 W. Burleigh St.",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-372-3090",
+          "website": "https://smartindeporresmke.org/",
+          "details": null,
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:83",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0070909822531,
+            43.1370367473021
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:83",
+          "name": "St. Peter-Immanuel Lutheran Church",
+          "siteType": "food_pantry",
+          "address": "7801 W. Acacia St.",
+          "city": "Milwaukee",
+          "zipCode": "53223",
+          "phone": "414-353-6800",
+          "website": "https://www.spi-mke.com/resources-and-links",
+          "details": "Monday 1pm - 3pm, Saturday 10am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:84",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0295312902562,
+            42.9867103213072
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:84",
+          "name": "St. Matthias Catholic Church",
+          "siteType": "food_pantry",
+          "address": "9306 Beloit Rd.",
+          "city": "Milwaukee",
+          "zipCode": "53227",
+          "phone": "414-321-0893",
+          "website": "https://www.stmatthias-milw.org/outreach-1/blog-post-title-three-y3peb-4lwnz-5pkhf-6xefl",
+          "details": "Second and fourth Saturday, 7:30am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:85",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.905610009237,
+            42.9714681033081
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:85",
+          "name": "St. Veronica Congregation",
+          "siteType": "food_pantry",
+          "address": "353 E Norwich St.",
+          "city": "Milwaukee",
+          "zipCode": "53207",
+          "phone": "414-482-2920",
+          "website": "https://www.saintveronica.org/our-ministries",
+          "details": "Wednesdays 4pm - 6pm, 1st and 3rd Saturdays 9am - 11am",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:86",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9127806332381,
+            42.9945085383073
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:86",
+          "name": "UMOS",
+          "siteType": "food_pantry",
+          "address": "2701 S. Chase Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53207",
+          "phone": "414-389-6000",
+          "website": "https://www.umos.org/food-pantry/",
+          "details": "Monday through Friday, 1pm - 4pm",
+          "serviceArea": "53207 | 53221",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:87",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.8961911522356,
+            42.9880408203076
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:87",
+          "name": "Unity Lutheran Church",
+          "siteType": "food_pantry",
+          "address": "1025 E. Oklahoma Ave.",
+          "city": "Milwaukee",
+          "zipCode": "53207",
+          "phone": "414-744-6311",
+          "website": "https://www.unitymilwaukee.org/outreach.html#:~:text=Open%20every%20two%20weeks%20on,check%20website%20for%20days%20open.",
+          "details": "Wednesday 5pm - 6pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:88",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9517368202443,
+            43.0373357643057
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:88",
+          "name": "St. Rose Food Pantry",
+          "siteType": "food_pantry",
+          "address": "3005 W Michigan St.",
+          "city": "Milwaukee",
+          "zipCode": "53208",
+          "phone": "414-342-1778",
+          "website": "https://www.stmichael-strose.org/food-pantry-and-clothing",
+          "details": "Second and forth Tuesdays at 4pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:89",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9413465112427,
+            43.0423819043056
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:89",
+          "name": "City on a Hill",
+          "siteType": "food_pantry",
+          "address": "2224 W. Kilbourn Ave",
+          "city": "Milwaukee",
+          "zipCode": "53233",
+          "phone": "414-931-6670",
+          "website": "https://lifecentermke.churchcenter.com/registrations/events/2997182",
+          "details": "2nd Saturday 12pm - 2pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:90",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.0358455512576,
+            43.1492618473016
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:90",
+          "name": "Evangel Assembly of God",
+          "siteType": "food_pantry",
+          "address": "9900 Good Hope Rd",
+          "city": "Milwaukee",
+          "zipCode": "53224",
+          "phone": "414-755-9696",
+          "website": "https://lifecentermke.churchcenter.com/registrations/events/1904359",
+          "details": "1st and 3rd Wednesdays 4pm - 6pm, Drive-Thru",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:91",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.8995176452363,
+            43.0658552673048
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:91",
+          "name": "Kinship Community Food Center",
+          "siteType": "food_pantry",
+          "address": "924 E Clarke St",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-301-1478",
+          "website": "https://www.kinshipmke.org/",
+          "details": "Tuesday 4pm - 6pm, Saturday 8:30am - 10:30am",
+          "serviceArea": "53212 | 53211 | 53202 | 53203",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:92",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.911296341238,
+            43.029619634306
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:92",
+          "name": "LGBT Center",
+          "siteType": "food_pantry",
+          "address": "161 S 1st Street",
+          "city": "Milwaukee",
+          "zipCode": "53204",
+          "phone": "414-271-2656",
+          "website": "https://www.mkelgbt.org/food-pantry",
+          "details": "Appointment only while moving locations",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:93",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9287844772408,
+            43.0746750363044
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:93",
+          "name": "Metropolitan Missionary Baptist Church",
+          "siteType": "food_pantry",
+          "address": "1345 W Burleigh St",
+          "city": "Milwaukee",
+          "zipCode": "53206",
+          "phone": "414-562-7200",
+          "website": "https://www.mmbcmke.org/community-outreach",
+          "details": "Tuesdays and Thursdays",
+          "serviceArea": "53206",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:94",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9182838752392,
+            43.0635638723048
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:94",
+          "name": "Northcott Neighborhood House",
+          "siteType": "food_pantry",
+          "address": "2460 N 6th St",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-372-3770",
+          "website": "https://northcotthouse.org/",
+          "details": "Monday - Friday, 10:00 am - 2:00 pm",
+          "serviceArea": "53212 | 53206",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:95",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9281862362407,
+            43.0502174223053
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:95",
+          "name": "Nourish MKE Site – Cherry Food Center",
+          "siteType": "food_pantry",
+          "address": "1230 W Cherry St",
+          "city": "Milwaukee",
+          "zipCode": "53205",
+          "phone": "414-289-6030",
+          "website": "https://www.nourishmke.org/find-food/vliet/",
+          "details": "Wednesday, Thursday, Friday 9am - 12pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:96",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -88.007950299253,
+            43.0517520113051
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:96",
+          "name": "Tosa Food Pantry",
+          "siteType": "food_pantry",
+          "address": "1600 Underwood Ave",
+          "city": "Wauwatosa",
+          "zipCode": "53213",
+          "phone": "414-453-0700",
+          "website": "https://www.tosacommunityfoodpantry.org/",
+          "details": "Mondays 1pm - 3pm, Saturdays 9am - 11am",
+          "serviceArea": "53213 | 53222 | 53225 | 53226",
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "data-you-can-use:pantries-2026:97",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -87.9151599212387,
+            43.0637803233049
+          ]
+        },
+        "properties": {
+          "id": "data-you-can-use:pantries-2026:97",
+          "name": "WestCare Wisconsin E.A.T.S Food Pantry",
+          "siteType": "food_pantry",
+          "address": "335 W Wright St",
+          "city": "Milwaukee",
+          "zipCode": "53212",
+          "phone": "414-239-9359",
+          "website": "https://westcare.com/places/wisconsin/#programs",
+          "details": "Wednesdays 1pm",
+          "serviceArea": null,
+          "verificationStatus": "source_listed_check_before_visiting"
+        }
+      }
+    ]
+  },
+  "source": {
+    "sourceName": "Milwaukee Food Environment Map — Food Pantries and Meal Sites",
+    "publisher": "Data You Can Use",
+    "collaborators": [
+      "Milwaukee Food Council",
+      "UWM Institute for Systems Change and Peacebuilding"
+    ],
+    "datasetVersion": "Pantries 2026, ArcGIS FeatureServer layer 57",
+    "sourceUrl": "https://experience.arcgis.com/experience/4883a0957d124294aa236d9e9cc696a5",
+    "layerUrl": "https://services5.arcgis.com/3kr3fkJcIf6EOY6g/arcgis/rest/services/Pantries_2026/FeatureServer/57",
+    "retrievedAt": "2026-08-30T19:17:48Z",
+    "sourceLastEditedAt": "2026-03-05T19:55:13Z",
+    "termsUrl": "https://doc.arcgis.com/en/arcgis-online/reference/terms-of-use.htm",
+    "attribution": "Data You Can Use, Milwaukee Food Council, and UWM Institute for Systems Change and Peacebuilding",
+    "sourceSnapshotSha256": "5b86d359dd55e008836dfba4f4bde45d0561567bcce9d346882392a744e77f94",
+    "featureCount": 89,
+    "limitation": "These are source-listed locations, not independently verified current hours or availability. Details may have changed; check before visiting. This display layer does not change Food Access Need, Equity Baseline, or Food Equity Priority."
+  }
+}
