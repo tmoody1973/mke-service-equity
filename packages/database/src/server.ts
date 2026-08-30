@@ -11,6 +11,12 @@ export {
 } from "./atlas/atlas-repository";
 export type {AtlasRepositoryClient} from "./atlas/atlas-repository";
 export {parseAtlasMultiPolygon, serializedGeoJsonBytes} from "./atlas/geometry";
+export {
+  AtlasProfileDataIntegrityError,
+  buildAtlasTractProfile,
+  loadAtlasTractProfile,
+} from "./atlas/profile-repository";
+export type {AtlasProfileRepositoryClient} from "./atlas/profile-repository";
 export {selectAtlasRun} from "./atlas/run-selector";
 export type {
   AtlasRunSelection,

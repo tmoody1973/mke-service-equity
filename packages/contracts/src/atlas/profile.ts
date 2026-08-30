@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {atlasUnavailableReasonSchema} from "./run";
 import {atlasTractPropertiesSchema} from "./tract";
 
 export const presentationQualityStatusSchema = z.enum([
@@ -11,12 +12,35 @@ export const presentationQualityStatusSchema = z.enum([
 ]);
 
 const measurementUnitSchema = z.string().trim().min(1);
+const nullablePercentSchema = z.number().finite().min(0).max(100).nullable();
 
 export const observedMeasurementSchema = z.strictObject({
   state: z.literal("observed"),
   value: z.number().finite(),
   unit: measurementUnitSchema,
   qualityStatus: z.enum(["verified", "provisional", "stale"]),
+  marginOfError: z.number().finite().nonnegative().nullable(),
+  confidenceLow: z.number().finite().min(0).max(100).nullable(),
+  confidenceHigh: z.number().finite().min(0).max(100).nullable(),
+}).superRefine((measurement, context) => {
+  const oneConfidenceBoundMissing = (measurement.confidenceLow === null)
+    !== (measurement.confidenceHigh === null);
+  if (oneConfidenceBoundMissing) {
+    context.addIssue({
+      code: "custom",
+      message: "Confidence bounds must be provided together.",
+    });
+  }
+  if (
+    measurement.confidenceLow !== null
+    && measurement.confidenceHigh !== null
+    && measurement.confidenceLow > measurement.confidenceHigh
+  ) {
+    context.addIssue({
+      code: "custom",
+      message: "The lower confidence bound cannot exceed the upper bound.",
+    });
+  }
 });
 
 export const unavailableMeasurementSchema = z.discriminatedUnion("state", [
@@ -51,13 +75,40 @@ export const atlasMeasurementSchema = z.union([
   unavailableMeasurementSchema,
 ]);
 
+export const atlasProvenanceItemSchema = z.strictObject({
+  sourceName: z.string().trim().min(1),
+  publisher: z.string().trim().min(1),
+  datasetVersion: z.string().trim().min(1),
+  sourceUrl: z.url(),
+  retrievedAt: z.iso.datetime({offset: true}),
+  validFrom: z.iso.date().nullable(),
+  validTo: z.iso.date().nullable(),
+  methodologyUrl: z.url().nullable(),
+  limitation: z.string().trim().min(1).nullable(),
+});
+
+export const atlasNearestResourceSchema = z.strictObject({
+  name: z.string().trim().min(1),
+  category: z.literal("full_service_grocery"),
+  address: z.string().trim().min(1).nullable(),
+  city: z.string().trim().min(1).nullable(),
+  postalCode: z.string().trim().min(1).nullable(),
+});
+
 export const atlasEvidenceItemSchema = z.strictObject({
   slug: z.string().trim().min(1),
   name: z.string().trim().min(1),
+  definition: z.string().trim().min(1),
   domain: z.string().trim().min(1),
+  dataYear: z.string().trim().min(1).nullable(),
   measurement: atlasMeasurementSchema,
-  contribution: z.number().finite().nullable(),
+  countyPercentile: z.number().finite().min(0).max(100),
+  effectiveWeight: z.number().finite().positive().max(1),
+  contribution: z.number().finite(),
   higherIsWorse: z.boolean(),
+  provenance: z.array(atlasProvenanceItemSchema).min(1),
+  nearestResource: atlasNearestResourceSchema.nullable(),
+  limitation: z.string().trim().min(1).nullable(),
 });
 
 export const atlasContextItemSchema = z.strictObject({
@@ -67,28 +118,73 @@ export const atlasContextItemSchema = z.strictObject({
   scoringRole: z.literal("context_only"),
 });
 
-export const atlasProvenanceItemSchema = z.strictObject({
-  sourceName: z.string().trim().min(1),
-  publisher: z.string().trim().min(1),
-  datasetVersion: z.string().trim().min(1),
-  validFrom: z.iso.date().nullable(),
-  validTo: z.iso.date().nullable(),
-  methodologyUrl: z.url().nullable(),
-  limitation: z.string().trim().min(1).nullable(),
+export const atlasContextSectionSchema = z.discriminatedUnion("state", [
+  z.strictObject({
+    state: z.literal("available"),
+    items: z.array(atlasContextItemSchema),
+  }),
+  z.strictObject({
+    state: z.literal("unavailable"),
+    reason: z.enum(["not_pinned_to_run", "not_approved_for_publication"]),
+  }),
+]);
+
+export const atlasProfileScoreSummarySchema = z.strictObject({
+  foodAccessNeedPercentile: nullablePercentSchema,
+  equityBaselinePercentile: nullablePercentSchema,
+  retailAccessScore: nullablePercentSchema,
+  transportationConstraintScore: nullablePercentSchema,
 });
 
 export const atlasTractProfileSchema = z.strictObject({
   runId: z.uuid(),
   tract: atlasTractPropertiesSchema,
   explanation: z.string().trim().min(1),
+  scores: atlasProfileScoreSummarySchema,
   foodComponents: z.array(atlasEvidenceItemSchema),
   equityDrivers: z.array(atlasEvidenceItemSchema),
-  context: z.array(atlasContextItemSchema),
+  context: atlasContextSectionSchema,
   provenance: z.array(atlasProvenanceItemSchema),
+  limitations: z.array(z.string().trim().min(1)),
+}).superRefine((profile, context) => {
+  if (profile.tract.qualityStatus === "complete" && profile.foodComponents.length !== 4) {
+    context.addIssue({
+      code: "custom",
+      message: "A complete profile requires exactly four Food Access components.",
+      path: ["foodComponents"],
+    });
+  }
+  if (profile.tract.qualityStatus === "complete" && profile.equityDrivers.length !== 13) {
+    context.addIssue({
+      code: "custom",
+      message: "A complete profile requires exactly thirteen Equity Baseline drivers.",
+      path: ["equityDrivers"],
+    });
+  }
 });
 
+export const atlasProfileUnavailableReasonSchema = z.union([
+  atlasUnavailableReasonSchema,
+  z.enum(["invalid_tract", "profile_incomplete"]),
+]);
+
+export const atlasTractProfileResponseSchema = z.discriminatedUnion("state", [
+  z.strictObject({
+    state: z.literal("available"),
+    profile: atlasTractProfileSchema,
+  }),
+  z.strictObject({
+    state: z.literal("unavailable"),
+    reason: atlasProfileUnavailableReasonSchema,
+  }),
+]);
+
 export type AtlasContextItem = z.infer<typeof atlasContextItemSchema>;
+export type AtlasContextSection = z.infer<typeof atlasContextSectionSchema>;
 export type AtlasEvidenceItem = z.infer<typeof atlasEvidenceItemSchema>;
 export type AtlasMeasurement = z.infer<typeof atlasMeasurementSchema>;
+export type AtlasNearestResource = z.infer<typeof atlasNearestResourceSchema>;
+export type AtlasProfileUnavailableReason = z.infer<typeof atlasProfileUnavailableReasonSchema>;
 export type AtlasProvenanceItem = z.infer<typeof atlasProvenanceItemSchema>;
 export type AtlasTractProfile = z.infer<typeof atlasTractProfileSchema>;
+export type AtlasTractProfileResponse = z.infer<typeof atlasTractProfileResponseSchema>;

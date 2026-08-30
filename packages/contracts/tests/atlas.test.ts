@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 import {
   atlasResponseSchema,
   atlasTractProfileSchema,
+  atlasTractProfileResponseSchema,
   atlasTractPropertiesSchema,
 } from "../src/atlas";
 
@@ -10,7 +11,7 @@ const tractProperties = {
   name: "Census Tract 1.01",
   population: 2_430,
   geographyVintage: "2020",
-  foodEquityPriority: 5,
+  foodEquityPriority: 1,
   foodAccessNeedBand: "very_high",
   equityBaselineBand: "high",
   qualityStatus: "complete",
@@ -123,64 +124,108 @@ describe("atlasTractPropertiesSchema", () => {
 });
 
 describe("atlasTractProfileSchema", () => {
-  it("keeps observed zero, missing, and suppressed measurements distinct", () => {
-    const profile = atlasTractProfileSchema.parse({
-      runId: run.id,
-      tract: tractProperties,
-      explanation: "This tract has very high food access need and a high Equity Baseline band.",
-      foodComponents: [
-        {
-          slug: "households_no_vehicle",
-          name: "Households without a vehicle",
-          domain: "transportation_constraint",
-          measurement: {state: "observed", value: 0, unit: "percent", qualityStatus: "verified"},
-          contribution: 0,
-          higherIsWorse: true,
-        },
-        {
-          slug: "transit_service_intensity",
-          name: "Scheduled transit service intensity",
-          domain: "transportation_constraint",
-          measurement: {state: "missing", value: null, unit: "trips", qualityStatus: "missing"},
-          contribution: null,
-          higherIsWorse: false,
-        },
-      ],
-      equityDrivers: [
-        {
-          slug: "limited_english_proficiency",
-          name: "Limited English proficiency",
-          domain: "demographic",
-          measurement: {state: "suppressed", value: null, unit: "percent", qualityStatus: "suppressed"},
-          contribution: null,
-          higherIsWorse: true,
-        },
-      ],
-      context: [],
-      provenance: [],
-    });
+  const provenance = {
+    sourceName: "American Community Survey 5-year estimates",
+    publisher: "U.S. Census Bureau",
+    datasetVersion: "2024 ACS 5-year",
+    sourceUrl: "https://api.census.gov/data/2024/acs/acs5",
+    retrievedAt: "2026-08-29T12:00:00.000Z",
+    validFrom: null,
+    validTo: null,
+    methodologyUrl: "https://www.census.gov/programs-surveys/acs/methodology.html",
+    limitation: null,
+  } as const;
+
+  const evidence = Array.from({length: 4}, (_, index) => ({
+    slug: `food-metric-${index}`,
+    name: `Food metric ${index}`,
+    definition: "A scored Food Access measure.",
+    domain: index < 2 ? "retail_access" : "transportation_constraint",
+    dataYear: null,
+    measurement: {
+      state: "observed" as const,
+      value: index,
+      unit: "percent",
+      qualityStatus: "verified" as const,
+      marginOfError: null,
+      confidenceLow: null,
+      confidenceHigh: null,
+    },
+    countyPercentile: 50,
+    effectiveWeight: 0.25,
+    contribution: 0,
+    higherIsWorse: true,
+    provenance: [provenance],
+    nearestResource: null,
+    limitation: null,
+  }));
+
+  const drivers = Array.from({length: 13}, (_, index) => ({
+    ...evidence[0],
+    slug: index === 0 ? "limited_english_proficiency" : `equity-driver-${index}`,
+    name: index === 0 ? "Speaks English less than ‘very well,’ age 5+" : `Equity driver ${index}`,
+    definition: "A scored Equity Baseline measure.",
+    domain: index < 3 ? "demographic" : index < 7 ? "socioeconomic" : "health",
+  }));
+
+  const completeProfile = {
+    runId: run.id,
+    tract: tractProperties,
+    explanation: "Priority 1 reflects very high Food Access Need and high Equity Baseline conditions.",
+    scores: {
+      foodAccessNeedPercentile: 84.2,
+      equityBaselinePercentile: 73.1,
+      retailAccessScore: 81.5,
+      transportationConstraintScore: 76.4,
+    },
+    foodComponents: evidence,
+    equityDrivers: drivers,
+    context: {state: "unavailable", reason: "not_pinned_to_run"},
+    provenance: [provenance],
+    limitations: ["These tract-level measures do not describe every person in the tract."],
+  } as const;
+
+  it("preserves an observed zero and the approved English-language label", () => {
+    const profile = atlasTractProfileSchema.parse(completeProfile);
 
     expect(profile.foodComponents[0]?.measurement).toMatchObject({state: "observed", value: 0});
-    expect(profile.foodComponents[1]?.measurement.state).toBe("missing");
-    expect(profile.equityDrivers[0]?.measurement.state).toBe("suppressed");
+    expect(profile.equityDrivers[0]?.name).toContain("English");
   });
 
   it("rejects a non-observed measurement carrying a numeric value", () => {
     expect(() => atlasTractProfileSchema.parse({
-      runId: run.id,
-      tract: tractProperties,
-      explanation: "Explanation",
+      ...completeProfile,
       foodComponents: [{
-        slug: "metric",
-        name: "Metric",
-        domain: "retail_access",
+        ...evidence[0],
         measurement: {state: "missing", value: 0, unit: "percent", qualityStatus: "missing"},
-        contribution: null,
-        higherIsWorse: true,
       }],
-      equityDrivers: [],
-      context: [],
-      provenance: [],
     })).toThrow();
   });
+
+  it("rejects a complete profile without all four Food and thirteen Equity inputs", () => {
+    expect(() => atlasTractProfileSchema.parse({
+      ...completeProfile,
+      foodComponents: [],
+      equityDrivers: [],
+    })).toThrow();
+  });
+
+  it("rejects internal operational metadata", () => {
+    expect(() => atlasTractProfileSchema.parse({
+      ...completeProfile,
+      storageUri: "s3://private/raw-data.zip",
+    })).toThrow();
+  });
+});
+
+describe("atlasTractProfileResponseSchema", () => {
+  it.each(["invalid_tract", "profile_incomplete", "no_published_run"] as const)(
+    "accepts the safe unavailable reason %s",
+    (reason) => {
+      expect(atlasTractProfileResponseSchema.parse({state: "unavailable", reason})).toEqual({
+        state: "unavailable",
+        reason,
+      });
+    },
+  );
 });

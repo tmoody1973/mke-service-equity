@@ -22,7 +22,7 @@ function row(overrides: Record<string, unknown> = {}) {
     geometry_valid: true,
     food_score_id: "193632b7-c8d3-52fc-8226-77d4eae10995",
     food_score_run_id: foodRunId,
-    priority: 5,
+    priority: 1,
     food_access_need_band: "very_high",
     food_equity_baseline_band: "high",
     quality_status: "complete",
@@ -71,7 +71,7 @@ describe("buildAtlasFeatureCollection", () => {
       feature.properties.qualityStatus,
       feature.properties.foodEquityPriority,
     ])).toEqual([
-      ["55079000101", "complete", 5],
+      ["55079000101", "complete", 1],
       ["55079187200", "insufficient_data", null],
       ["55079990000", "ineligible_zero_population", null],
     ]);
