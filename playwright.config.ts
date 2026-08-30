@@ -1,6 +1,7 @@
 import {defineConfig} from "@playwright/test";
 
-const baseURL = "http://127.0.0.1:3000";
+const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL;
+const baseURL = externalBaseURL ?? "http://127.0.0.1:3000";
 
 const widths = [
   {height: 812, name: "width-375", width: 375},
@@ -26,10 +27,12 @@ export default defineConfig({
     baseURL,
     trace: "on-first-retry",
   },
-  webServer: {
-    command: "npm run start --workspace @mke/web",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    url: baseURL,
-  },
+  webServer: externalBaseURL
+    ? undefined
+    : {
+        command: "npm run start --workspace @mke/web",
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+        url: baseURL,
+      },
 });

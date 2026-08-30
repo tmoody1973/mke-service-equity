@@ -32,7 +32,7 @@ describe("ApplicationShell", () => {
 
     render(<ApplicationShell><p>Workspace content</p></ApplicationShell>);
 
-    expect(screen.getByRole("link", {name: "Skip to map workspace"})).toHaveAttribute(
+    expect(screen.getByRole("link", {name: "Skip to the Food Equity Atlas"})).toHaveAttribute(
       "href",
       "#map-workspace",
     );

@@ -229,3 +229,23 @@ export const Sheet = Object.assign(SheetRoot, {
   Heading: SheetHeading,
   Trigger: SheetTrigger,
 });
+
+function EmptyStateRoot(props: ComponentPropsWithoutRef<"div">) {
+  return <div {...props} />;
+}
+
+function EmptyStateTitle(props: ComponentPropsWithoutRef<"h3">) {
+  return <h3 {...props} />;
+}
+
+function EmptyStateDescription(props: ComponentPropsWithoutRef<"p">) {
+  return <p {...props} />;
+}
+
+export const EmptyState = Object.assign(EmptyStateRoot, {
+  Content: SheetElement,
+  Description: EmptyStateDescription,
+  Header: SheetElement,
+  Media: SheetElement,
+  Title: EmptyStateTitle,
+});

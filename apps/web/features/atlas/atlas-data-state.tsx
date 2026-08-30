@@ -15,10 +15,10 @@ export function AtlasDataState({response}: AtlasDataStateProps) {
     && response.mode === "validated_preview";
 
   const message = preview
-    ? "Validated preview — not published"
+    ? "Preview only — checked, but not published."
     : noPublishedRun
-      ? "No published Food Equity data is available yet."
-      : "Atlas data is temporarily unavailable.";
+      ? "No published Food Equity results are available yet."
+      : "The Food Equity Atlas is temporarily unavailable. Please try again later.";
 
   return (
     <div className="pointer-events-none absolute inset-x-3 bottom-20 z-10 max-w-md min-[600px]:inset-x-auto min-[600px]:bottom-3 min-[600px]:left-4">

@@ -102,7 +102,7 @@ const tracts = {
       name: "Census Tract 1.01",
       population: 2_430,
       geographyVintage: "2020",
-      foodEquityPriority: 5 as const,
+      foodEquityPriority: 1 as const,
       foodAccessNeedBand: "very_high" as const,
       equityBaselineBand: "high" as const,
       qualityStatus: "complete" as const,

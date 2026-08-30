@@ -10,7 +10,7 @@ const complete: AtlasTractProperties = {
   name: "Census Tract 1.01",
   population: 2_430,
   geographyVintage: "2020",
-  foodEquityPriority: 5,
+  foodEquityPriority: 1,
   foodAccessNeedBand: "very_high",
   equityBaselineBand: "high",
   qualityStatus: "complete",
@@ -20,7 +20,7 @@ const complete: AtlasTractProperties = {
 describe("explainTractSummary", () => {
   it("explains a priority as a relative band combination, not a causal claim", () => {
     expect(explainTractSummary(complete)).toBe(
-      "Priority 5 combines a very high Food Access Need band with a high Equity Baseline band. Priority 5 is the highest relative priority in this version.",
+      "Priority 1 is based on two measures: Food Access Need is very high, and Equity Baseline is high. Priority 1 is the highest relative priority in this version.",
     );
   });
 
@@ -31,7 +31,7 @@ describe("explainTractSummary", () => {
       foodAccessNeedBand: null,
       qualityStatus: "insufficient_data",
       exclusionReasons: ["origin_unsnapped"],
-    })).toContain("walking-network origin could not be matched reliably");
+    })).toContain("Census population center could not be connected reliably");
   });
 
   it("does not confuse zero population with a zero score", () => {
@@ -43,7 +43,7 @@ describe("explainTractSummary", () => {
       equityBaselineBand: null,
       qualityStatus: "ineligible_zero_population",
       exclusionReasons: ["zero_population"],
-    })).toContain("does not mean the tract received a score of zero");
+    })).toContain("This is not a score of zero");
   });
 });
 
@@ -52,8 +52,8 @@ describe("TractSummary", () => {
     render(<TractSummary tract={complete} />);
 
     expect(screen.getByRole("heading", {name: "Census Tract 1.01"})).toBeInTheDocument();
-    expect(screen.getByText("Priority 5")).toBeInTheDocument();
+    expect(screen.getByText("Priority 1")).toBeInTheDocument();
     expect(screen.getByText("Population 2,430")).toBeInTheDocument();
-    expect(screen.getByText(/very high Food Access Need/)).toBeInTheDocument();
+    expect(screen.getByText(/Food Access Need is very high/)).toBeInTheDocument();
   });
 });

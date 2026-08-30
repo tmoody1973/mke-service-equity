@@ -12,43 +12,43 @@ function bandLabel(value: string | null): string {
 
 export function explainTractSummary(tract: AtlasTractProperties): string {
   if (tract.qualityStatus === "ineligible_zero_population") {
-    return "This tract has zero recorded population in the approved geography source, so it is not eligible for scoring. This does not mean the tract received a score of zero.";
+    return "The approved 2020 Census tract data records no residents for this tract, so it is not scored. This is not a score of zero.";
   }
 
   if (tract.qualityStatus === "insufficient_data") {
     const originUnsnapped = tract.exclusionReasons.includes("origin_unsnapped");
     return originUnsnapped
-      ? "A Food Equity Priority is not shown because the approved walking-network origin could not be matched reliably. Missing information was not replaced with zero."
-      : "A Food Equity Priority is not shown because required data did not meet the approved completeness rules. Missing information was not replaced with zero.";
+      ? "No priority is shown because this tract's Census population center could not be connected reliably to the approved walking network. Missing data was not counted as zero."
+      : "No priority is shown because one or more required measures were unavailable or did not pass the approved data checks. Missing data was not counted as zero.";
   }
 
-  const priorityContext = tract.foodEquityPriority === 5
-    ? "Priority 5 is the highest relative priority in this version."
-    : "A higher number indicates a higher relative priority in this version.";
+  const priorityContext = tract.foodEquityPriority === 1
+    ? "Priority 1 is the highest relative priority in this version."
+    : "A lower number means a higher relative priority in this version.";
 
-  return `Priority ${tract.foodEquityPriority} combines a ${bandLabel(tract.foodAccessNeedBand)} Food Access Need band with a ${bandLabel(tract.equityBaselineBand)} Equity Baseline band. ${priorityContext}`;
+  return `Priority ${tract.foodEquityPriority} is based on two measures: Food Access Need is ${bandLabel(tract.foodAccessNeedBand)}, and Equity Baseline is ${bandLabel(tract.equityBaselineBand)}. ${priorityContext}`;
 }
 
 export function TractSummary({idPrefix = "atlas", tract}: TractSummaryProps) {
   const stateLabel = tract.qualityStatus === "complete"
-    ? `Priority ${tract.foodEquityPriority}`
-    : tract.qualityStatus === "insufficient_data"
-      ? "Insufficient data"
-      : "Not scored";
+      ? `Priority ${tract.foodEquityPriority}`
+      : tract.qualityStatus === "insufficient_data"
+        ? "Insufficient data"
+        : "Not scored — no recorded population";
 
   return (
     <Card aria-labelledby={`${idPrefix}-tract-summary-${tract.geoid}`} className="gap-3" role="article">
       <Card.Header className="gap-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-medium uppercase tracking-wide text-muted">
-            GEOID {tract.geoid}
+            Census tract ID {tract.geoid}
           </span>
           <Chip size="sm" variant="secondary">{stateLabel}</Chip>
         </div>
         <Card.Title id={`${idPrefix}-tract-summary-${tract.geoid}`}>{tract.name}</Card.Title>
         <Card.Description>
           {tract.population === null
-            ? "Population not available"
+            ? "Population data is not available"
             : `Population ${tract.population.toLocaleString("en-US")}`}
         </Card.Description>
       </Card.Header>

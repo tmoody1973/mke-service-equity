@@ -9,7 +9,7 @@ describe("AtlasDataState", () => {
     render(<AtlasDataState response={{state: "unavailable", reason: "no_published_run"}} />);
 
     expect(screen.getByRole("status")).toHaveTextContent(
-      "No published Food Equity data is available yet.",
+      "No published Food Equity results are available yet.",
     );
   });
 
@@ -27,13 +27,17 @@ describe("AtlasDataState", () => {
       tracts: {type: "FeatureCollection", features: []} as never,
     }} />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Validated preview — not published");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Preview only — checked, but not published.",
+    );
   });
 
   it("uses safe copy for internal data failures", () => {
     render(<AtlasDataState response={{state: "unavailable", reason: "data_incomplete"}} />);
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Atlas data is temporarily unavailable.");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "The Food Equity Atlas is temporarily unavailable. Please try again later.",
+    );
     expect(screen.queryByText(/database|postgres|storage/i)).not.toBeInTheDocument();
   });
 });

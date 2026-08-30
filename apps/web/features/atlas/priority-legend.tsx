@@ -14,11 +14,11 @@ type PriorityLegendProps = {
 };
 
 const priorityLabels = {
-  1: "1 — Lower relative priority",
-  2: "2 — Lower-middle relative priority",
-  3: "3 — Middle relative priority",
-  4: "4 — Higher relative priority",
-  5: "5 — Highest relative priority",
+  1: "1 — Highest",
+  2: "2 — High",
+  3: "3 — Moderate",
+  4: "4 — Lower",
+  5: "5 — Lowest",
 } as const;
 const priorities = [1, 2, 3, 4, 5] as const;
 
@@ -36,7 +36,9 @@ export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}:
         <h2 className="text-sm font-semibold" id={`${idPrefix}-priority-legend-title`}>
           Food Equity Priority
         </h2>
-        <p className="text-xs text-muted">Relative priority within this data version.</p>
+        <p className="text-xs text-muted">
+          Compares each tract with other Milwaukee County tracts in this data version.
+        </p>
       </div>
       <div aria-label="Food Equity Priority filter" className="grid gap-1" role="group">
         <Button
@@ -46,12 +48,12 @@ export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}:
           size="sm"
           variant={activePriorities.length === 0 ? "secondary" : "ghost"}
         >
-          Show all priorities
+          Show all tracts
         </Button>
         {priorities.map(
           (priority) => (
             <Button
-              aria-label={`Filter to priority ${priority}`}
+              aria-label={`Show or hide Priority ${priority} tracts`}
               aria-pressed={activePriorities.includes(priority)}
               className="h-9 justify-start gap-2 px-2"
               key={priority}
@@ -84,7 +86,7 @@ export function PriorityLegend({activePriorities, idPrefix = "atlas", onChange}:
             className="size-3 rounded-sm border-2 border-dashed border-slate-600"
             style={{backgroundColor: ZERO_POPULATION_COLOR}}
           />
-          Zero population — not scored
+          No recorded population — not scored
         </li>
       </ul>
     </section>

@@ -3,7 +3,7 @@
 import type {AtlasResponse} from "@mke/contracts";
 import {render, screen, within} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import {afterEach, describe, expect, it, vi} from "vitest";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
 const navigation = vi.hoisted(() => ({
   pathname: "/",
@@ -47,7 +47,7 @@ const available: AtlasResponse = {
         name: "Census Tract 1.01",
         population: 2_430,
         geographyVintage: "2020",
-        foodEquityPriority: 5,
+        foodEquityPriority: 1,
         foodAccessNeedBand: "very_high",
         equityBaselineBand: "high",
         qualityStatus: "complete",
@@ -58,8 +58,15 @@ const available: AtlasResponse = {
 };
 
 describe("AtlasWorkspace", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve({
+      json: () => Promise.resolve({state: "unavailable", reason: "profile_incomplete"}),
+    })));
+  });
+
   afterEach(() => {
     navigation.searchParams = new URLSearchParams();
+    vi.unstubAllGlobals();
     vi.clearAllMocks();
   });
 
@@ -67,7 +74,7 @@ describe("AtlasWorkspace", () => {
     render(<AtlasWorkspace atlas={unavailable} styleUrl="/map-style.json" />);
 
     expect(screen.getByRole("status")).toHaveTextContent(
-      "No published Food Equity data is available yet.",
+      "No published Food Equity results are available yet.",
     );
     expect(screen.getByRole("region", {name: "Map workspace"})).toHaveAttribute(
       "data-selected-tract",
@@ -80,7 +87,7 @@ describe("AtlasWorkspace", () => {
 
     render(<AtlasWorkspace atlas={available} styleUrl="/map-style.json" />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Validated preview — not published");
+    expect(screen.getByText("Preview only — checked, but not published.")).toBeInTheDocument();
     expect(screen.getByRole("region", {name: "Map workspace"})).toHaveAttribute(
       "data-selected-tract",
       "55079000101",
@@ -91,11 +98,11 @@ describe("AtlasWorkspace", () => {
     const user = userEvent.setup();
     render(<AtlasWorkspace atlas={available} styleUrl="/map-style.json" />);
 
-    await user.click(screen.getByRole("button", {name: "Browse tracts"}));
+    await user.click(screen.getByRole("button", {name: "Browse census tracts"}));
 
     const dialog = screen.getByRole("dialog");
     expect(screen.getByRole("heading", {name: "Explore census tracts"})).toBeInTheDocument();
-    expect(within(dialog).getByRole("button", {name: /Census Tract 1.01.*Priority 5/}))
+    expect(within(dialog).getByRole("button", {name: /Census Tract 1.01.*Priority 1/}))
       .toBeInTheDocument();
   });
 });

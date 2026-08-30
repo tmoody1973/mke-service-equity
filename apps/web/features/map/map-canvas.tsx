@@ -218,7 +218,7 @@ export function MapCanvas({
           className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-divider bg-background px-4 py-3 text-sm"
           role="alert"
         >
-          The tract map could not be displayed. Use the census tract list to continue.
+          The map couldn’t load. Select Browse census tracts to continue.
         </p>
       ) : null}
       {mapStatus === "loading" ? (

@@ -10,14 +10,17 @@ describe("PriorityLegend", () => {
     render(<PriorityLegend activePriorities={[]} onChange={vi.fn()} />);
 
     expect(screen.getByRole("group", {name: "Food Equity Priority filter"})).toBeInTheDocument();
-    expect(screen.getByRole("button", {name: "Show all priorities"})).toHaveAttribute(
+    expect(screen.getByRole("button", {name: "Show all tracts"})).toHaveAttribute(
       "aria-pressed",
       "true",
     );
-    expect(screen.getByText("1 — Lower relative priority")).toBeInTheDocument();
-    expect(screen.getByText("5 — Highest relative priority")).toBeInTheDocument();
+    expect(screen.getByText("1 — Highest")).toBeInTheDocument();
+    expect(screen.getByText("2 — High")).toBeInTheDocument();
+    expect(screen.getByText("3 — Moderate")).toBeInTheDocument();
+    expect(screen.getByText("4 — Lower")).toBeInTheDocument();
+    expect(screen.getByText("5 — Lowest")).toBeInTheDocument();
     expect(screen.getByText("Insufficient data")).toBeInTheDocument();
-    expect(screen.getByText("Zero population — not scored")).toBeInTheDocument();
+    expect(screen.getByText("No recorded population — not scored")).toBeInTheDocument();
   });
 
   it("changes the explicit priority filter", async () => {
@@ -25,7 +28,7 @@ describe("PriorityLegend", () => {
     const onChange = vi.fn();
     render(<PriorityLegend activePriorities={[]} onChange={onChange} />);
 
-    await user.click(screen.getByRole("button", {name: "Filter to priority 5"}));
+    await user.click(screen.getByRole("button", {name: "Show or hide Priority 5 tracts"}));
     expect(onChange).toHaveBeenCalledWith([5]);
   });
 });

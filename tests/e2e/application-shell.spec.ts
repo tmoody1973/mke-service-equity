@@ -26,7 +26,7 @@ test("renders and operates the shell at the configured width", async ({page}, te
     await page.evaluate(() => window.innerWidth),
   );
 
-  const skipLink = page.getByRole("link", {name: "Skip to map workspace"});
+  const skipLink = page.getByRole("link", {name: "Skip to the Food Equity Atlas"});
   await page.keyboard.press("Tab");
   await expect(skipLink).toBeFocused();
   await page.keyboard.press("Enter");
@@ -42,7 +42,9 @@ test("renders and operates the shell at the configured width", async ({page}, te
   await expect(attribution).toBeVisible();
   await expect(attribution).toBeInViewport();
   await expect(attribution).toContainText("MapLibre GL JS");
-  await expect(page.getByRole("status")).toContainText("No published Food Equity data");
+  await expect(
+    page.getByText("No published Food Equity results are available yet.", {exact: true}),
+  ).toBeVisible();
 
   const mapWorkspaceBox = await mapWorkspace.boundingBox();
   const mapContainerBox = await mapContainer.boundingBox();

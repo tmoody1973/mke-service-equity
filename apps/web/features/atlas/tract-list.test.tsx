@@ -24,8 +24,12 @@ function feature(
       population: qualityStatus === "ineligible_zero_population" ? 0 : 1_000,
       geographyVintage: "2020",
       foodEquityPriority: priority as 1 | 2 | 3 | 4 | 5 | null,
-      foodAccessNeedBand: priority === null ? null : "high",
-      equityBaselineBand: qualityStatus === "ineligible_zero_population" ? null : "high",
+      foodAccessNeedBand: priority === null ? null : priority === 5 ? "very_low" : "high",
+      equityBaselineBand: qualityStatus === "ineligible_zero_population"
+        ? null
+        : priority === 5
+          ? "very_low"
+          : "high",
       qualityStatus,
       exclusionReasons: qualityStatus === "complete" ? [] : [qualityStatus],
     },
@@ -45,8 +49,10 @@ describe("TractList", () => {
     expect(screen.getAllByRole("button")).toHaveLength(3);
     expect(screen.getByRole("button", {name: /Census Tract 87200.*Insufficient data/}))
       .toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", {name: /Census Tract 90000.*Zero population/}))
+    expect(screen.getByRole("button", {name: /Census Tract 90000.*No recorded population/}))
       .toBeInTheDocument();
+    expect(screen.getByText("3 tracts")).toBeInTheDocument();
+    expect(screen.getAllByText(/Census tract ID 55079/)).toHaveLength(3);
   });
 
   it("selects a tract through the non-map control", async () => {

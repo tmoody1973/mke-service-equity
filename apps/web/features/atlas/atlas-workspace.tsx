@@ -8,8 +8,9 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import {MapCanvas} from "../map/map-canvas";
 import {AtlasDataState} from "./atlas-data-state";
 import {PriorityLegend} from "./priority-legend";
+import {TractProfileState} from "./profile/profile-state";
+import {useTractProfile} from "./profile/use-tract-profile";
 import {TractList} from "./tract-list";
-import {TractSummary} from "./tract-summary";
 import {
   atlasHref,
   buildAtlasSearchParams,
@@ -47,6 +48,10 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
         && urlState.priorities.includes(feature.properties.foodEquityPriority))),
   [tractFeatures, urlState.priorities]);
   const selectedFeature = tractFeatures.find((feature) => feature.id === urlState.tract);
+  const profile = useTractProfile(
+    selectedFeature?.properties.geoid ?? null,
+    atlas.state === "available" ? atlas.run.id : null,
+  );
 
   const writeUrlState = useCallback((nextState: AtlasUrlState, replace = false) => {
     const href = atlasHref(pathname, buildAtlasSearchParams(searchParams, nextState));
@@ -118,9 +123,14 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
         {selectedFeature ? (
           <aside
             aria-label="Selected tract summary"
-            className="absolute right-20 top-3 z-10 hidden w-80 min-[1200px]:block min-[1280px]:hidden"
+            className="absolute right-20 top-3 z-10 hidden max-h-[calc(100dvh-1.5rem)] w-80 overflow-y-auto min-[1200px]:block min-[1280px]:hidden"
           >
-            <TractSummary idPrefix="tablet" tract={selectedFeature.properties} />
+            <TractProfileState
+              idPrefix="tablet"
+              isLoading={profile.isLoading}
+              response={profile.response}
+              tract={selectedFeature.properties}
+            />
           </aside>
         ) : null}
         {atlas.state === "available" ? (
@@ -137,14 +147,14 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                 className="absolute bottom-4 left-1/2 z-20 min-h-11 -translate-x-1/2 shadow-sm min-[1200px]:hidden"
                 variant="secondary"
               >
-                {selectedFeature ? "View selected tract" : "Browse tracts"}
+                {selectedFeature ? "View tract details" : "Browse census tracts"}
               </Button>
             </Sheet.Trigger>
             <Sheet.Backdrop variant="transparent">
               <Sheet.Content className="mx-auto max-w-[42rem] min-[1200px]:hidden">
                 <Sheet.Dialog>
                   <Sheet.Handle />
-                  <Sheet.CloseTrigger aria-label="Close tract explorer" />
+                  <Sheet.CloseTrigger aria-label="Close census tract explorer" />
                   <Sheet.Header>
                     <Sheet.Heading>
                       {selectedFeature?.properties.name ?? "Explore census tracts"}
@@ -152,7 +162,12 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                   </Sheet.Header>
                   <Sheet.Body className="flex min-h-0 flex-col gap-5 overflow-y-auto pb-6">
                     {selectedFeature ? (
-                      <TractSummary idPrefix="mobile" tract={selectedFeature.properties} />
+                      <TractProfileState
+                        idPrefix="mobile"
+                        isLoading={profile.isLoading}
+                        response={profile.response}
+                        tract={selectedFeature.properties}
+                      />
                     ) : null}
                     <PriorityLegend
                       activePriorities={urlState.priorities}
@@ -175,12 +190,17 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
       {atlas.state === "available" ? (
         <aside className="hidden w-[22.5rem] shrink-0 overflow-y-auto border-l border-divider bg-background p-4 min-[1280px]:block">
           {selectedFeature ? (
-            <TractSummary idPrefix="desktop" tract={selectedFeature.properties} />
+            <TractProfileState
+              idPrefix="desktop"
+              isLoading={profile.isLoading}
+              response={profile.response}
+              tract={selectedFeature.properties}
+            />
           ) : (
             <EmptyState className="flex h-full flex-col items-center justify-center gap-2 text-center">
               <h2 className="text-base font-semibold">Select a census tract</h2>
               <p className="max-w-64 text-sm text-muted">
-                Choose a tract on the map or in the list to see its Food Equity summary.
+                Choose a tract on the map or from the list to see its priority and why it received that result.
               </p>
             </EmptyState>
           )}
