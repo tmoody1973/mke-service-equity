@@ -14,16 +14,8 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => navigation.searchParams,
 }));
 
-const {mapConstructor} = vi.hoisted(() => ({
-  mapConstructor: vi.fn(function MapMock() {
-    return {addControl: vi.fn(), remove: vi.fn(), resize: vi.fn()};
-  }),
-}));
-
-vi.mock("maplibre-gl", () => ({
-  AttributionControl: vi.fn(function AttributionControl() {}),
-  Map: mapConstructor,
-  NavigationControl: vi.fn(function NavigationControl() {}),
+vi.mock("../map/map-canvas", () => ({
+  MapCanvas: () => <div data-map-container />,
 }));
 
 import {AtlasWorkspace} from "./atlas-workspace";

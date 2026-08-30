@@ -39,6 +39,10 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
     }
   }, [pathname, searchParams]);
 
+  const handleSelectTract = useCallback((tract: string) => {
+    writeUrlState({...urlState, tract});
+  }, [urlState, writeUrlState]);
+
   useEffect(() => {
     const normalized = buildAtlasSearchParams(searchParams, urlState);
     if (normalized.toString() !== searchParams.toString()) {
@@ -53,7 +57,12 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
       data-selected-tract={urlState.tract ?? ""}
       role="region"
     >
-      <MapCanvas styleUrl={styleUrl} />
+      <MapCanvas
+        onSelectTract={handleSelectTract}
+        selectedTract={urlState.tract}
+        styleUrl={styleUrl}
+        tracts={atlas.state === "available" ? atlas.tracts : undefined}
+      />
       <AtlasDataState response={atlas} />
     </section>
   );

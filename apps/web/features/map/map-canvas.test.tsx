@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import {render, screen} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
 vi.mock("next/navigation", () => ({
@@ -8,23 +9,60 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-const {mapAddControl, mapConstructor, mapRemove, mapResize} = vi.hoisted(() => {
+const {
+  layerHandlers,
+  mapAddControl,
+  mapAddLayer,
+  mapAddSource,
+  mapConstructor,
+  mapFitBounds,
+  mapRemove,
+  mapResize,
+  mapSetFeatureState,
+} = vi.hoisted(() => {
   const remove = vi.fn();
   const resize = vi.fn();
   const addControl = vi.fn();
+  const addLayer = vi.fn();
+  const addSource = vi.fn();
+  const fitBounds = vi.fn();
+  const setFeatureState = vi.fn();
+  const setData = vi.fn();
+  const handlers = new globalThis.Map<string, (event?: unknown) => void>();
+  const on = vi.fn((event: string, layerOrHandler: string | ((event?: unknown) => void), handler?: (event?: unknown) => void) => {
+    if (event === "load" && typeof layerOrHandler === "function") {
+      layerOrHandler();
+      return;
+    }
+    if (typeof layerOrHandler === "string" && handler) {
+      handlers.set(`${event}:${layerOrHandler}`, handler);
+    }
+  });
 
   return {
+    layerHandlers: handlers,
     mapAddControl: addControl,
+    mapAddLayer: addLayer,
+    mapAddSource: addSource,
     mapConstructor: vi.fn(function MapMock(options: unknown) {
       void options;
       return {
         addControl,
+        addLayer,
+        addSource,
+        fitBounds,
+        getCanvas: () => ({style: {cursor: ""}}),
+        getSource: () => ({setData}),
+        on,
         remove,
         resize,
+        setFeatureState,
       };
     }),
+    mapFitBounds: fitBounds,
     mapRemove: remove,
     mapResize: resize,
+    mapSetFeatureState: setFeatureState,
   };
 });
 
@@ -35,10 +73,35 @@ vi.mock("maplibre-gl", () => ({
 }));
 
 import {MapShell} from "./map-shell";
+import {MapCanvas} from "./map-canvas";
+
+const tracts = {
+  type: "FeatureCollection" as const,
+  features: [{
+    type: "Feature" as const,
+    id: "55079000101",
+    geometry: {
+      type: "MultiPolygon" as const,
+      coordinates: [[[[-87.95, 43.03], [-87.94, 43.03], [-87.94, 43.04], [-87.95, 43.03]]]] as [number, number][][][],
+    },
+    properties: {
+      geoid: "55079000101",
+      name: "Census Tract 1.01",
+      population: 2_430,
+      geographyVintage: "2020",
+      foodEquityPriority: 5 as const,
+      foodAccessNeedBand: "very_high" as const,
+      equityBaselineBand: "high" as const,
+      qualityStatus: "complete" as const,
+      exclusionReasons: [],
+    },
+  }],
+};
 
 describe("MapShell", () => {
   beforeEach(() => {
     vi.stubEnv("NEXT_PUBLIC_MAP_STYLE_URL", "/fixtures/map-style.json");
+    layerHandlers.clear();
   });
 
   afterEach(() => {
@@ -64,5 +127,35 @@ describe("MapShell", () => {
 
     unmount();
     expect(mapRemove).toHaveBeenCalledOnce();
+  });
+
+  it("adds tract layers, resets extent, and sends click selection by GEOID", async () => {
+    const user = userEvent.setup();
+    const onSelectTract = vi.fn();
+
+    render(
+      <section>
+        <MapCanvas
+          onSelectTract={onSelectTract}
+          selectedTract="55079000101"
+          styleUrl="/fixtures/map-style.json"
+          tracts={tracts}
+        />
+      </section>,
+    );
+
+    expect(mapAddSource).toHaveBeenCalledOnce();
+    expect(mapAddLayer).toHaveBeenCalledTimes(3);
+    expect(mapSetFeatureState).toHaveBeenCalledWith(
+      {source: "atlas-tracts", id: "55079000101"},
+      {selected: true},
+    );
+    expect(mapFitBounds).toHaveBeenCalledOnce();
+
+    layerHandlers.get("click:atlas-tract-fill")?.({features: [{id: "55079000101"}]});
+    expect(onSelectTract).toHaveBeenCalledWith("55079000101");
+
+    await user.click(screen.getByRole("button", {name: "Reset map"}));
+    expect(mapFitBounds).toHaveBeenCalledTimes(2);
   });
 });
