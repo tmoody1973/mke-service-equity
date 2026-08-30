@@ -3,6 +3,11 @@
 import {render, screen} from "@testing-library/react";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 const {mapAddControl, mapConstructor, mapRemove, mapResize} = vi.hoisted(() => {
   const remove = vi.fn();
   const resize = vi.fn();
