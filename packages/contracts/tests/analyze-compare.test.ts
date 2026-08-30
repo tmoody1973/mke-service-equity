@@ -215,13 +215,13 @@ describe("compareResponseSchema", () => {
             ...originalTract.tract,
             foodEquityPriority: null,
             foodAccessNeedBand: null,
-            equityBaselineBand: null,
+            equityBaselineBand: "moderate",
             qualityStatus: "insufficient_data",
             exclusionReasons: ["origin_unsnapped"],
           },
           scores: {
             foodAccessNeedPercentile: null,
-            equityBaselinePercentile: null,
+            equityBaselinePercentile: 55,
             retailAccessScore: null,
             transportationConstraintScore: null,
           },
@@ -231,6 +231,123 @@ describe("compareResponseSchema", () => {
       ],
     };
     expect(compareResponseSchema.parse(response).state).toBe("available");
+  });
+
+  it("accepts an insufficient Food tract when both Equity Baseline fields are absent", () => {
+    const base = availableResponse();
+    const first = base.tracts[0]!;
+    const second = base.tracts[1]!;
+    const insufficient = {
+      ...second,
+      tract: {
+        ...second.tract,
+        foodEquityPriority: null,
+        foodAccessNeedBand: null,
+        equityBaselineBand: null,
+        qualityStatus: "insufficient_data",
+        exclusionReasons: ["origin_unsnapped"],
+      },
+      scores: {
+        foodAccessNeedPercentile: null,
+        equityBaselinePercentile: null,
+        retailAccessScore: null,
+        transportationConstraintScore: null,
+      },
+      foodAccessMeasures: [],
+      equityIndicators: [],
+    };
+    expect(compareResponseSchema.parse({...base, tracts: [first, insufficient]}).state)
+      .toBe("available");
+  });
+
+  it.each([
+    {equityBaselineBand: "moderate", equityBaselinePercentile: null},
+    {equityBaselineBand: null, equityBaselinePercentile: 55},
+  ] as const)(
+    "rejects a one-sided Equity Baseline pair for insufficient Food data",
+    ({equityBaselineBand, equityBaselinePercentile}) => {
+      const base = availableResponse();
+      const first = base.tracts[0]!;
+      const second = base.tracts[1]!;
+      const insufficient = {
+        ...second,
+        tract: {
+          ...second.tract,
+          foodEquityPriority: null,
+          foodAccessNeedBand: null,
+          equityBaselineBand,
+          qualityStatus: "insufficient_data",
+          exclusionReasons: ["origin_unsnapped"],
+        },
+        scores: {
+          foodAccessNeedPercentile: null,
+          equityBaselinePercentile,
+          retailAccessScore: null,
+          transportationConstraintScore: null,
+        },
+        foodAccessMeasures: [],
+        equityIndicators: [],
+      };
+      expect(compareResponseSchema.safeParse({...base, tracts: [first, insufficient]}).success)
+        .toBe(false);
+    },
+  );
+  it("keeps a zero-population tract fully unscored with no invented evidence", () => {
+    const base = availableResponse();
+    const first = base.tracts[0]!;
+    const second = base.tracts[1]!;
+    const zeroPopulation = {
+      ...second,
+      tract: {
+        ...second.tract,
+        population: 0,
+        foodEquityPriority: null,
+        foodAccessNeedBand: null,
+        equityBaselineBand: null,
+        qualityStatus: "ineligible_zero_population",
+        exclusionReasons: ["zero_population"],
+      },
+      scores: {
+        foodAccessNeedPercentile: null,
+        equityBaselinePercentile: null,
+        retailAccessScore: null,
+        transportationConstraintScore: null,
+      },
+      foodAccessMeasures: [],
+      equityIndicators: [],
+    };
+    expect(compareResponseSchema.parse({...base, tracts: [first, zeroPopulation]}).state)
+      .toBe("available");
+  });
+
+  it("rejects a zero-population state when the tract population is not zero", () => {
+    const base = availableResponse();
+    const first = base.tracts[0]!;
+    const second = base.tracts[1]!;
+    const invalidZeroPopulation = {
+      ...second,
+      tract: {
+        ...second.tract,
+        population: null,
+        foodEquityPriority: null,
+        foodAccessNeedBand: null,
+        equityBaselineBand: null,
+        qualityStatus: "ineligible_zero_population",
+        exclusionReasons: ["zero_population"],
+      },
+      scores: {
+        foodAccessNeedPercentile: null,
+        equityBaselinePercentile: null,
+        retailAccessScore: null,
+        transportationConstraintScore: null,
+      },
+      foodAccessMeasures: [],
+      equityIndicators: [],
+    };
+    expect(compareResponseSchema.safeParse({
+      ...base,
+      tracts: [first, invalidZeroPopulation],
+    }).success).toBe(false);
   });
 
   it("rejects incomplete metric sets, mixed runs, missing source definitions, and partial order", () => {

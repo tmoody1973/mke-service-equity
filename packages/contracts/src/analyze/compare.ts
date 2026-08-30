@@ -144,10 +144,42 @@ export const comparisonTractSchema = z.strictObject({
       message: "An incomplete or zero-population tract cannot carry invented comparison evidence.",
     });
   }
-  if (scoreValues.some((score) => score !== null)) {
+
+  if (value.tract.qualityStatus === "insufficient_data") {
+    if (
+      value.tract.foodAccessNeedBand !== null
+      || value.scores.foodAccessNeedPercentile !== null
+      || value.scores.retailAccessScore !== null
+      || value.scores.transportationConstraintScore !== null
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "An insufficient Food tract cannot carry Food Access summary scores or a band.",
+        path: ["scores"],
+      });
+    }
+    const hasEquityBaselineBand = value.tract.equityBaselineBand !== null;
+    const hasEquityBaselinePercentile = value.scores.equityBaselinePercentile !== null;
+    if (hasEquityBaselineBand !== hasEquityBaselinePercentile) {
+      context.addIssue({
+        code: "custom",
+        message: "An insufficient Food tract must carry its Equity Baseline band and percentile together or omit both.",
+        path: ["scores", "equityBaselinePercentile"],
+      });
+    }
+    return;
+  }
+
+  if (
+    value.tract.population !== 0
+    || scoreValues.some((score) => score !== null)
+    || value.tract.foodAccessNeedBand !== null
+    || value.tract.equityBaselineBand !== null
+    || value.tract.foodEquityPriority !== null
+  ) {
     context.addIssue({
       code: "custom",
-      message: "An incomplete or zero-population tract requires explicit null summary scores.",
+      message: "A zero-population tract requires population zero and explicit null scores, bands, and Priority.",
       path: ["scores"],
     });
   }
