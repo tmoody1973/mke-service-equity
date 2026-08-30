@@ -81,7 +81,7 @@ class AccessResource:
     source_key: str
     source_snapshot_sha256: str
     quality_status: str
-    active: bool
+    active: bool | None
     scoring_eligible: bool
 
 
@@ -349,6 +349,34 @@ def _calculate_walking_access(
     resource_source_sha256 = _single_resource_source(
         relevant_resources, expected_sha256=resource_snapshot_sha256
     )
+    unknown_activity = tuple(
+        sorted(item.resource_id for item in relevant_resources if item.active is None)
+    )
+    if unknown_activity:
+        if scoring_eligible:
+            raise AccessibilityError(
+                "scoring resources require an explicit source-backed active state"
+            )
+        inactive = tuple(
+            sorted(item.resource_id for item in relevant_resources if item.active is False)
+        )
+        resource_categories = tuple(
+            sorted({item.category for item in relevant_resources}, key=lambda item: item.value)
+        )
+        return tuple(
+            _missing_walking_result(
+                origin=origin,
+                approved_area_id=approved_area_id,
+                graph=graph,
+                resource_source_sha256=resource_source_sha256,
+                scoring_eligible=False,
+                resource_categories=resource_categories,
+                excluded_resource_ids=inactive,
+                unroutable_resource_ids=unknown_activity,
+                quality_reason="resource_activity_unknown",
+            )
+            for origin, approved_area_id in _validate_origins(origins, approved_area_for_origin)
+        )
     prepared, excluded, initially_unroutable = _prepare_resources(
         graph,
         resources,

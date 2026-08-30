@@ -123,7 +123,7 @@ def resource(
     category: ResourceCategory = ResourceCategory.FULL_SERVICE_GROCERY,
     coordinate_state: str = "source_coordinate",
     quality_status: str = "verified",
-    active: bool = True,
+    active: bool | None = True,
     scoring_eligible: bool | None = None,
 ) -> AccessResource:
     return AccessResource(
@@ -361,6 +361,35 @@ def test_contextual_resource_may_be_retained_as_unroutable_without_score_effect(
     assert result.count_within_10_minutes == 0
     assert result.count_within_15_minutes == 0
     assert result.count_within_20_minutes == 0
+
+
+def test_unknown_context_activity_produces_missing_counts_not_false_zero() -> None:
+    result = calculate_contextual_access(
+        accessibility_graph(),
+        origins=(origin(),),
+        resources=(
+            resource(
+                "PANTRY",
+                x="804.672",
+                y="0",
+                category=ResourceCategory.EMERGENCY_FOOD_PANTRY,
+                quality_status="stale_unverified_context",
+                active=None,
+            ),
+        ),
+        resource_snapshot_sha256=RESOURCE_SOURCE_SHA256,
+        resource_snapshot_quality_status="stale_unverified_context",
+        approved_area_for_origin=approved_origin_area,
+        resource_in_review_area=lambda _x, _y: True,
+    )[0]
+
+    assert result.reachable is None
+    assert result.count_within_10_minutes is None
+    assert result.count_within_15_minutes is None
+    assert result.count_within_20_minutes is None
+    assert result.quality_status == "missing"
+    assert result.quality_reason == "resource_activity_unknown"
+    assert result.unroutable_resource_ids == ("PANTRY",)
 
 
 def test_empty_context_inventory_retains_dataset_quality_instead_of_becoming_verified() -> None:

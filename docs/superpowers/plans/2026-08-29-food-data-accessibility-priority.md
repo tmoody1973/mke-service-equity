@@ -714,7 +714,7 @@ git commit -m "feat(data): score deterministic food equity priority (MOO-753)"
   `DATABASE_URL_UNPOOLED`, and `MKE_PIPELINE_ENV=development`.
 - Produces: idempotent records, `draft -> validated|failed`, redacted reports, no publication.
 
-- [ ] **Step 1: Write failing repository/runner/CLI tests**
+- [x] **Step 1: Write failing repository/runner/CLI tests**
 
 Cover exact stage order, stage-only execution, read-only stages without database configuration,
 development-only writes, approved Equity Baseline run resolution, one transaction, rollback,
@@ -727,14 +727,14 @@ uv run pytest tests/data/food_equity/test_runner.py tests/data/food_equity/test_
 
 Expected RED: persistence/orchestration modules are missing.
 
-- [ ] **Step 2: Implement parameterized transactional persistence**
+- [x] **Step 2: Implement parameterized transactional persistence**
 
 Insert/reuse sources and snapshots, resources, access/value records, then run/components/scores in
 deterministic order. Use Psycopg parameter binding and one analytical transaction. On failure,
 roll back all partial writes; a separate transaction may mark an existing draft failed with
 redacted metadata.
 
-- [ ] **Step 3: Expose the closed Plan 3 CLI**
+- [x] **Step 3: Expose the closed Plan 3 CLI**
 
 ```text
 python -m pipelines.food_equity fetch
@@ -751,14 +751,14 @@ python -m pipelines.food_equity run --through validated --verify-existing
 Every invocation writes a secret-free report under `data/reports/food-equity/`. Do not expose
 `publish` or production lifecycle transitions.
 
-- [ ] **Step 4: Add opt-in integration tests**
+- [x] **Step 4: Add opt-in integration tests**
 
 Against a disposable migrated development branch, verify resource/source foreign keys,
 geometry/SRID, missing-quality consistency, approved Equity Baseline reference, component
 lineage, orphan prevention, transaction rollback, lifecycle trigger, idempotency, and output-hash
 comparison. Skip safely when environment variables are absent and never print them.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 ```bash
 uv run pytest tests/data/food_equity/test_runner.py tests/data/food_equity/test_cli.py -q

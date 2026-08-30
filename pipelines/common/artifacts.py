@@ -549,6 +549,42 @@ def preserve_file_snapshot(
     return StoredSnapshot(raw_path, manifest_path, manifest, reused=not raw_created)
 
 
+def load_stored_snapshot(
+    *,
+    root: Path,
+    manifest_path: Path,
+    expected_source_key: str,
+) -> StoredSnapshot:
+    """Reload and verify one immutable snapshot from a bounded manifest path."""
+
+    try:
+        resolved_root = root.resolve(strict=True)
+        resolved_manifest = manifest_path.resolve(strict=True)
+        resolved_manifest.relative_to(resolved_root)
+    except (OSError, ValueError) as error:
+        raise ArtifactError("snapshot manifest must remain inside the workspace root") from error
+    try:
+        manifest = _manifest_from_bytes(resolved_manifest.read_bytes())
+    except OSError as error:
+        raise ArtifactError("snapshot manifest cannot be read") from error
+    if manifest.source_key != expected_source_key:
+        raise ArtifactError("snapshot manifest source key does not match the requested source")
+    storage_path = Path(manifest.storage_uri)
+    if storage_path.is_absolute():
+        raise ArtifactError("snapshot storage URI must be a relative workspace path")
+    try:
+        raw_path = (resolved_root / storage_path).resolve(strict=True)
+        raw_path.relative_to(resolved_root)
+    except (OSError, ValueError) as error:
+        raise ArtifactError("snapshot storage path escaped the workspace root") from error
+    digest, byte_size = _hash_file(raw_path)
+    if digest != manifest.checksum_sha256 or byte_size != manifest.byte_size:
+        raise ArtifactCollisionError("stored manifest does not match snapshot bytes")
+    if raw_path.relative_to(resolved_root).as_posix() != manifest.storage_uri:
+        raise ArtifactCollisionError("stored manifest path does not match snapshot bytes")
+    return StoredSnapshot(raw_path, resolved_manifest, manifest, reused=True)
+
+
 __all__ = [
     "ArtifactCollisionError",
     "ArtifactError",
@@ -558,6 +594,7 @@ __all__ = [
     "StoredSnapshot",
     "atomic_write_bytes",
     "canonical_json_bytes",
+    "load_stored_snapshot",
     "preserve_file_snapshot",
     "preserve_snapshot",
     "sanitize_metadata",

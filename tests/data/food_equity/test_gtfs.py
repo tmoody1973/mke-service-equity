@@ -43,7 +43,6 @@ GTFS_MEMBERS = (
     "trips.txt",
 )
 RETRIEVED_AT = datetime(2026, 9, 1, 1, tzinfo=UTC)
-SOURCE_LAST_MODIFIED = datetime(2026, 7, 22, 0, 6, 18, tzinfo=UTC)
 
 
 def archive_bytes(
@@ -84,8 +83,9 @@ def normalized_fixture(content: bytes | None = None):
 
 
 class FakeResponse:
-    def __init__(self, content: bytes) -> None:
+    def __init__(self, content: bytes, *, last_modified: str | None = None) -> None:
         self.content = content
+        self.headers = {"Last-Modified": last_modified} if last_modified is not None else {}
 
     def __enter__(self) -> FakeResponse:
         return self
@@ -230,10 +230,23 @@ def test_bounded_fetch_rejects_oversized_response_before_parsing(
         fetch_and_preserve_gtfs(
             tmp_path,
             clock=lambda: RETRIEVED_AT,
-            source_last_modified=SOURCE_LAST_MODIFIED,
             service_area_contains=lambda _longitude, _latitude: True,
             validator_jar_path=tmp_path / "not-reached.jar",
-            opener=lambda _request: FakeResponse(content),
+            opener=lambda _request: FakeResponse(
+                content, last_modified="Wed, 22 Jul 2026 00:06:18 GMT"
+            ),
+            sleeper=lambda _seconds: None,
+        )
+
+
+def test_fetch_requires_source_last_modified_header(tmp_path: Path) -> None:
+    with pytest.raises(HttpFetchError, match="Last-Modified"):
+        fetch_and_preserve_gtfs(
+            tmp_path,
+            clock=lambda: RETRIEVED_AT,
+            service_area_contains=lambda _longitude, _latitude: True,
+            validator_jar_path=tmp_path / "not-reached.jar",
+            opener=lambda _request: FakeResponse(archive_bytes()),
             sleeper=lambda _seconds: None,
         )
 
@@ -444,7 +457,7 @@ def test_fetches_once_and_preserves_exact_source_bytes_and_attribution(tmp_path:
 
     def opener(request: object) -> FakeResponse:
         calls.append(request.full_url)  # type: ignore[attr-defined]
-        return FakeResponse(content)
+        return FakeResponse(content, last_modified="Wed, 22 Jul 2026 00:06:18 GMT")
 
     def validator_runner(command: tuple[str, ...]) -> subprocess.CompletedProcess[bytes]:
         output_dir = Path(command[command.index("-o") + 1])
@@ -455,7 +468,6 @@ def test_fetches_once_and_preserves_exact_source_bytes_and_attribution(tmp_path:
     fetched = fetch_and_preserve_gtfs(
         tmp_path,
         clock=lambda: RETRIEVED_AT,
-        source_last_modified=SOURCE_LAST_MODIFIED,
         opener=opener,
         sleeper=lambda _seconds: None,
         service_area_contains=lambda _longitude, _latitude: True,

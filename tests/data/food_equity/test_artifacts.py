@@ -9,6 +9,7 @@ from pipelines.common.artifacts import (
     ArtifactCollisionError,
     ArtifactError,
     ArtifactPaths,
+    load_stored_snapshot,
     preserve_file_snapshot,
     preserve_snapshot,
 )
@@ -59,6 +60,32 @@ def test_food_snapshot_is_immutable_sanitized_and_reused(tmp_path: Path) -> None
     manifest_text = first.manifest_path.read_text(encoding="utf-8")
     assert "secret" not in manifest_text
     assert "%5BREDACTED%5D" in manifest_text
+
+    reloaded = load_stored_snapshot(
+        root=tmp_path,
+        manifest_path=first.manifest_path,
+        expected_source_key="sram",
+    )
+    assert reloaded.raw_path == first.raw_path
+    assert reloaded.manifest == first.manifest
+
+
+def test_snapshot_reload_rejects_wrong_source_and_tampered_bytes(tmp_path: Path) -> None:
+    stored = _preserve(tmp_path)
+    with pytest.raises(ArtifactError, match="source key"):
+        load_stored_snapshot(
+            root=tmp_path,
+            manifest_path=stored.manifest_path,
+            expected_source_key="walking_network",
+        )
+
+    stored.raw_path.write_bytes(b"tampered")
+    with pytest.raises(ArtifactCollisionError, match="does not match"):
+        load_stored_snapshot(
+            root=tmp_path,
+            manifest_path=stored.manifest_path,
+            expected_source_key="sram",
+        )
 
 
 def test_pipeline_namespaces_cannot_collide(tmp_path: Path) -> None:

@@ -12,6 +12,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Protocol, cast
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -23,7 +24,7 @@ from pipelines.common.artifacts import (
     canonical_json_bytes,
     preserve_snapshot,
 )
-from pipelines.common.http import Opener, Sleeper, fetch_bytes
+from pipelines.common.http import Opener, Sleeper, fetch_bytes_with_headers
 from pipelines.food_equity.errors import SourceValidationError
 from pipelines.food_equity.models import MethodologyRegistry
 from pipelines.food_equity.registry import load_registry
@@ -951,7 +952,6 @@ def fetch_and_preserve_gtfs(
     root: Path,
     *,
     clock: Callable[[], datetime],
-    source_last_modified: datetime,
     service_area_contains: ServiceAreaContains,
     validator_jar_path: Path,
     validator_sha256: str = MOBILITYDATA_VALIDATOR_SHA256,
@@ -969,41 +969,51 @@ def fetch_and_preserve_gtfs(
         parsed = read_gtfs_archive(content, service_area_contains=service_area_contains)
 
     if opener is None and sleeper is None:
-        content = fetch_bytes(
+        fetched = fetch_bytes_with_headers(
             MCTS_GTFS_SOURCE_URL,
+            required_headers=("Last-Modified",),
             validator=validate,
             max_bytes=MAX_ARCHIVE_BYTES,
         )
     elif opener is None:
-        content = fetch_bytes(
+        assert sleeper is not None
+        fetched = fetch_bytes_with_headers(
             MCTS_GTFS_SOURCE_URL,
-            sleeper=cast(Sleeper, sleeper),
+            required_headers=("Last-Modified",),
+            sleeper=sleeper,
             validator=validate,
             max_bytes=MAX_ARCHIVE_BYTES,
         )
     elif sleeper is None:
-        content = fetch_bytes(
+        fetched = fetch_bytes_with_headers(
             MCTS_GTFS_SOURCE_URL,
+            required_headers=("Last-Modified",),
             opener=opener,
             validator=validate,
             max_bytes=MAX_ARCHIVE_BYTES,
         )
     else:
-        content = fetch_bytes(
+        fetched = fetch_bytes_with_headers(
             MCTS_GTFS_SOURCE_URL,
+            required_headers=("Last-Modified",),
             opener=opener,
             sleeper=sleeper,
             validator=validate,
             max_bytes=MAX_ARCHIVE_BYTES,
         )
+    content = fetched.content
     if parsed is None:
         raise AssertionError("GTFS fetch validator did not parse the response")
     feed = normalize_gtfs(parsed)
     retrieved_at = clock()
     if retrieved_at.tzinfo is None or retrieved_at.utcoffset() is None:
         raise GtfsSourceError("GTFS snapshot clock must return a timezone-aware datetime")
+    try:
+        source_last_modified = parsedate_to_datetime(fetched.headers["last-modified"])
+    except (KeyError, TypeError, ValueError) as error:
+        raise GtfsSourceError("GTFS source Last-Modified header is invalid") from error
     if source_last_modified.tzinfo is None or source_last_modified.utcoffset() is None:
-        raise GtfsSourceError("GTFS source Last-Modified timestamp must be timezone-aware")
+        raise GtfsSourceError("GTFS source Last-Modified header must include a timezone")
     if source_last_modified > retrieved_at:
         raise GtfsSourceError("GTFS source Last-Modified timestamp cannot follow retrieval")
     analysis_dates = select_analysis_dates(feed, retrieved_at=retrieved_at)
