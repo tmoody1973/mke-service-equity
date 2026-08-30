@@ -149,6 +149,43 @@ manual/partner overrides and verified context require dated verification evidenc
 10-, 15-, and 20-minute counts are separate scalar metrics and cannot enter Food Access Need or
 Priority. Score exclusions are retained verbatim for audit and recovery.
 
+### Food Equity prerequisites and exact bundle
+
+`fetch` performs local preflight before remote acquisition. Configure these names without shell
+tracing or printing their values:
+
+```text
+CENSUS_API_KEY
+MKE_FOOD_WALKING_NETWORK_PATH
+MKE_FOOD_CLASSIFICATION_EVIDENCE_PATH
+MKE_FOOD_CLASSIFICATION_EVIDENCE_SHA256
+MKE_GTFS_VALIDATOR_JAR
+```
+
+The PBF and classification file must be regular files inside the workspace; the validator JAR
+may be stored under ignored `.tools/`. Their exact approved hashes must validate. The Plan 2
+TIGER fetch state must also exist in the same workspace because it supplies the canonical 302
+GEOIDs and inclusive county-plus-two-mile predicates.
+
+`fetch` writes a replaceable pointer at `data/normalized/food-equity/fetched.json`; every pointer
+is workspace-relative and resolves to a content-addressed manifest and raw artifact. Later
+stage-only invocations re-read and re-hash the same bytes. A missing, escaped, changed, or
+incomplete seven-source bundle fails closed.
+
+Recommended attributable execution is one stage at a time in CLI order. `load` idempotently
+writes sources, snapshots, historical resource versions, scoring metrics, contextual metrics,
+and lineage, but creates no score-run draft. `score` recomputes canonical output against the
+exact pinned Equity Baseline. `validate-run` is the only stage that coordinates reuse or
+atomically inserts the draft, components, scores, persisted-row reconciliation, and transition
+to `validated`. A complete `run --through validated --verify-existing` safely replays base
+inserts and requires the recomputed output hash for an identical fingerprint.
+
+Recovery never edits a manifest, status, or SQL row by hand. Read the newest secret-free report,
+correct the named artifact, configuration, or source failure, rerun `fetch` only when acquiring a
+new exact bundle, then restart at the failed stage. Derived pointers are atomically replaceable
+and source artifacts are immutable, so rerunning a successful stage is safe. A changed official
+source is preserved as a new manifest; the old content hash is never overwritten.
+
 ## Update rhythm
 
 - ACS: annual

@@ -784,7 +784,7 @@ git commit -m "feat(data): orchestrate validated food equity runs (MOO-753)"
 - Consumes: implemented commands, schema, fixtures, and failure behavior.
 - Produces: reproducible operations and a real-data verification template.
 
-- [ ] **Step 1: Run the complete offline gate**
+- [x] **Step 1: Run the complete offline gate**
 
 ```bash
 uv sync --locked
@@ -802,14 +802,14 @@ git diff --check
 Expected: every offline check passes; integration tests are excluded; fixtures require no live
 network or database.
 
-- [ ] **Step 2: Document exact operation and recovery**
+- [x] **Step 2: Document exact operation and recovery**
 
 Record prerequisites, non-secret environment names, stage commands, artifact boundaries,
 licenses/attribution, methodology/registry versions, quality states, classification evidence,
 network/GTFS limits, run identity, rollback, and failure recovery. Do not duplicate formulas
 in multiple drifting documents.
 
-- [ ] **Step 3: Commit checkpoint**
+- [x] **Step 3: Commit checkpoint**
 
 ```bash
 git add README.md docs .github/workflows/ci.yml

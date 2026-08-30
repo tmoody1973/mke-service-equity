@@ -207,6 +207,29 @@ other deterministic inputs for one run. `output_hash` identifies the canonical s
 An existing fingerprint is reused; `--verify-existing` also requires a matching independently
 recomputed output hash.
 
+## Plan 3 integrity and lifecycle
+
+Migration `0002_food_equity.sql` introduces stable resources, immutable resource versions,
+scalar access metrics, many-to-many snapshot lineage, Food score runs, components, and scores.
+Forward-only migration `0003_food_equity_contract_amendment.sql` makes source-blank names and
+unknown activity nullable, changes resource-version identity to include both validity endpoints
+with `NULLS NOT DISTINCT`, adds dated-verification checks, and requires structured score
+exclusion reasons.
+
+Foreign keys prevent resource/source, version/resource, version/snapshot, metric/geography,
+metric/snapshot, component/run, component/geography, score/run, score/geography, and pinned
+baseline orphans. Resource geometry is a non-empty EPSG:4326 point only when the coordinate state
+supports one. Metric state/value and quality checks preserve observed zero, unreachable, and
+missing as different facts. The production write plan reconciles a 302-by-10 persisted metric
+grid, a 302-by-4 scoring grid, all metric/snapshot links, 1,200 components, and 302 scores before
+validation.
+
+The separate Food lifecycle permits only `draft -> validated` and `draft -> failed`; it contains
+no `published` value. Each run pins the exact validated Equity Baseline ID and output hash. Base
+records are conflict-safe and reusable, while analytical rows and the lifecycle transition share
+one transaction. A failed transaction leaves no partial draft. A pre-existing draft may be
+marked failed only through the guarded, redacted repository path.
+
 ## public_investments
 
 - id

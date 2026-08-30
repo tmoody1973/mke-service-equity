@@ -30,8 +30,10 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 Drizzle may create its migration journal. Plan 2 migration
 `packages/database/drizzle/0001_equity_baseline.sql` adds the eight approved Equity Baseline
 tables, spatial and relational constraints, and the lifecycle trigger described in the
-[logical schema](../data/schema.md). It deliberately excludes food resources, access metrics,
-publication, and application read models.
+[logical schema](../data/schema.md). Plan 3 migration `0002_food_equity.sql` and forward-only
+amendment `0003_food_equity_contract_amendment.sql` add the reviewed Food resource, access,
+provenance, score, and development lifecycle contract. They deliberately exclude publication and
+application read models.
 
 ## Local checks
 
@@ -98,3 +100,27 @@ validated-run unit. A separate redacted failure update may change an existing dr
 there is no command or repository operation that publishes.
 
 A code deployment does not publish a score run. The public application continues to read only explicitly published analytical runs once later plans add them.
+
+## Plan 3 isolated run
+
+Authoritative Food Equity work uses a child branch named `moo-753-food-equity`, parented from the
+approved Plan 2 branch that contains baseline run
+`502e2a04-b013-53cd-8b09-c9144862701a`, with a seven-day TTL. Before any write, record sanitized
+project/branch/parent IDs, expiry, database, role, non-default status, and `development-only` in
+the Plan 3 verification record. Never record a connection string.
+
+After checkout and secret-safe environment loading, apply and verify all migrations:
+
+```bash
+npm run db:migrate --workspace @mke/database
+npm run test:integration --workspace @mke/database
+uv run pytest tests/data/food_equity/test_database_integration.py -q -m integration
+```
+
+Independently confirm PostGIS, migrations `0000` through `0003`, all Plan 2/3 tables and named
+constraints, the exact validated pinned baseline, zero Food foreign-key orphans, and zero
+published Food runs. Database pipeline commands additionally require
+`MKE_PIPELINE_ENV=development`. The Food `load` stage writes reusable source/resource/metric
+facts; `validate-run` replays them and writes the analytical run in one transaction. Repeating
+`run --through validated --verify-existing` must return the same run ID and output hash without
+increasing natural-key or analytical counts.

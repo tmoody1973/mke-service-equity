@@ -160,3 +160,17 @@ zero. Missing source names also remain null.
   update and valid-through dates must appear with any representation, along with the required
   not-sponsored/not-operated statement.
 - Census API keys are never stored in URLs, manifests, logs, fixtures, or committed files.
+
+### Operational source resolution
+
+Live acquisition resolves the exact local PBF, reviewed classification evidence, and GTFS
+Validator JAR through the environment names in the ingestion guide. Those paths and the evidence
+checksum are runtime configuration, not source substitutions. The pipeline validates each local
+artifact against its separately approved identity before making a new bundle pointer.
+
+The Food bundle contains exactly seven persisted source manifests: SRAM, FNS retailers, ACS
+vehicle access, tract origins, MCTS GTFS, walking network, and emergency-food context.
+Classification evidence has its own immutable manifest and fingerprint because it is verification
+evidence rather than a source metric. The Plan 2 TIGER snapshot remains separate canonical
+geography lineage and must match the Food fetch pointer. No stage may resolve a source by
+`latest`, substitute a fixture, or accept a caller-provided geography predicate.

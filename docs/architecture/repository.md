@@ -16,9 +16,11 @@ mke-service-equity/
 │   └── design-system/        # Project semantic token aliases
 ├── pipelines/
 │   ├── common/               # Shared Python workspace foundation
-│   └── equity_baseline/      # Registry, source adapters, normalization, scoring, orchestration
+│   ├── equity_baseline/      # Registry, source adapters, normalization, scoring, orchestration
+│   └── food_equity/          # Food sources, routing, scoring, persistence, and closed CLI
 ├── tests/
 │   ├── data/equity_baseline/ # Fixture, deterministic, CLI, and opt-in database tests
+│   ├── data/food_equity/     # Food source, graph, score, runner, and opt-in database tests
 │   └── e2e/                  # Five-width Playwright and axe checks
 ├── data/README.md            # Data handling boundary; no source data in Plan 1
 ├── docs/                     # Product, architecture, method, UX, and operations
@@ -42,6 +44,14 @@ Plan 2 adds the provenance and Equity Baseline domain tables through the databas
 downloads, normalized extracts, and generated quality reports remain ignored local artifacts;
 only sanitized manifests may enter `data/manifests/`. The public application still has no
 analytical read path because Plan 2 creates validated data but never publishes it.
+
+Plan 3 keeps acquisition, validation, normalization, retail classification, graph routing,
+scoring, and persistence adapters in `pipelines/food_equity/`. PostGIS remains the database
+authority for persisted geometry and relational integrity; Python derives database-free stage
+predicates from the exact Plan 2 TIGER snapshot and routes on the pinned local PBF. The browser
+does not perform analytical GIS. `live.py` is the official-source orchestration boundary, and
+`persistence.py` is the lossless adapter into parameterized write plans. Context metrics are
+persisted with provenance but never enter score components.
 
 The Python boundary is intentionally deterministic and testable without a network or database.
 Live database tests are marked `integration`, require an isolated migrated development branch,
