@@ -47,10 +47,10 @@ sheet. The desktop and mobile profile render the same content model rather than 
 
 | Viewport | Layout |
 |---|---|
-| 1440 px and wider | Application nav, 288 px Explore panel, flexible map, 360 px profile panel. |
-| 1024–1439 px | Compact application nav, 272 px Explore panel, flexible map; profile overlays or replaces the Explore panel when selected so the map remains usable. |
-| 768–1023 px | Map-first tablet layout; controls use compact overlays and selection opens a sheet. |
-| 375–767 px | Full map canvas below the app header; search/filter controls remain reachable; selection opens a draggable bottom sheet with collapsed and expanded stops. |
+| 1440 px and wider | Application nav, 272 px Explore panel, flexible map, 360 px profile panel. |
+| 1200–1439 px | Application nav, 272 px Explore panel, flexible map; profile overlays at 1200–1279 px and becomes a persistent panel at 1280 px. |
+| 769–1199 px | Map-first compact layout; the map retains usable width and Explore/profile content opens in a sheet. |
+| 375–768 px | Full map canvas below the app header; selection and filtering open a draggable sheet with 180 px, 65%, and full-height stops. |
 
 The implementation is verified at 375, 430, 768, 1024, and 1440 px. No essential action depends
 on hover. Map controls and sheet handles meet a 44 px minimum target. A map resize is issued after
@@ -214,6 +214,10 @@ HeroUI/HeroUI Pro owns application chrome and interaction primitives: SearchFiel
 Chip, Accordion, Sheet, EmptyState, and Resizable panels where appropriate. Compound APIs,
 documented imports, `onPress`, semantic HTML, and existing design tokens are required. Custom UI
 primitives are introduced only when neither HeroUI package has the needed behavior.
+
+MapLibre 6 browser workers are served from same-origin modules copied from the pinned dependency
+before development and production builds. Both the worker and its shared module are required; the
+application does not depend on a third-party worker CDN.
 
 ### 5.3 Search authority
 

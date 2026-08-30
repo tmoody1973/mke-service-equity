@@ -268,12 +268,12 @@ git commit -m "feat: add accessible MOO-754 tract selection"
 - Modify: `apps/web/app/globals.css`
 - Create: responsive component/E2E tests
 
-- [ ] Fetch current Sheet/Resizable/EmptyState HeroUI Pro docs before using their APIs.
-- [ ] Implement wide Explore/map/profile layout and compact 1024 px behavior.
-- [ ] Implement tablet/mobile map-first layout with accessible bottom sheet.
-- [ ] Preserve one shared summary content component across panel and sheet.
-- [ ] Handle loading, unavailable, invalid selection, and error views without fake values.
-- [ ] Verify map resize and focus behavior across every panel/sheet transition.
+- [x] Fetch current Sheet/Resizable/EmptyState HeroUI Pro docs before using their APIs.
+- [x] Implement wide Explore/map/profile layout and compact 1024 px behavior.
+- [x] Implement tablet/mobile map-first layout with accessible bottom sheet.
+- [x] Preserve one shared summary content component across panel and sheet.
+- [x] Handle loading, unavailable, invalid selection, and error views without fake values.
+- [x] Verify map resize and focus behavior across every panel/sheet transition.
 
 ```bash
 npm test --workspace @mke/web -- atlas-workspace tract-profile-container
@@ -287,14 +287,14 @@ git commit -m "feat: complete MOO-754 first visible atlas slice"
 **Files:**
 - Create/update: `docs/verification/plan-4-food-equity-atlas.md`
 
-- [ ] Use local server-only preview variables with run
+- [x] Use local server-only preview variables with run
   `97bd1cdf-bf96-573f-8fcf-92e8676925d4`; never commit the database URL or Census key.
-- [ ] Record run/methodology ID, canonical tract count, priority/quality counts, payload bytes,
+- [x] Record run/methodology ID, canonical tract count, priority/quality counts, payload bytes,
   geometry validity, and several GEOID score traces.
-- [ ] Confirm public mode returns `no_published_run` and response/browser bundles contain no
+- [x] Confirm public mode returns `no_published_run` and response/browser bundles contain no
   validated run data.
-- [ ] Review screenshots at 375, 430, 768, 1024, and 1440 px.
-- [ ] Run keyboard, touch-target, reduced-motion, high-contrast, and axe checks.
+- [x] Review screenshots at 375, 430, 768, 1024, and 1440 px.
+- [x] Run keyboard, touch-target, reduced-motion, forced-colors, and axe checks.
 - [ ] Obtain Tarik's review of the real first slice before Phase B.
 
 ```bash
