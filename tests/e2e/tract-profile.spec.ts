@@ -51,9 +51,11 @@ test("renders the plain-language tract profile at the configured width", async (
   await expect(profile.getByText("Speaks English less than ‘very well,’ age 5+", {exact: true})).toBeVisible();
   await expect(profile.getByText(/English-language access, not literacy/i)).toBeVisible();
   await expect(profile.getByText(/not raw percentages, changes over time, causes, or recommendations/i)).toBeVisible();
-  await expect(profile.getByText(/High means this tract has more of the measured barriers/i))
+  await expect(profile.getByRole("heading", {name: "How to read Equity Baseline"}))
     .toBeVisible();
-  await expect(profile.getByText(/measured conditions, not the people who live here/i))
+  await expect(profile.getByText(/13 measures covering income and housing costs/i))
+    .toBeVisible();
+  await expect(profile.getByText(/does not rate or judge the people who live here/i))
     .toBeVisible();
   await expect(profile.getByText(/spans NORTHRIDGE, NORTHRIDGE LAKES, RIDGEVIEW, HILLTOP PARISH/i))
     .toBeVisible();

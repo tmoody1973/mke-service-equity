@@ -61,10 +61,12 @@ Public copy uses “Census tract ID,” defines necessary technical terms, and e
 contributions are not raw percentages, changes over time, causes, or recommendations. Compare and
 download controls are later-plan features, not part of the current profile.
 
-The Equity Baseline band is defined beside the result: high means more of the measured barriers
-than many other Milwaukee County tracts, low means fewer, and moderate means near the county
-middle. The copy states that this comparison describes measured conditions and does not judge the
-people who live in the tract.
+The Equity Baseline band has a visible “How to read Equity Baseline” explanation beside the result.
+It says that the baseline combines 13 measures covering income and housing costs, education and
+jobs, health and disability, English-language access, and populations that have historically faced
+unequal access to public resources. High means more combined barriers than in many other Milwaukee
+County tracts, low means fewer, and moderate means near the county middle. The copy states that the
+comparison describes conditions in a place and does not rate or judge residents.
 
 Location context may show municipality, Census ZCTA, and the approved City of Milwaukee
 neighborhood reference as separate concepts. When the City reference covers at least half the

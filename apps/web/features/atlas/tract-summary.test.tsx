@@ -53,8 +53,8 @@ describe("explainTractSummary", () => {
 
 describe("explainEquityBaselineBand", () => {
   it("defines high and low as county comparisons of measured barriers", () => {
-    expect(explainEquityBaselineBand("high")).toContain("more of the measured barriers");
-    expect(explainEquityBaselineBand("low")).toContain("fewer of the measured barriers");
+    expect(explainEquityBaselineBand("high")).toContain("more barriers here");
+    expect(explainEquityBaselineBand("low")).toContain("fewer barriers here");
   });
 });
 
@@ -66,7 +66,9 @@ describe("TractSummary", () => {
     expect(screen.getByText("Priority 1")).toBeInTheDocument();
     expect(screen.getByText("Population 2,430")).toBeInTheDocument();
     expect(screen.getByText(/Food Access Need is very high/)).toBeInTheDocument();
-    expect(screen.getByText(/It describes measured conditions, not the people who live here/i))
+    expect(screen.getByRole("heading", {name: "How to read Equity Baseline"})).toBeInTheDocument();
+    expect(screen.getByText(/income and housing costs, education and jobs/i)).toBeInTheDocument();
+    expect(screen.getByText(/It does not rate or judge the people who live here/i))
       .toBeInTheDocument();
   });
 });

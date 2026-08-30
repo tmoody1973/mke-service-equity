@@ -12,13 +12,13 @@ function bandLabel(value: string | null): string {
 
 export function explainEquityBaselineBand(value: string | null): string {
   if (value === "high" || value === "very_high") {
-    return "High means this tract has more of the measured barriers than many other Milwaukee County tracts.";
+    return "Together, the 13 measures show more barriers here than in many other Milwaukee County tracts.";
   }
   if (value === "low" || value === "very_low") {
-    return "Low means this tract has fewer of the measured barriers than many other Milwaukee County tracts.";
+    return "Together, the 13 measures show fewer barriers here than in many other Milwaukee County tracts.";
   }
   if (value === "moderate") {
-    return "Moderate means this tract is near the middle of Milwaukee County tracts on the measured barriers.";
+    return "Together, the 13 measures place this tract near the middle of Milwaukee County tracts.";
   }
   return "The Equity Baseline comparison is not available for this tract.";
 }
@@ -79,9 +79,26 @@ export function TractSummary({idPrefix = "atlas", tract}: TractSummaryProps) {
                 <dd className="font-medium capitalize">{bandLabel(tract.equityBaselineBand)}</dd>
               </div>
             </dl>
-            <p className="text-xs text-muted">
-              {explainEquityBaselineBand(tract.equityBaselineBand)} It describes measured conditions, not the people who live here.
-            </p>
+            <section
+              aria-labelledby={`${idPrefix}-equity-baseline-help`}
+              className="space-y-2 rounded-lg border border-divider bg-default p-3 text-xs"
+            >
+              <h3 className="text-sm font-semibold" id={`${idPrefix}-equity-baseline-help`}>
+                How to read Equity Baseline
+              </h3>
+              <p>
+                It combines 13 measures covering income and housing costs, education and jobs,
+                health and disability, English-language access, and populations that have
+                historically faced unequal access to public resources.
+              </p>
+              <p>
+                <span className="font-semibold capitalize">{bandLabel(tract.equityBaselineBand)}:</span>{" "}
+                {explainEquityBaselineBand(tract.equityBaselineBand)}
+              </p>
+              <p className="text-muted">
+                This describes conditions in a place. It does not rate or judge the people who live here.
+              </p>
+            </section>
           </>
         ) : null}
       </Card.Content>
