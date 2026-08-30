@@ -8,6 +8,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import {MapCanvas} from "../map/map-canvas";
 import {AtlasDataState} from "./atlas-data-state";
 import {AtlasSearch} from "./atlas-search";
+import {FoodSiteDetails, FoodSiteLayerControl} from "./food-site-layer";
 import {PriorityLegend} from "./priority-legend";
 import {TractProfileState} from "./profile/profile-state";
 import {useTractProfile} from "./profile/use-tract-profile";
@@ -34,9 +35,19 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
       ? atlas.tracts.features.map((feature) => feature.properties.geoid)
       : [],
   ), [atlas]);
+  const foodSitesLayer = useMemo(() => atlas.state === "available"
+    ? atlas.contextLayers.foodSites
+    : {state: "unavailable" as const, reason: "snapshot_not_configured" as const}, [atlas]);
+  const foodSiteFeatures = useMemo(() => foodSitesLayer.state === "available"
+    ? foodSitesLayer.features.features
+    : [], [foodSitesLayer]);
+  const availableFoodSiteIds = useMemo(
+    () => new Set(foodSiteFeatures.map((feature) => feature.id)),
+    [foodSiteFeatures],
+  );
   const urlState = useMemo(
-    () => parseAtlasUrlState(searchParams, availableGeoids),
-    [availableGeoids, searchParams],
+    () => parseAtlasUrlState(searchParams, availableGeoids, availableFoodSiteIds),
+    [availableFoodSiteIds, availableGeoids, searchParams],
   );
   const tractFeatures = useMemo(
     () => atlas.state === "available" ? atlas.tracts.features : [],
@@ -49,6 +60,7 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
         && urlState.priorities.includes(feature.properties.foodEquityPriority))),
   [tractFeatures, urlState.priorities]);
   const selectedFeature = tractFeatures.find((feature) => feature.id === urlState.tract);
+  const selectedFoodSite = foodSiteFeatures.find((feature) => feature.id === urlState.site);
   const profile = useTractProfile(
     selectedFeature?.properties.geoid ?? null,
     atlas.state === "available" ? atlas.run.id : null,
@@ -77,6 +89,22 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
     writeUrlState({...urlState, priorities});
   }, [urlState, writeUrlState]);
 
+  const handleFoodSitesChange = useCallback((foodSites: boolean) => {
+    writeUrlState({...urlState, foodSites, site: foodSites ? urlState.site : null});
+  }, [urlState, writeUrlState]);
+
+  const handleSelectFoodSite = useCallback((site: string) => {
+    writeUrlState({...urlState, foodSites: true, site});
+    if (window.matchMedia?.("(max-width: 768px)").matches) {
+      setMobileSnapPoint(0.65);
+      setMobileSheetOpen(true);
+    }
+  }, [urlState, writeUrlState]);
+
+  const handleCloseFoodSite = useCallback(() => {
+    writeUrlState({...urlState, site: null});
+  }, [urlState, writeUrlState]);
+
   const handleMobileSheetOpenChange = useCallback((open: boolean) => {
     if (open) {
       setMobileSnapPoint(1);
@@ -96,11 +124,18 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
       aria-label="Map workspace"
       className="relative flex h-[calc(100dvh-3.5rem)] min-h-96 overflow-hidden border-t border-divider bg-default min-[769px]:h-dvh"
       data-selected-tract={urlState.tract ?? ""}
+      data-selected-food-site={urlState.site ?? ""}
       role="region"
     >
       {atlas.state === "available" ? (
-        <aside className="hidden w-[17rem] shrink-0 flex-col gap-5 overflow-hidden border-r border-divider bg-background p-4 min-[1200px]:flex">
+        <aside className="hidden w-[17rem] shrink-0 flex-col gap-5 overflow-y-auto border-r border-divider bg-background p-4 min-[1200px]:flex">
             <AtlasSearch idPrefix="desktop" onSelect={handleSelectTract} />
+            <FoodSiteLayerControl
+              enabled={urlState.foodSites}
+              idPrefix="desktop"
+              layer={foodSitesLayer}
+              onChange={handleFoodSitesChange}
+            />
             <PriorityLegend
               activePriorities={urlState.priorities}
               idPrefix="desktop"
@@ -117,22 +152,35 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
       <div className="relative min-w-0 flex-1">
         <MapCanvas
           onSelectTract={handleSelectTract}
+          onSelectFoodSite={handleSelectFoodSite}
           priorities={urlState.priorities}
+          foodSites={foodSitesLayer.state === "available" ? foodSitesLayer.features : undefined}
+          selectedFoodSite={urlState.site}
           selectedTract={urlState.tract}
+          showFoodSites={urlState.foodSites}
           styleUrl={styleUrl}
           tracts={atlas.state === "available" ? atlas.tracts : undefined}
         />
-        {selectedFeature ? (
+        {selectedFoodSite || selectedFeature ? (
           <aside
             aria-label="Selected tract summary"
             className="absolute right-20 top-3 z-10 hidden max-h-[calc(100dvh-1.5rem)] w-80 overflow-y-auto min-[1200px]:block min-[1280px]:hidden"
           >
-            <TractProfileState
-              idPrefix="tablet"
-              isLoading={profile.isLoading}
-              response={profile.response}
-              tract={selectedFeature.properties}
-            />
+            {selectedFoodSite && foodSitesLayer.state === "available" ? (
+              <FoodSiteDetails
+                idPrefix="tablet"
+                onClose={handleCloseFoodSite}
+                site={selectedFoodSite.properties}
+                sourceUrl={foodSitesLayer.source.sourceUrl}
+              />
+            ) : selectedFeature ? (
+              <TractProfileState
+                idPrefix="tablet"
+                isLoading={profile.isLoading}
+                response={profile.response}
+                tract={selectedFeature.properties}
+              />
+            ) : null}
           </aside>
         ) : null}
         {atlas.state === "available" ? (
@@ -149,7 +197,11 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                 className="absolute bottom-4 left-1/2 z-20 min-h-11 -translate-x-1/2 shadow-sm min-[1200px]:hidden"
                 variant="secondary"
               >
-                {selectedFeature ? "View tract details" : "Browse census tracts"}
+                {selectedFoodSite
+                  ? "View food-site details"
+                  : selectedFeature
+                    ? "View tract details"
+                    : "Browse census tracts"}
               </Button>
             </Sheet.Trigger>
             <Sheet.Backdrop variant="transparent">
@@ -159,11 +211,21 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                   <Sheet.CloseTrigger aria-label="Close census tract explorer" />
                   <Sheet.Header>
                     <Sheet.Heading>
-                      {selectedFeature?.properties.name ?? "Explore census tracts"}
+                      {selectedFoodSite?.properties.name
+                        ?? selectedFeature?.properties.name
+                        ?? "Explore census tracts"}
                     </Sheet.Heading>
                   </Sheet.Header>
                   <Sheet.Body className="flex min-h-0 flex-col gap-5 overflow-y-auto pb-6">
                     <AtlasSearch idPrefix="mobile" onSelect={handleSelectTract} />
+                    {selectedFoodSite && foodSitesLayer.state === "available" ? (
+                      <FoodSiteDetails
+                        idPrefix="mobile"
+                        onClose={handleCloseFoodSite}
+                        site={selectedFoodSite.properties}
+                        sourceUrl={foodSitesLayer.source.sourceUrl}
+                      />
+                    ) : null}
                     {selectedFeature ? (
                       <TractProfileState
                         idPrefix="mobile"
@@ -176,6 +238,12 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
                       activePriorities={urlState.priorities}
                       idPrefix="mobile"
                       onChange={handlePriorityChange}
+                    />
+                    <FoodSiteLayerControl
+                      enabled={urlState.foodSites}
+                      idPrefix="mobile"
+                      layer={foodSitesLayer}
+                      onChange={handleFoodSitesChange}
                     />
                     <TractList
                       idPrefix="mobile"
@@ -192,7 +260,14 @@ export function AtlasWorkspace({atlas, styleUrl}: AtlasWorkspaceProps) {
       </div>
       {atlas.state === "available" ? (
         <aside className="hidden w-[22.5rem] shrink-0 overflow-y-auto border-l border-divider bg-background p-4 min-[1280px]:block">
-          {selectedFeature ? (
+          {selectedFoodSite && foodSitesLayer.state === "available" ? (
+            <FoodSiteDetails
+              idPrefix="desktop"
+              onClose={handleCloseFoodSite}
+              site={selectedFoodSite.properties}
+              sourceUrl={foodSitesLayer.source.sourceUrl}
+            />
+          ) : selectedFeature ? (
             <TractProfileState
               idPrefix="desktop"
               isLoading={profile.isLoading}

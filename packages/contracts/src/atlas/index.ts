@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {atlasFoodSitesLayerResponseSchema} from "./context-layers";
 import {
   atlasModeSchema,
   atlasRunSummarySchema,
@@ -11,6 +12,9 @@ export const atlasAvailableResponseSchema = z.strictObject({
   mode: atlasModeSchema,
   run: atlasRunSummarySchema,
   tracts: atlasTractFeatureCollectionSchema,
+  contextLayers: z.strictObject({
+    foodSites: atlasFoodSitesLayerResponseSchema,
+  }),
 });
 
 export const atlasUnavailableResponseSchema = z.strictObject({
@@ -24,6 +28,7 @@ export const atlasResponseSchema = z.discriminatedUnion("state", [
 ]);
 
 export * from "./profile";
+export * from "./context-layers";
 export * from "./run";
 export * from "./search";
 export * from "./tract";

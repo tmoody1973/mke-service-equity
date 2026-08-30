@@ -155,10 +155,19 @@ Show dataset, publisher, vintage, status, definition, and links/methodology.
 ### Food Resources
 - Full-Service Grocery
 - Other Food Retail
-- Pantries
-- Meal Programs
+- Pantries — approved Data You Can Use/Milwaukee Food Council source-listed display layer; check before visiting
+- Meal Programs — included in the same approved source-listed display layer; check before visiting
 - Farmers Markets
 - Community Resources
+
+The Food Resources control explains before activation that the locations are for finding possible
+help and do not affect tract scores. Selecting a place shows its source-listed type, address,
+phone, provider website, and narrative source note when present. Every selected-place view says
+that current hours and services were not independently confirmed, advises the reader to check
+before visiting, credits Data You Can Use, Milwaukee Food Council, and UWM Institute for Systems
+Change and Peacebuilding, and links to the original Milwaukee Food Environment Map. The URL may
+store `context=food_sites` and a validated stable `site` identifier; unknown identifiers are
+dropped rather than guessed.
 
 ### Access
 - Walking Access

@@ -126,9 +126,14 @@ not published**.
 
 All scored facts join through the selected Food run. Contextual resource layers are not selected
 by `MAX(created_at)`, latest snapshot, or proximity alone. They remain unavailable until the
-implementation can prove the exact run/source snapshot relationship and public redistribution
-terms. The first visible slice contains no public resource points. A disabled control may explain
-why a layer is unavailable; it may not imply coverage that has not been approved.
+implementation can prove either an exact run/source snapshot relationship or an explicit,
+deterministic release-pinned display-only relationship, plus public redistribution terms. A
+display-only layer must carry `affectsScores: false`, must not be described as part of the score
+run, and must remain source-listed rather than verified unless site-level verification evidence
+exists. The first visible slice contained no public resource points. On 2026-08-30 Tarik approved
+the public Data You Can Use/Milwaukee Food Council `Pantries 2026` snapshot with citation as the
+first display-only exception; its exact checksum, dates, attribution, terms, and
+`display_context_only_not_part_of_score_run` relationship are validated in the Atlas contract.
 
 ## 3. Server presentation contracts
 

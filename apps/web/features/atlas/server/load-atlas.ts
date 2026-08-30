@@ -1,7 +1,9 @@
 import "server-only";
 
 import {
+  atlasFoodSitesLayerSchema,
   atlasResponseSchema,
+  type AtlasFoodSitesLayerResponse,
   type AtlasResponse,
   type AtlasTractFeatureCollection,
 } from "@mke/contracts";
@@ -11,6 +13,7 @@ import {
   type AtlasRunSelection,
   type SelectedAtlasRun,
 } from "@mke/database/server";
+import foodSitesSnapshot from "../../../data/context/food-sites-2026.json";
 
 type AtlasEnvironment = Record<string, string | undefined>;
 
@@ -20,11 +23,20 @@ export type LoadAtlasDependencies = {
     selectedRun: SelectedAtlasRun,
     environment: AtlasEnvironment,
   ) => Promise<AtlasTractFeatureCollection>;
+  loadFoodSites: () => Promise<AtlasFoodSitesLayerResponse>;
 };
+
+export function loadApprovedFoodSitesSnapshot(): AtlasFoodSitesLayerResponse {
+  const parsed = atlasFoodSitesLayerSchema.safeParse(foodSitesSnapshot);
+  return parsed.success
+    ? parsed.data
+    : {state: "unavailable", reason: "snapshot_not_valid"};
+}
 
 const defaultDependencies: LoadAtlasDependencies = {
   selectRun: (environment) => selectAtlasRun(environment),
   loadTracts: (selectedRun, environment) => loadAtlasTracts(selectedRun, environment),
+  loadFoodSites: () => Promise.resolve(loadApprovedFoodSitesSnapshot()),
 };
 
 export async function loadAtlas(
@@ -38,12 +50,16 @@ export async function loadAtlas(
       return atlasResponseSchema.parse(selection);
     }
 
-    const tracts = await dependencies.loadTracts(selection, environment);
+    const [tracts, foodSites] = await Promise.all([
+      dependencies.loadTracts(selection, environment),
+      dependencies.loadFoodSites(),
+    ]);
     const response = atlasResponseSchema.safeParse({
       state: "available",
       mode: selection.mode,
       run: selection.run,
       tracts,
+      contextLayers: {foodSites},
     });
 
     if (!response.success) {

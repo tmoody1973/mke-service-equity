@@ -45,6 +45,10 @@ function dependencies(overrides: Partial<LoadAtlasDependencies> = {}): LoadAtlas
   return {
     selectRun: vi.fn(() => Promise.resolve(selectedRun)),
     loadTracts: vi.fn(() => Promise.resolve(tracts)),
+    loadFoodSites: vi.fn(() => Promise.resolve({
+      state: "unavailable" as const,
+      reason: "snapshot_not_configured" as const,
+    })),
     ...overrides,
   };
 }
@@ -56,6 +60,9 @@ describe("loadAtlas", () => {
       mode: "validated_preview",
       run: selectedRun.state === "selected" ? selectedRun.run : undefined,
       tracts,
+      contextLayers: {
+        foodSites: {state: "unavailable", reason: "snapshot_not_configured"},
+      },
     });
   });
 
@@ -80,6 +87,19 @@ describe("loadAtlas", () => {
     await expect(loadAtlas({}, dependencies({
       loadTracts: vi.fn(() => Promise.reject(new Error("postgresql://user:secret@example/mke"))),
     }))).resolves.toEqual({state: "unavailable", reason: "data_incomplete"});
+  });
+
+  it("loads the approved immutable food-site display snapshot with its exact checksum", async () => {
+    const {loadApprovedFoodSitesSnapshot} = await import("./load-atlas");
+    const layer = loadApprovedFoodSitesSnapshot();
+
+    expect(layer.state).toBe("available");
+    if (layer.state === "available") {
+      expect(layer.features.features).toHaveLength(89);
+      expect(layer.affectsScores).toBe(false);
+      expect(layer.source.sourceSnapshotSha256)
+        .toBe("5b86d359dd55e008836dfba4f4bde45d0561567bcce9d346882392a744e77f94");
+    }
   });
 
   it("fails closed when a dependency violates the outbound browser contract", async () => {

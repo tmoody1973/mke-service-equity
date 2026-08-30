@@ -6,6 +6,8 @@ export type AtlasUrlState = {
   tract: string | null;
   layer: AtlasLayer;
   priorities: Array<number>;
+  foodSites: boolean;
+  site: string | null;
 };
 
 type SearchParamsReader = {
@@ -28,13 +30,20 @@ function readPriorities(value: string | null): Array<number> {
 export function parseAtlasUrlState(
   searchParams: SearchParamsReader,
   availableGeoids: ReadonlySet<string>,
+  availableFoodSiteIds: ReadonlySet<string> = new Set(),
 ): AtlasUrlState {
   const requestedTract = searchParams.get("tract");
+  const requestedSite = searchParams.get("site");
+  const site = requestedSite && availableFoodSiteIds.has(requestedSite) ? requestedSite : null;
+  const foodSites = site !== null || searchParams.get("context")?.split(",").includes("food_sites")
+    === true;
 
   return {
     tract: requestedTract && availableGeoids.has(requestedTract) ? requestedTract : null,
     layer: DEFAULT_ATLAS_LAYER,
     priorities: readPriorities(searchParams.get("priority")),
+    foodSites,
+    site,
   };
 }
 
@@ -46,6 +55,8 @@ export function buildAtlasSearchParams(
   next.delete("tract");
   next.delete("layer");
   next.delete("priority");
+  next.delete("context");
+  next.delete("site");
 
   if (state.tract) {
     next.set("tract", state.tract);
@@ -55,6 +66,12 @@ export function buildAtlasSearchParams(
   }
   if (state.priorities.length > 0) {
     next.set("priority", [...new Set(state.priorities)].sort((a, b) => a - b).join(","));
+  }
+  if (state.foodSites || state.site) {
+    next.set("context", "food_sites");
+  }
+  if (state.site) {
+    next.set("site", state.site);
   }
 
   return next;

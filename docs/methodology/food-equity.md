@@ -153,6 +153,13 @@ Need determines priority. Investment and services show response.
 Emergency-food resources and public investment are absent from score components and the
 score-input fingerprint. Their changes cannot alter Food Access Need, its band, or Priority.
 
+The Atlas may separately display the approved `Pantries 2026` Data You Can Use/Milwaukee Food
+Council snapshot as source-listed community context. That release-pinned point layer is not an
+input, component, proxy, or validation condition for this methodology. It carries the visible
+status **Check before visiting** because hours and current service availability were not
+independently verified. Turning the layer on or selecting a place changes only the map display and
+share URL; it cannot recalculate or change any score.
+
 ## Missing data and uncertainty
 
 Never substitute missing with zero. Zero is valid only when the source explicitly observes zero,

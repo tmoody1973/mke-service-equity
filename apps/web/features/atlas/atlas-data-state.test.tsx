@@ -25,6 +25,9 @@ describe("AtlasDataState", () => {
         dataVintages: {acs: "2020-2024"},
       },
       tracts: {type: "FeatureCollection", features: []} as never,
+      contextLayers: {
+        foodSites: {state: "unavailable", reason: "snapshot_not_configured"},
+      },
     }} />);
 
     expect(screen.getByRole("status")).toHaveTextContent(

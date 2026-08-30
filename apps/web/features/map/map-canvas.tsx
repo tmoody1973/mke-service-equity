@@ -1,6 +1,9 @@
 "use client";
 
-import type {AtlasTractFeatureCollection} from "@mke/contracts";
+import type {
+  AtlasFoodSiteFeatureCollection,
+  AtlasTractFeatureCollection,
+} from "@mke/contracts";
 import {Button} from "@heroui/react";
 import {
   AttributionControl,
@@ -12,6 +15,12 @@ import {
 } from "maplibre-gl";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {resetMilwaukeeExtent} from "./map-camera";
+import {
+  addFoodSiteLayers,
+  FOOD_SITE_LAYER_ID,
+  FOOD_SITE_SOURCE_ID,
+  setFoodSiteLayerVisibility,
+} from "./food-site-layers";
 import {
   addTractLayers,
   applyTractPriorityFilter,
@@ -25,6 +34,10 @@ type MapCanvasProps = {
   selectedTract?: string | null;
   styleUrl: string;
   tracts?: AtlasTractFeatureCollection | undefined;
+  foodSites?: AtlasFoodSiteFeatureCollection | undefined;
+  onSelectFoodSite?: (siteId: string) => void;
+  selectedFoodSite?: string | null;
+  showFoodSites?: boolean;
 };
 
 const emptyTracts = {type: "FeatureCollection" as const, features: [] as []};
@@ -41,8 +54,12 @@ function featureGeoid(event: MapLayerMouseEvent): string | null {
 
 export function MapCanvas({
   onSelectTract,
+  onSelectFoodSite,
   priorities = [],
+  foodSites,
+  selectedFoodSite = null,
   selectedTract = null,
+  showFoodSites = false,
   styleUrl,
   tracts,
 }: MapCanvasProps) {
@@ -52,9 +69,14 @@ export function MapCanvas({
   const appliedSelectedTractRef = useRef<string | null>(null);
   const hoveredTractRef = useRef<string | null>(null);
   const selectedTractRef = useRef<string | null>(selectedTract);
+  const appliedSelectedFoodSiteRef = useRef<string | null>(null);
+  const selectedFoodSiteRef = useRef<string | null>(selectedFoodSite);
   const tractsRef = useRef(tracts);
   const onSelectTractRef = useRef(onSelectTract);
   const prioritiesRef = useRef(priorities);
+  const foodSitesRef = useRef(foodSites);
+  const onSelectFoodSiteRef = useRef(onSelectFoodSite);
+  const showFoodSitesRef = useRef(showFoodSites);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -72,7 +94,12 @@ export function MapCanvas({
 
     map.addControl(new NavigationControl({showCompass: false}), "top-right");
     map.addControl(
-      new AttributionControl({compact: false, customAttribution: "MapLibre GL JS"}),
+      new AttributionControl({
+        compact: false,
+        customAttribution: foodSitesRef.current
+          ? '<a href="https://experience.arcgis.com/experience/4883a0957d124294aa236d9e9cc696a5" target="_blank" rel="noopener noreferrer">Food sites: Data You Can Use + partners</a> · MapLibre GL JS'
+          : "MapLibre GL JS",
+      }),
       "bottom-right",
     );
     map.on("error", (event) => {
@@ -111,15 +138,50 @@ export function MapCanvas({
     };
 
     const handleSelect = (event: MapLayerMouseEvent) => {
+      if (
+        showFoodSitesRef.current
+        && map.getLayer(FOOD_SITE_LAYER_ID)
+        && map.queryRenderedFeatures(event.point, {layers: [FOOD_SITE_LAYER_ID]}).length > 0
+      ) {
+        return;
+      }
       const geoid = featureGeoid(event);
       if (geoid) {
         onSelectTractRef.current?.(geoid);
       }
     };
 
+    const handleSelectFoodSite = (event: MapLayerMouseEvent) => {
+      const siteId = featureGeoid(event);
+      if (siteId) {
+        onSelectFoodSiteRef.current?.(siteId);
+      }
+    };
+
+    const handleFoodSitePointerEnter = () => {
+      map.getCanvas().style.cursor = "pointer";
+    };
+
+    const handleFoodSitePointerLeave = () => {
+      map.getCanvas().style.cursor = "";
+    };
+
     const handleLoad = () => {
       try {
         addTractLayers(map, tractsRef.current ?? emptyTracts);
+        if (foodSitesRef.current) {
+          addFoodSiteLayers(map, foodSitesRef.current, showFoodSitesRef.current);
+          map.on("mouseenter", FOOD_SITE_LAYER_ID, handleFoodSitePointerEnter);
+          map.on("mouseleave", FOOD_SITE_LAYER_ID, handleFoodSitePointerLeave);
+          map.on("click", FOOD_SITE_LAYER_ID, handleSelectFoodSite);
+          if (selectedFoodSiteRef.current) {
+            map.setFeatureState(
+              {source: FOOD_SITE_SOURCE_ID, id: selectedFoodSiteRef.current},
+              {selected: true},
+            );
+            appliedSelectedFoodSiteRef.current = selectedFoodSiteRef.current;
+          }
+        }
         applyTractPriorityFilter(map, prioritiesRef.current);
         map.on("mousemove", TRACT_FILL_LAYER_ID, handlePointerMove);
         map.on("mouseleave", TRACT_FILL_LAYER_ID, handlePointerLeave);
@@ -166,6 +228,14 @@ export function MapCanvas({
   }, [tracts]);
 
   useEffect(() => {
+    foodSitesRef.current = foodSites;
+    const source = mapRef.current?.getSource(FOOD_SITE_SOURCE_ID) as GeoJSONSource | undefined;
+    if (source && foodSites) {
+      source.setData(foodSites as Parameters<GeoJSONSource["setData"]>[0]);
+    }
+  }, [foodSites]);
+
+  useEffect(() => {
     selectedTractRef.current = selectedTract;
     const map = mapRef.current;
     const previous = appliedSelectedTractRef.current;
@@ -183,8 +253,32 @@ export function MapCanvas({
   }, [selectedTract]);
 
   useEffect(() => {
+    selectedFoodSiteRef.current = selectedFoodSite;
+    const map = mapRef.current;
+    const previous = appliedSelectedFoodSiteRef.current;
+
+    if (!map?.getSource(FOOD_SITE_SOURCE_ID)) {
+      return;
+    }
+    if (previous && previous !== selectedFoodSite) {
+      map.setFeatureState({source: FOOD_SITE_SOURCE_ID, id: previous}, {selected: false});
+    }
+    if (selectedFoodSite) {
+      map.setFeatureState(
+        {source: FOOD_SITE_SOURCE_ID, id: selectedFoodSite},
+        {selected: true},
+      );
+    }
+    appliedSelectedFoodSiteRef.current = selectedFoodSite;
+  }, [selectedFoodSite]);
+
+  useEffect(() => {
     onSelectTractRef.current = onSelectTract;
   }, [onSelectTract]);
+
+  useEffect(() => {
+    onSelectFoodSiteRef.current = onSelectFoodSite;
+  }, [onSelectFoodSite]);
 
   useEffect(() => {
     prioritiesRef.current = priorities;
@@ -193,6 +287,14 @@ export function MapCanvas({
       applyTractPriorityFilter(map, priorities);
     }
   }, [priorities]);
+
+  useEffect(() => {
+    showFoodSitesRef.current = showFoodSites;
+    const map = mapRef.current;
+    if (map?.getLayer(FOOD_SITE_LAYER_ID)) {
+      setFoodSiteLayerVisibility(map, showFoodSites);
+    }
+  }, [showFoodSites]);
 
   const handleReset = useCallback(() => {
     const map = mapRef.current;
@@ -209,6 +311,8 @@ export function MapCanvas({
       <div
         aria-label="Interactive map of Milwaukee County census tracts"
         className="absolute inset-0"
+        data-food-site-count={foodSites?.features.length ?? 0}
+        data-food-sites-visible={showFoodSites ? "true" : "false"}
         data-map-container
         data-map-status={mapStatus}
         ref={containerRef}

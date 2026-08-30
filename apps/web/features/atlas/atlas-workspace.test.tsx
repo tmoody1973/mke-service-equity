@@ -10,13 +10,18 @@ const navigation = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
+const mapCanvasProps = vi.hoisted(() => ({current: null as null | Record<string, unknown>}));
+
 vi.mock("next/navigation", () => ({
   usePathname: () => navigation.pathname,
   useSearchParams: () => navigation.searchParams,
 }));
 
 vi.mock("../map/map-canvas", () => ({
-  MapCanvas: () => <div data-map-container />,
+  MapCanvas: (props: Record<string, unknown>) => {
+    mapCanvasProps.current = props;
+    return <div data-map-container />;
+  },
 }));
 
 import {AtlasWorkspace} from "./atlas-workspace";
@@ -55,6 +60,56 @@ const available: AtlasResponse = {
       },
     }],
   },
+  contextLayers: {
+    foodSites: {
+      state: "available",
+      layerId: "food_sites",
+      title: "Food pantries and meal sites",
+      description: "Community food sites listed by the source. Check before visiting.",
+      affectsScores: false,
+      qualityStatus: "source_listed_check_before_visiting",
+      scoreRunRelationship: "display_context_only_not_part_of_score_run",
+      features: {
+        type: "FeatureCollection",
+        features: [{
+          type: "Feature",
+          id: "data-you-can-use:pantries-2026:18",
+          geometry: {type: "Point", coordinates: [-87.947, 43.09]},
+          properties: {
+            id: "data-you-can-use:pantries-2026:18",
+            name: "All Saints Catholic Church",
+            siteType: "food_pantry",
+            address: "4060 N. 26th St.",
+            city: "Milwaukee",
+            zipCode: "53209",
+            phone: "414-444-5610",
+            website: "https://example.org/pantry",
+            details: "Pantry Tuesday and Thursday.",
+            serviceArea: null,
+            verificationStatus: "source_listed_check_before_visiting",
+          },
+        }],
+      },
+      source: {
+        sourceName: "Milwaukee Food Environment Map — Food Pantries and Meal Sites",
+        publisher: "Data You Can Use",
+        collaborators: [
+          "Milwaukee Food Council",
+          "UWM Institute for Systems Change and Peacebuilding",
+        ],
+        datasetVersion: "Pantries 2026",
+        sourceUrl: "https://example.org/map",
+        layerUrl: "https://example.org/layer",
+        retrievedAt: "2026-08-30T19:17:48Z",
+        sourceLastEditedAt: "2026-03-05T19:55:13Z",
+        termsUrl: "https://example.org/terms",
+        attribution: "Data You Can Use, Milwaukee Food Council, and UWM Institute for Systems Change and Peacebuilding",
+        sourceSnapshotSha256: "a".repeat(64),
+        featureCount: 1,
+        limitation: "Check before visiting.",
+      },
+    },
+  },
 };
 
 describe("AtlasWorkspace", () => {
@@ -68,6 +123,7 @@ describe("AtlasWorkspace", () => {
     navigation.searchParams = new URLSearchParams();
     vi.unstubAllGlobals();
     vi.clearAllMocks();
+    mapCanvasProps.current = null;
   });
 
   it("renders an honest unavailable state without constructing tract state", () => {
@@ -104,5 +160,23 @@ describe("AtlasWorkspace", () => {
     expect(screen.getByRole("heading", {name: "Explore census tracts"})).toBeInTheDocument();
     expect(within(dialog).getByRole("button", {name: /Census Tract 1.01.*Priority 1/}))
       .toBeInTheDocument();
+  });
+
+  it("enables the credited context layer and opens plain-language site details", async () => {
+    const user = userEvent.setup();
+    render(<AtlasWorkspace atlas={available} styleUrl="/map-style.json" />);
+
+    const desktopToggle = screen.getAllByRole("switch", {
+      name: "Show food pantries and meal sites",
+    })[0];
+    expect(desktopToggle).not.toBeChecked();
+    await user.click(desktopToggle!);
+    expect(window.location.search).toContain("context=food_sites");
+
+    const onSelectFoodSite = mapCanvasProps.current?.onSelectFoodSite as
+      | ((siteId: string) => void)
+      | undefined;
+    onSelectFoodSite?.("data-you-can-use:pantries-2026:18");
+    expect(window.location.search).toContain("site=data-you-can-use%3Apantries-2026%3A18");
   });
 });

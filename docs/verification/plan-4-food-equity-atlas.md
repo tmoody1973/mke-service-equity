@@ -5,8 +5,8 @@
 - Linear issue: `MOO-754`
 - Branch: `codex/moo-754-atlas-tract-profile`
 - Verification date: 2026-08-30
-- Current result: the map, selected-tract profile, exact evidence, provenance, responsive layouts,
-  and plain-language content pass verification; search and approved contextual layers remain
+- Current result: the map, selected-tract profile, exact evidence, provenance, tract/neighborhood
+  search, approved food-site context layer, responsive layouts, and plain-language content pass verification
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -56,8 +56,8 @@ lineage before returning an available profile.
 For complete Census Tract 1.01 (`55079000101`), live reconciliation returned exactly 4 Food Access
 Need components and 13 Equity Baseline components. Separate live checks covered insufficient-data
 tract `55079187200` and zero-population tract `55079990000`; neither received inferred components
-or fake zero values. Context resources remain explicitly unavailable until their exact snapshot is
-tied to the run.
+or fake zero values. The approved food-site display layer is explicitly separate from those
+results: it is release-pinned context, not a score-run input or analytical proximity result.
 
 The profile explains contribution values as composite-score points relative to the Milwaukee
 County midpoint. It explicitly says these values are not raw percentages, changes over time,
@@ -151,7 +151,7 @@ passes with zero browser console errors.
 
 The City of Milwaukee DCD neighborhood reference and deterministic tract-overlap rule were
 explicitly approved on 2026-08-30. Tract and neighborhood search are implemented. Authoritative
-ZCTA/municipality ingestion, address authority, approved contextual resource layers, final
+ZCTA/municipality ingestion, address authority, additional contextual resource layers, final
 performance hardening, and the load-bearing completion review remain. The implementation does not
 make the mutable live service a runtime dependency and does not imply deployment or publication.
 
@@ -201,3 +201,28 @@ Access Need and other measured barriers. Its planning note directs readers to in
 1 and 2 tracts first, inspect the evidence, compare nearby areas, and talk with residents and local
 groups. It also states that the number does not choose a project, prove a cause, or automatically
 decide funding. The guide passed the profile Playwright and axe checks at all five required widths.
+
+## Approved food-site context layer
+
+Tarik approved use of the public Data You Can Use/Milwaukee Food Council `Pantries 2026` layer on
+2026-08-30 with credit and citation. The strict Python adapter validated and normalized one exact
+89-feature ArcGIS GeoJSON response with SHA-256
+`5b86d359dd55e008836dfba4f4bde45d0561567bcce9d346882392a744e77f94`. The browser-safe
+artifact contains 86 food pantries, two meal programs, and one food bank. All 89 rows retain a
+name, type, address, and source coordinate; two lack a phone, 17 lack a website, 19 lack a source
+note, and 61 lack a source-listed service area. Missing fields remain null.
+
+The layer contract requires `affectsScores: false` and
+`display_context_only_not_part_of_score_run`. MapLibre performs display and selection only. The
+source has no independently verified active/current field, so the control and every selected-site
+card say **Check before visiting**, describe notes as source notes, and link available provider
+contact information. The app credits Data You Can Use, Milwaukee Food Council, and UWM Institute
+for Systems Change and Peacebuilding and links to the original Milwaukee Food Environment Map in
+the layer control, selected-site card, and map attribution.
+
+Dedicated Playwright and axe checks passed at 375, 430, 768, 1024, and 1440 px with the layer on
+and a deep-linked site selected. All five reached MapLibre `ready`, rendered 89 points, preserved
+the shareable `context` and stable `site` URL values, had no horizontal page overflow, and reported
+zero WCAG A/AA violations. The production build passed. Offline suites passed 68 web tests, 32
+contract tests, 85 database tests, one design-system test, and 590 Python tests; 12 external
+integration tests remained intentionally deselected.

@@ -38,6 +38,55 @@ const run = {
   dataVintages: {acs: "2020-2024", foodRetail: "2025"},
 } as const;
 
+const foodSites = {
+  state: "available",
+  layerId: "food_sites",
+  title: "Food pantries and meal sites",
+  description: "Source-listed community food sites. Check before visiting.",
+  affectsScores: false,
+  qualityStatus: "source_listed_check_before_visiting",
+  scoreRunRelationship: "display_context_only_not_part_of_score_run",
+  features: {
+    type: "FeatureCollection",
+    features: [{
+      type: "Feature",
+      id: "data-you-can-use:pantries-2026:18",
+      geometry: {type: "Point", coordinates: [-87.947, 43.09]},
+      properties: {
+        id: "data-you-can-use:pantries-2026:18",
+        name: "All Saints Catholic Church",
+        siteType: "food_pantry",
+        address: "4060 N. 26th St.",
+        city: "Milwaukee",
+        zipCode: "53209",
+        phone: "414-444-5610",
+        website: "https://example.org/pantry",
+        details: "Pantry: Tuesday and Thursday",
+        serviceArea: null,
+        verificationStatus: "source_listed_check_before_visiting",
+      },
+    }],
+  },
+  source: {
+    sourceName: "Milwaukee Food Environment Map — Food Pantries and Meal Sites",
+    publisher: "Data You Can Use",
+    collaborators: [
+      "Milwaukee Food Council",
+      "UWM Institute for Systems Change and Peacebuilding",
+    ],
+    datasetVersion: "Pantries 2026, ArcGIS FeatureServer layer 57",
+    sourceUrl: "https://experience.arcgis.com/experience/4883a0957d124294aa236d9e9cc696a5",
+    layerUrl: "https://services5.arcgis.com/example/FeatureServer/57",
+    retrievedAt: "2026-08-30T19:17:48Z",
+    sourceLastEditedAt: "2026-03-05T19:55:13Z",
+    termsUrl: "https://doc.arcgis.com/en/arcgis-online/reference/terms-of-use.htm",
+    attribution: "Data You Can Use, Milwaukee Food Council, and UWM Institute for Systems Change and Peacebuilding",
+    sourceSnapshotSha256: "a".repeat(64),
+    featureCount: 1,
+    limitation: "Source-listed locations are not independently verified. Check before visiting.",
+  },
+} as const;
+
 describe("atlasSearchResponseSchema", () => {
   it("accepts bounded tract and City-neighborhood results that resolve to GEOIDs", () => {
     const response = atlasSearchResponseSchema.parse({
@@ -119,6 +168,7 @@ describe("atlasResponseSchema", () => {
       mode: "validated_preview",
       run,
       tracts: {type: "FeatureCollection", features: [feature]},
+      contextLayers: {foodSites},
     });
 
     expect(response.state).toBe("available");
@@ -145,6 +195,7 @@ describe("atlasResponseSchema", () => {
       state: "available",
       mode: "published",
       run,
+      contextLayers: {foodSites},
       tracts: {
         type: "FeatureCollection",
         features: [{...feature, id: "55079000102"}],
@@ -157,6 +208,7 @@ describe("atlasResponseSchema", () => {
       state: "available",
       mode: "published",
       run,
+      contextLayers: {foodSites},
       tracts: {type: "FeatureCollection", features: [feature, feature]},
     })).toThrow();
   });
@@ -166,7 +218,34 @@ describe("atlasResponseSchema", () => {
       state: "available",
       mode: "validated_preview",
       run: {...run, storageUri: "s3://private/source.zip"},
+      contextLayers: {foodSites},
       tracts: {type: "FeatureCollection", features: [feature]},
+    })).toThrow();
+  });
+
+  it("keeps source-listed food sites separate from the score run and rejects count drift", () => {
+    const response = atlasResponseSchema.parse({
+      state: "available",
+      mode: "validated_preview",
+      run,
+      tracts: {type: "FeatureCollection", features: [feature]},
+      contextLayers: {foodSites},
+    });
+    expect(response.state).toBe("available");
+    if (response.state === "available" && response.contextLayers.foodSites.state === "available") {
+      expect(response.contextLayers.foodSites.affectsScores).toBe(false);
+      expect(response.contextLayers.foodSites.scoreRunRelationship)
+        .toBe("display_context_only_not_part_of_score_run");
+    }
+
+    expect(() => atlasResponseSchema.parse({
+      state: "available",
+      mode: "validated_preview",
+      run,
+      tracts: {type: "FeatureCollection", features: [feature]},
+      contextLayers: {
+        foodSites: {...foodSites, source: {...foodSites.source, featureCount: 2}},
+      },
     })).toThrow();
   });
 });

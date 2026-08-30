@@ -360,12 +360,18 @@ git commit -m "test: verify MOO-754 first atlas slice"
 
 ### Task 15: Audit and add only approved contextual resource layers
 
-- [ ] Prove exact source snapshot, run relationship, public redistribution permission, dates,
+- [x] Prove exact source snapshot, run/display-only relationship, public redistribution permission, dates,
   attribution, and quality for each proposed layer.
-- [ ] Keep contextual resources visually and semantically separate from score inputs.
-- [ ] Never show unverified/stale resources as current verified service locations.
-- [ ] If MOO-768 schema is required for deterministic pinning, document dependency and leave the
+- [x] Keep contextual resources visually and semantically separate from score inputs.
+- [x] Never show unverified/stale resources as current verified service locations.
+- [x] If MOO-768 schema is required for deterministic pinning, document dependency and leave the
   layer unavailable until it is merged.
+
+Implementation note: the approved `Pantries 2026` layer is a release-pinned browser display
+snapshot, not a database/run-selected analytical layer, so MOO-768 schema is not required for its
+deterministic display identity. Its contract says `affectsScores: false` and
+`display_context_only_not_part_of_score_run`. Governed publication of the Food score run remains
+separate under MOO-768.
 
 ---
 
