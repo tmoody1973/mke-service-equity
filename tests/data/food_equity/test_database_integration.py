@@ -271,8 +271,46 @@ def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
         zero_count,
         insufficient_count,
     ) in reconciliations:
-        assert (score_count, component_count) == (302, 1200)
-        assert (complete_count, zero_count, insufficient_count) == (300, 2, 0)
+        assert (score_count, component_count) == (302, 1196)
+        assert (complete_count, zero_count, insufficient_count) == (299, 2, 1)
+
+    with psycopg.connect(integration_url()) as connection:
+        insufficient = connection.execute(
+            "SELECT geographies.geoid,scores.exclusion_reasons "
+            "FROM food_scores scores JOIN geographies ON geographies.id=scores.geography_id "
+            "JOIN food_score_runs runs ON runs.id=scores.food_score_run_id "
+            "WHERE runs.status='validated' AND scores.quality_status='insufficient_data' "
+            "ORDER BY runs.id,geographies.geoid"
+        ).fetchall()
+
+    assert all(
+        row
+        == (
+            "55079187200",
+            [
+                "missing_metric:full_service_grocery_walk_access",
+                "missing_metric:scheduled_transit_service_intensity",
+            ],
+        )
+        for row in insufficient
+    )
+
+    with psycopg.connect(integration_url()) as connection:
+        unsnapped_metrics = connection.execute(
+            "SELECT metrics.metric_slug,metrics.state,metrics.value,metrics.quality_status,"
+            "metrics.quality_metadata->>'quality_reason' "
+            "FROM food_access_metric_values metrics "
+            "JOIN geographies ON geographies.id=metrics.geography_id "
+            "WHERE geographies.geoid='55079187200' "
+            "AND metrics.metric_slug IN "
+            "('full_service_grocery_walk_access','scheduled_transit_service_intensity') "
+            "ORDER BY metrics.metric_slug"
+        ).fetchall()
+
+    assert unsnapped_metrics == [
+        ("full_service_grocery_walk_access", "missing", None, "missing", "origin_unsnapped"),
+        ("scheduled_transit_service_intensity", "missing", None, "missing", "origin_unsnapped"),
+    ]
 
 
 def test_draft_validates_only_against_the_exact_pinned_baseline_and_remains_unpublished() -> None:

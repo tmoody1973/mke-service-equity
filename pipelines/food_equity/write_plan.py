@@ -43,11 +43,17 @@ SCORING_METRIC_SLUGS = frozenset(
     }
 )
 EXPECTED_SCORE_COUNT = 302
-EXPECTED_COMPLETE_COUNT = 300
+EXPECTED_COMPLETE_COUNT = 299
+EXPECTED_INSUFFICIENT_COUNT = 1
 EXPECTED_ZERO_POPULATION_COUNT = 2
+EXPECTED_INSUFFICIENT_GEOID = "55079187200"
+EXPECTED_INSUFFICIENT_REASONS = (
+    "missing_metric:full_service_grocery_walk_access",
+    "missing_metric:scheduled_transit_service_intensity",
+)
 EXPECTED_ACCESS_METRIC_COUNT = 1208
 EXPECTED_METRIC_SNAPSHOT_LINK_COUNT = 2416
-EXPECTED_COMPONENT_COUNT = 1200
+EXPECTED_COMPONENT_COUNT = 1196
 EXPECTED_CONTEXT_METRIC_COUNT = 1812
 EXPECTED_TOTAL_ACCESS_METRIC_COUNT = 3020
 EXPECTED_TOTAL_METRIC_SNAPSHOT_LINK_COUNT = 7852
@@ -598,7 +604,8 @@ def _resource_version_statement(
         "classification_evidence,full_service_grocery,snap_authorized,active,valid_from,valid_to,"
         "verified_at,created_at) "
         "SELECT %s,r.id,ss.id,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,"
-        "CASE WHEN %s IS NULL THEN NULL ELSE ST_SetSRID(ST_MakePoint(%s,%s),4326) END,"
+        "CASE WHEN %s::double precision IS NULL "
+        "THEN NULL ELSE ST_SetSRID(ST_MakePoint(%s,%s),4326) END,"
         "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s FROM food_resources r "
         "JOIN source_snapshots ss ON true JOIN data_sources ds ON ds.id=ss.source_id "
         "WHERE r.canonical_resource_key=%s AND r.source_record_id=%s AND r.source_id=ds.id "
@@ -805,16 +812,60 @@ def _validate_production_counts(
     score_counts = Counter(score.status for score in scoring.scores)
     expected = {
         "complete": EXPECTED_COMPLETE_COUNT,
+        "insufficient_data": EXPECTED_INSUFFICIENT_COUNT,
         "ineligible_zero_population": EXPECTED_ZERO_POPULATION_COUNT,
     }
     if len(scoring.scores) != EXPECTED_SCORE_COUNT or score_counts != expected:
         raise WritePlanError(
-            "Food score reconciliation must be 302 total, 300 complete, and 2 zero"
+            "Food score reconciliation must be 302 total, 299 complete, 1 insufficient, and 2 zero"
         )
     if len(scoring.components) != EXPECTED_COMPONENT_COUNT:
-        raise WritePlanError("Food score component reconciliation must equal 1,200")
+        raise WritePlanError("Food score component reconciliation must equal 1,196")
+    _validate_approved_insufficient(scoring, access)
     if len(access) != EXPECTED_ACCESS_METRIC_COUNT:
         raise WritePlanError("Food access metric reconciliation must equal 1,208")
+    _validate_production_metric_counts(scoring, inputs, access, link_count)
+
+
+def _validate_approved_insufficient(
+    scoring: FoodScoringResult,
+    access: Mapping[AccessMetricNaturalKey, AccessMetricPersistenceRow],
+) -> None:
+    insufficient = tuple(score for score in scoring.scores if score.status == "insufficient_data")
+    if (
+        len(insufficient) != 1
+        or insufficient[0].geoid != EXPECTED_INSUFFICIENT_GEOID
+        or insufficient[0].exclusion_reasons != EXPECTED_INSUFFICIENT_REASONS
+    ):
+        raise WritePlanError(
+            "Food insufficient-data reconciliation must match the approved unsnapped tract"
+        )
+    required_metrics = frozenset(
+        {"full_service_grocery_walk_access", "scheduled_transit_service_intensity"}
+    )
+    missing_rows = {
+        key.metric_slug: row
+        for key, row in access.items()
+        if key.geoid == EXPECTED_INSUFFICIENT_GEOID and key.metric_slug in required_metrics
+    }
+    if set(missing_rows) != required_metrics or any(
+        row.value is not None
+        or row.state != "missing"
+        or row.quality_status != "missing"
+        or row.quality_metadata.get("quality_reason") != "origin_unsnapped"
+        for row in missing_rows.values()
+    ):
+        raise WritePlanError(
+            "Food insufficient-data metrics must match the approved unsnapped-origin cause"
+        )
+
+
+def _validate_production_metric_counts(
+    scoring: FoodScoringResult,
+    inputs: PersistenceInputs,
+    access: Mapping[AccessMetricNaturalKey, AccessMetricPersistenceRow],
+    link_count: int,
+) -> None:
     if link_count != EXPECTED_METRIC_SNAPSHOT_LINK_COUNT:
         raise WritePlanError("Food access snapshot lineage reconciliation must equal 2,416")
     if set(inputs.geography_ids) != {score.geoid for score in scoring.scores}:
@@ -855,7 +906,7 @@ def _validate_production_counts(
         (geoid, metric_slug) for geoid in complete_geoids for metric_slug in SCORING_METRIC_SLUGS
     }
     if component_pairs != expected_component_pairs:
-        raise WritePlanError("Food score components must form the exact 300-by-4 scoring grid")
+        raise WritePlanError("Food score components must form the exact 299-by-4 scoring grid")
 
 
 def _reconciliation_statements(

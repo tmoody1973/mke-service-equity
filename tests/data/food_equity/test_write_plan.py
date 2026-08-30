@@ -33,6 +33,7 @@ from pipelines.food_equity.write_plan import (
     SnapshotPersistenceRow,
     SourcePersistenceRow,
     WritePlanError,
+    _validate_approved_insufficient,
     build_load_statements,
     build_write_plan,
     canonical_sha256,
@@ -308,6 +309,7 @@ def test_nullable_resource_facts_and_verification_date_are_preserved() -> None:
     statements, _, _ = build_load_statements(inputs=inputs(), registry=load_registry(), now=NOW)
     version = next(item for item in statements if "food_resource_versions" in item.sql)
 
+    assert "CASE WHEN %s::double precision IS NULL" in version.sql
     assert version.parameters[3] is None  # name
     assert version.parameters[19] is None  # active is unknown, not false
     assert version.parameters[22] is None  # verification date was not invented
@@ -379,6 +381,64 @@ def test_nearest_resource_reselection_requires_the_expected_version_fingerprint(
 
     assert "rv.version_fingerprint=%s" in metric.sql
     assert "c" * 64 in metric.parameters
+
+
+def test_live_insufficient_reconciliation_requires_the_exact_unsnapped_cause() -> None:
+    approved_geoid = "55079187200"
+    source_inputs = inputs()
+    template = next(
+        row for row in source_inputs.access_metrics if row.key.metric_slug == SCORING_SLUG
+    )
+
+    def missing_metric(slug: str, fingerprint: str) -> AccessMetricPersistenceRow:
+        return replace(
+            template,
+            key=AccessMetricNaturalKey(approved_geoid, slug, fingerprint),
+            nearest_resource_version=None,
+            value=None,
+            state="missing",
+            quality_status="missing",
+            quality_metadata={"quality_reason": "origin_unsnapped"},
+        )
+
+    grocery = missing_metric("full_service_grocery_walk_access", "4" * 64)
+    transit = missing_metric("scheduled_transit_service_intensity", "5" * 64)
+    access = {grocery.key: grocery, transit.key: transit}
+    approved_score = replace(
+        scoring().scores[0],
+        geoid=approved_geoid,
+        exclusion_reasons=(
+            "missing_metric:full_service_grocery_walk_access",
+            "missing_metric:scheduled_transit_service_intensity",
+        ),
+    )
+    approved = replace(scoring(), scores=(approved_score,))
+
+    _validate_approved_insufficient(approved, access)
+
+    wrong_geoid = replace(
+        approved,
+        scores=(replace(approved_score, geoid="55079000101"),),
+    )
+    with pytest.raises(WritePlanError, match="approved unsnapped tract"):
+        _validate_approved_insufficient(wrong_geoid, access)
+
+    wrong_reasons = replace(
+        approved,
+        scores=(replace(approved_score, exclusion_reasons=("missing_metric:other",)),),
+    )
+    with pytest.raises(WritePlanError, match="approved unsnapped tract"):
+        _validate_approved_insufficient(wrong_reasons, access)
+
+    wrong_cause = replace(
+        grocery,
+        quality_metadata={"quality_reason": "resource_unsnapped"},
+    )
+    with pytest.raises(WritePlanError, match="unsnapped-origin cause"):
+        _validate_approved_insufficient(
+            approved,
+            {wrong_cause.key: wrong_cause, transit.key: transit},
+        )
 
 
 def test_score_statement_maps_enum_band_and_persists_exclusion_reasons(tmp_path: Path) -> None:

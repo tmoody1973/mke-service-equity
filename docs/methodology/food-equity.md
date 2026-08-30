@@ -160,7 +160,14 @@ such as no scheduled trips reachable from an otherwise valid tract origin and fe
 
 ACS margins of error and reliability states remain attached. Network, coordinate, source-age,
 classification, and transit-calendar quality states are explicit. A validated run requires no
-insufficient result among baseline-eligible tracts.
+unattributed insufficient result among baseline-eligible tracts. The approved 2026-08-30 live
+reconciliation contains exactly one: tract `55079187200` is `insufficient_data` because its 2020
+Census center of population is 251.60 meters from the nearest approved pedestrian-network node,
+beyond the fixed 200-meter snap tolerance. Its grocery-walk and scheduled-transit indicators stay
+missing, its component and Priority values stay absent, and weights are not redistributed. The
+validated output contract is therefore 302 scores: 299 complete, one insufficient, and two
+zero-population, with 1,196 components. This amendment changes no source, formula, threshold,
+weight, band, matrix cell, or missing-data rule.
 
 ## Development baseline pin and publication
 
@@ -176,8 +183,9 @@ Publication is a separate governed action.
 
 Every result belongs to an immutable methodology version, score-run ID, source fingerprint, and
 explicit source vintages. A source, formula, weight, threshold, classification, band, matrix,
-completeness, or routing change creates a new methodology/source version and never redefines an
-old run.
+completeness or eligibility rule, or routing change creates a new methodology/source version and
+never redefines an old run. Recording the observed count of results produced by an unchanged
+completeness rule does not redefine that rule.
 
 No LLM may acquire, classify, calculate, infer, modify, or override an official value, score,
 band, or Priority. AI may later explain verified results; deterministic evidence remains the

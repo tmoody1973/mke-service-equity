@@ -221,8 +221,9 @@ metric/snapshot, component/run, component/geography, score/run, score/geography,
 baseline orphans. Resource geometry is a non-empty EPSG:4326 point only when the coordinate state
 supports one. Metric state/value and quality checks preserve observed zero, unreachable, and
 missing as different facts. The production write plan reconciles a 302-by-10 persisted metric
-grid, a 302-by-4 scoring grid, all metric/snapshot links, 1,200 components, and 302 scores before
-validation.
+grid, a 302-by-4 scoring grid, all metric/snapshot links, 1,196 components, and 302 scores before
+validation. The exact Food score shape is 299 complete, one attributable `insufficient_data`, and
+two `ineligible_zero_population` rows.
 
 The separate Food lifecycle permits only `draft -> validated` and `draft -> failed`; it contains
 no `published` value. Each run pins the exact validated Equity Baseline ID and output hash. Base

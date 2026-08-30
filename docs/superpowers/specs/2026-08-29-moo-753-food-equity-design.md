@@ -489,8 +489,10 @@ boundaries, funding history, or policy preference. Missing either band produces
 - Golden traces must reproduce each raw input, ranking direction, percentile, dimension,
   composite, band, matrix cell, Priority, quality state, and provenance link.
 - A validated run requires full tract reconciliation, all source validators, no silent row loss,
-  no unresolved active full-service grocery coordinates, no insufficient baseline-eligible tract,
-  and zero prohibited contextual fields in score inputs.
+  no unresolved active full-service grocery coordinates, exactly the approved live
+  `origin_unsnapped` insufficient state for tract `55079187200` and no other insufficient
+  baseline-eligible tract, and zero prohibited contextual fields in score inputs. The exact live
+  shape is 299 complete, one insufficient, two zero-population, and 1,196 components.
 
 ## 8. Approval decisions
 
@@ -513,7 +515,13 @@ The 2026-08-29 approval covers all of these load-bearing choices:
     historical resource-version identity including nullable validity endpoints, source-derived
     classification verification without an invented timestamp, dated override/context evidence,
     separate scalar 10/15/20-minute contextual metric slugs, and persisted score-exclusion
-    reasons.
+    reasons; and
+13. the 2026-08-30 live reconciliation amendment: preserve tract `55079187200` as insufficient
+    because its approved origin is 251.60 meters from the nearest graph node, retain the fixed
+    200-meter tolerance, and validate exactly 299 complete, one insufficient, two zero-population,
+    and 1,196 components.
 
-Any change to those choices requires a methodology version change, documentation, tests, and a
-new run. Approval does not authorize publication or production mutation.
+Any future change to those choices requires a methodology version change, documentation, tests,
+and a new run. The 2026-08-30 amendment records the first authoritative execution of the already
+approved missing-data rule; it changes validation evidence, not the calculation method. Approval
+does not authorize publication or production mutation.
