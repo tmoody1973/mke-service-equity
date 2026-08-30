@@ -48,6 +48,8 @@ function evidence(slug: string, index: number) {
       marginOfError: null,
       confidenceLow: null,
       confidenceHigh: null,
+      confidenceLevel: null,
+      reliability: null,
     },
     countyPercentile: 50,
     effectiveWeight: 0.25,

@@ -54,7 +54,12 @@ function foodRows() {
     metric_unit: unit,
     metric_quality_status: "verified",
     metric_quality_metadata: slug === "households_no_vehicle"
-      ? {margin_of_error: "2.4", quality_reason: null}
+      ? {
+          margin_of_error: "2.4",
+          cv_state: "reliable",
+          source_confidence_level: "90_percent",
+          quality_reason: null,
+        }
       : {quality_reason: null},
     domain,
     indicator_percentile: String(60 + index),
@@ -103,6 +108,12 @@ function equityRows() {
     margin_of_error: index < 7 ? "1.5" : null,
     confidence_low: index >= 7 ? "8.5" : null,
     confidence_high: index >= 7 ? "12.5" : null,
+    value_quality_metadata: index < 7
+      ? {
+          cv_state: index === 3 ? "use_with_caution" : "reliable",
+          source_confidence_level: "90_percent",
+        }
+      : {},
     data_year: index < 7 ? "2024 ACS 5-year" : "2023",
     value_quality_status: "verified",
     indicator_percentile: String(70 + index),
@@ -139,12 +150,27 @@ describe("buildAtlasTractProfile", () => {
       contribution: 2.75,
       nearestResource: {name: "Example Market"},
     });
+    expect(profile.foodComponents.find(
+      (component) => component.slug === "households_no_vehicle",
+    )?.measurement).toMatchObject({
+      confidenceLevel: 90,
+      reliability: "reliable",
+    });
     expect(profile.equityDrivers.find(
       (driver) => driver.slug === "limited_english_proficiency",
     )).toMatchObject({
       name: "Speaks English less than ‘very well,’ age 5+",
-      measurement: {marginOfError: 1.5},
+      measurement: {
+        marginOfError: 1.5,
+        confidenceLow: 8.5,
+        confidenceHigh: 11.5,
+        confidenceLevel: 90,
+        reliability: "reliable",
+      },
     });
+    expect(profile.equityDrivers.find(
+      (driver) => driver.slug === "indicator_3",
+    )?.measurement).toMatchObject({reliability: "use_with_caution"});
     expect(profile.context).toEqual({state: "unavailable", reason: "not_pinned_to_run"});
     expect(profile.provenance).toHaveLength(6);
   });
@@ -184,6 +210,9 @@ describe("buildAtlasTractProfile", () => {
     ["unlinked nearest resource", [header()], foodRows().map((row, index) => index === 1
       ? {...row, nearest_resource_snapshot_linked: false}
       : row), equityRows()],
+    ["invalid ACS reliability metadata", [header()], foodRows(), equityRows().map((row, index) => index === 0
+      ? {...row, value_quality_metadata: {cv_state: "unknown", source_confidence_level: "90_percent"}}
+      : row)],
   ] as const)("fails the whole profile for %s", (_name, headers, foods, equities) => {
     expect(() => buildAtlasTractProfile(headers, foods, equities, {
       foodRunId,

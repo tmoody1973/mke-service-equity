@@ -42,6 +42,13 @@ insufficient, and zero-population states remain explicit; none are converted to 
 
 ## Exact selected-tract profile
 
+The profile now carries ACS sampling reliability separately from source verification. For Census
+tract `55079008400`, Housing cost burden remains the stored 61.3% estimate at the 97th county
+percentile with a +3.9-point centered contribution. Its stored `use_with_caution` state and 22.5
+percentage-point margin produce a server-prepared 90% display range of 38.8%–83.8%. The UI states
+that the percentile shares this uncertainty and directs planners to compare nearby tracts and
+confirm with local data and residents. No score or methodology value changed.
+
 The profile route loads only after a tract is selected. The repository requires the selected Food
 Equity run, its pinned Equity Baseline run, the same tract, and exact component-to-snapshot-to-source
 lineage before returning an available profile.
@@ -119,14 +126,14 @@ The final local gate passed:
 
 | Check | Result |
 |---|---|
-| Web unit/component tests | 57 passed |
-| Contracts tests | 30 passed |
-| Database unit tests | 84 passed |
+| Web unit/component tests | 59 passed |
+| Contracts tests | 31 passed |
+| Database unit tests | 85 passed |
 | Design-system tests | 1 passed |
 | Live profile integration test | passed for complete, insufficient, and zero-population states |
-| Live profile Playwright + axe | 5 passed at the required widths |
+| Live profile and uncertainty Playwright + axe | 10 passed at the required widths |
 | Live tract/neighborhood search Playwright + axe | 5 passed at the required widths |
-| Public production Playwright + axe | 10 passed, 5 preview-only checks skipped |
+| Public production Playwright + axe | 10 passed, 15 preview-only checks skipped |
 | Workspace typechecks | passed |
 | ESLint | passed with generated MapLibre worker modules excluded |
 | Next.js production build | passed |

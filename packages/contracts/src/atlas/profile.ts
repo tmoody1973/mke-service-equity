@@ -14,6 +14,13 @@ export const presentationQualityStatusSchema = z.enum([
 const measurementUnitSchema = z.string().trim().min(1);
 const nullablePercentSchema = z.number().finite().min(0).max(100).nullable();
 
+export const atlasReliabilityStateSchema = z.enum([
+  "reliable",
+  "use_with_caution",
+  "high_uncertainty",
+  "cv_not_computable",
+]);
+
 export const observedMeasurementSchema = z.strictObject({
   state: z.literal("observed"),
   value: z.number().finite(),
@@ -22,6 +29,8 @@ export const observedMeasurementSchema = z.strictObject({
   marginOfError: z.number().finite().nonnegative().nullable(),
   confidenceLow: z.number().finite().min(0).max(100).nullable(),
   confidenceHigh: z.number().finite().min(0).max(100).nullable(),
+  confidenceLevel: z.literal(90).nullable(),
+  reliability: atlasReliabilityStateSchema.nullable(),
 }).superRefine((measurement, context) => {
   const oneConfidenceBoundMissing = (measurement.confidenceLow === null)
     !== (measurement.confidenceHigh === null);
@@ -39,6 +48,26 @@ export const observedMeasurementSchema = z.strictObject({
     context.addIssue({
       code: "custom",
       message: "The lower confidence bound cannot exceed the upper bound.",
+    });
+  }
+  if (
+    measurement.reliability !== null
+    && (
+      measurement.marginOfError === null
+      || measurement.confidenceLow === null
+      || measurement.confidenceHigh === null
+      || measurement.confidenceLevel !== 90
+    )
+  ) {
+    context.addIssue({
+      code: "custom",
+      message: "An ACS reliability state requires its 90% margin and range.",
+    });
+  }
+  if (measurement.confidenceLevel === 90 && measurement.marginOfError === null) {
+    context.addIssue({
+      code: "custom",
+      message: "A Census 90% confidence level requires its margin of error.",
     });
   }
 });
@@ -247,5 +276,6 @@ export type AtlasNeighborhoodContext = z.infer<typeof atlasNeighborhoodContextSc
 export type AtlasNeighborhoodOverlap = z.infer<typeof atlasNeighborhoodOverlapSchema>;
 export type AtlasProfileUnavailableReason = z.infer<typeof atlasProfileUnavailableReasonSchema>;
 export type AtlasProvenanceItem = z.infer<typeof atlasProvenanceItemSchema>;
+export type AtlasReliabilityState = z.infer<typeof atlasReliabilityStateSchema>;
 export type AtlasTractProfile = z.infer<typeof atlasTractProfileSchema>;
 export type AtlasTractProfileResponse = z.infer<typeof atlasTractProfileResponseSchema>;

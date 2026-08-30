@@ -309,6 +309,13 @@ copy states that plus/minus values are composite-score points relative to the co
 raw percentages, changes over time, causes, or recommendations. Limited English proficiency is
 explained as English-language access and explicitly not literacy.
 
+ACS evidence also separates verified lineage from survey precision. The browser-safe profile
+contract carries the pipeline's stored reliability state plus the server-prepared 90% range for
+percent measures. Cards use a visible text label, explain why a sampled estimate can have a wide
+range, warn that its county percentile has the same uncertainty, and give a planning tip to compare
+nearby tracts and confirm with local data and residents. This is presentation of existing
+uncertainty metadata; it does not change any analytical value, rank, eligibility rule, or score.
+
 ## 9. Verification and evidence
 
 Completion requires:

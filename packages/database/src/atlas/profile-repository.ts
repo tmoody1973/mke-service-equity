@@ -5,6 +5,7 @@ import {
   type AtlasNeighborhoodContext,
   type AtlasNearestResource,
   type AtlasProvenanceItem,
+  type AtlasReliabilityState,
   type AtlasTractProfile,
   type AtlasTractProperties,
 } from "@mke/contracts";
@@ -140,6 +141,38 @@ function nullableInteger(value: unknown, code: string): number | null {
   return parsed;
 }
 
+const RELIABILITY_STATES = new Set<AtlasReliabilityState>([
+  "reliable",
+  "use_with_caution",
+  "high_uncertainty",
+  "cv_not_computable",
+]);
+
+function readReliabilityMetadata(
+  metadataValue: unknown,
+  code: string,
+): {confidenceLevel: 90 | null; reliability: AtlasReliabilityState | null} {
+  if (!isRecord(metadataValue)) {
+    return fail(code);
+  }
+  const stateValue = metadataValue.cv_state;
+  const confidenceValue = metadataValue.source_confidence_level;
+  if (stateValue === undefined && confidenceValue === undefined) {
+    return {confidenceLevel: null, reliability: null};
+  }
+  if (
+    typeof stateValue !== "string"
+    || !RELIABILITY_STATES.has(stateValue as AtlasReliabilityState)
+    || confidenceValue !== "90_percent"
+  ) {
+    return fail(code);
+  }
+  return {
+    confidenceLevel: 90,
+    reliability: stateValue as AtlasReliabilityState,
+  };
+}
+
 function readDateTime(value: unknown, code: string): string {
   const parsed = value instanceof Date
     ? value
@@ -180,9 +213,11 @@ function readMeasurement(
   unitValue: unknown,
   qualityValue: unknown,
   uncertainty: {
+    confidenceLevel?: unknown;
     confidenceHigh?: unknown;
     confidenceLow?: unknown;
     marginOfError?: unknown;
+    reliability?: unknown;
   } = {},
 ): AtlasMeasurement {
   const state = requiredString(stateValue, "invalid_measurement_state");
@@ -190,14 +225,52 @@ function readMeasurement(
   const qualityStatus = requiredString(qualityValue, "invalid_measurement_quality");
 
   if (state === "observed") {
+    const observedValue = requiredNumber(value, "invalid_observed_value");
+    const marginOfError = nullableNumber(
+      uncertainty.marginOfError ?? null,
+      "invalid_margin_of_error",
+    );
+    const confidenceLevel = uncertainty.confidenceLevel === null
+      || uncertainty.confidenceLevel === undefined
+      ? null
+      : uncertainty.confidenceLevel === 90
+        ? 90 as const
+        : fail("invalid_confidence_level");
+    const reliabilityValue = uncertainty.reliability ?? null;
+    const reliability = reliabilityValue === null
+      ? null
+      : typeof reliabilityValue === "string"
+        && RELIABILITY_STATES.has(reliabilityValue as AtlasReliabilityState)
+        ? reliabilityValue as AtlasReliabilityState
+        : fail("invalid_reliability_state");
+    let confidenceLow = nullableNumber(
+      uncertainty.confidenceLow ?? null,
+      "invalid_confidence_low",
+    );
+    let confidenceHigh = nullableNumber(
+      uncertainty.confidenceHigh ?? null,
+      "invalid_confidence_high",
+    );
+    if (
+      confidenceLevel === 90
+      && marginOfError !== null
+      && confidenceLow === null
+      && confidenceHigh === null
+      && unit === "percent"
+    ) {
+      confidenceLow = Math.max(0, observedValue - marginOfError);
+      confidenceHigh = Math.min(100, observedValue + marginOfError);
+    }
     return {
       state,
-      value: requiredNumber(value, "invalid_observed_value"),
+      value: observedValue,
       unit,
       qualityStatus: qualityStatus as "verified" | "provisional" | "stale",
-      marginOfError: nullableNumber(uncertainty.marginOfError ?? null, "invalid_margin_of_error"),
-      confidenceLow: nullableNumber(uncertainty.confidenceLow ?? null, "invalid_confidence_low"),
-      confidenceHigh: nullableNumber(uncertainty.confidenceHigh ?? null, "invalid_confidence_high"),
+      marginOfError,
+      confidenceLow,
+      confidenceHigh,
+      confidenceLevel,
+      reliability,
     };
   }
 
@@ -337,6 +410,10 @@ function buildFoodEvidence(
     const marginOfError = slug === "households_no_vehicle"
       ? metadata.margin_of_error ?? null
       : null;
+    const uncertaintyMetadata = readReliabilityMetadata(
+      metadata,
+      "invalid_food_reliability_metadata",
+    );
     const countyPercentile = requiredNumber(
       assertSame(group, "indicator_percentile", "food_component_mismatch"),
       "invalid_food_percentile",
@@ -357,7 +434,7 @@ function buildFoodEvidence(
         assertSame(group, "metric_value", "food_component_mismatch"),
         assertSame(group, "metric_unit", "food_component_mismatch"),
         assertSame(group, "metric_quality_status", "food_component_mismatch"),
-        {marginOfError},
+        {marginOfError, ...uncertaintyMetadata},
       ),
       countyPercentile,
       effectiveWeight,
@@ -405,6 +482,10 @@ function buildEquityEvidence(
     const countyPercentile = requiredNumber(row.indicator_percentile, "invalid_equity_percentile");
     const effectiveWeight = requiredNumber(row.effective_weight, "invalid_equity_weight");
     const isEnglishAccess = slug === "limited_english_proficiency";
+    const uncertaintyMetadata = readReliabilityMetadata(
+      row.value_quality_metadata,
+      "invalid_equity_reliability_metadata",
+    );
 
     return {
       slug,
@@ -425,6 +506,7 @@ function buildEquityEvidence(
           marginOfError: row.margin_of_error,
           confidenceLow: row.confidence_low,
           confidenceHigh: row.confidence_high,
+          ...uncertaintyMetadata,
         },
       ),
       countyPercentile,
@@ -691,6 +773,7 @@ export async function loadAtlasTractProfile(
         indicator_value.confidence_high as confidence_high,
         indicator_value.data_year as data_year,
         indicator_value.quality_status::text as value_quality_status,
+        indicator_value.quality_metadata as value_quality_metadata,
         component.indicator_percentile as indicator_percentile,
         component.effective_weight as effective_weight,
         component.quality_status::text as component_quality_status,

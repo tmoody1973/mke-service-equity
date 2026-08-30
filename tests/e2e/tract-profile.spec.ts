@@ -97,3 +97,38 @@ test("renders the plain-language tract profile at the configured width", async (
 
   expect(browserErrors).toEqual([]);
 });
+
+test("explains a wide Census margin of error before planning", async ({page}, testInfo) => {
+  test.skip(!previewRunId, "Requires the explicit local validated-preview run.");
+
+  const browserErrors = observeBrowserErrors(page);
+  const width = testInfo.project.use.viewport?.width ?? 0;
+
+  await page.goto("/?tract=55079008400");
+  if (width < 1280) {
+    await page.getByRole("button", {name: "View tract details"}).click();
+  }
+
+  const profile = page.locator("[data-profile-tract='55079008400']:visible");
+  await expect(profile).toBeVisible();
+  const housingCard = profile.locator("[data-evidence-slug='housing_cost_burden']");
+  await expect(housingCard.getByText("61.3%", {exact: true})).toBeVisible();
+  await expect(housingCard.getByText("Use with caution", {exact: true})).toBeVisible();
+  await expect(housingCard.getByText(/Likely range \(Census 90% confidence\): 38.8% to 83.8%/i))
+    .toBeVisible();
+  await expect(housingCard.getByText(/county percentile uses the estimate above/i)).toBeVisible();
+  await expect(housingCard.getByText(/Compare nearby tracts and confirm with local data and residents/i))
+    .toBeVisible();
+
+  const screenshotDirectory = path.join("artifacts", "plan-4", "uncertainty");
+  await mkdir(screenshotDirectory, {recursive: true});
+  await housingCard.screenshot({
+    path: path.join(screenshotDirectory, `${testInfo.project.name}.png`),
+  });
+
+  const accessibilityScan = await new AxeBuilder({page})
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(accessibilityScan.violations).toEqual([]);
+  expect(browserErrors).toEqual([]);
+});

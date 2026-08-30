@@ -49,6 +49,19 @@ Each measure carries its own state, quality label, uncertainty, definition, limi
 An unavailable Community context section means its snapshot is not tied to the run. It does not
 mean the tract has no resources.
 
+For ACS observations, the profile exposes the persisted coefficient-of-variation state from the
+approved Equity Baseline or Food pipeline. It does not recalculate or relabel reliability in the
+browser. The four states remain `reliable` (CV at or below 15%), `use_with_caution` (above 15% and
+at or below 30%), `high_uncertainty` (above 30%), and `cv_not_computable` for a zero estimate.
+“Verified” and “reliable” answer different questions: verification means lineage and quality
+checks passed, while reliability describes sampling precision.
+
+For reader-facing percent measures with an ACS 90% margin of error, the server presentation layer
+provides a bounded range of `estimate - margin` through `estimate + margin`, clamped to 0–100%.
+This range is explanatory only. It does not change the stored estimate, percentile, score,
+eligibility, or methodology. Percentile copy carries the same caution because the percentile was
+calculated from that estimate.
+
 ## Food Equity quality contract
 
 Food scoring requires one observation for each of the four approved scoring slugs and each

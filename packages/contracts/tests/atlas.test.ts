@@ -276,6 +276,8 @@ describe("atlasTractProfileSchema", () => {
       marginOfError: null,
       confidenceLow: null,
       confidenceHigh: null,
+      confidenceLevel: null,
+      reliability: null,
     },
     countyPercentile: 50,
     effectiveWeight: 0.25,
@@ -341,6 +343,19 @@ describe("atlasTractProfileSchema", () => {
     expect(() => atlasTractProfileSchema.parse({
       ...completeProfile,
       storageUri: "s3://private/raw-data.zip",
+    })).toThrow();
+  });
+
+  it("requires an ACS reliability label to carry its 90% margin and range", () => {
+    expect(() => atlasTractProfileSchema.parse({
+      ...completeProfile,
+      foodComponents: [{
+        ...evidence[0],
+        measurement: {
+          ...evidence[0]!.measurement,
+          reliability: "use_with_caution",
+        },
+      }, ...evidence.slice(1)],
     })).toThrow();
   });
 });

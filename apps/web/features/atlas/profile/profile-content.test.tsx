@@ -18,22 +18,29 @@ const source = {
 } as const;
 
 function evidence(slug: string, name: string, index: number): AtlasEvidenceItem {
+  const isCautionExample = slug === "housing_cost_burden";
+  const value = isCautionExample ? 61.3 : 25 + index;
+  const marginOfError = isCautionExample ? 22.5 : 1.5;
   return {
     slug,
     name,
     definition: slug === "limited_english_proficiency"
       ? "Share of people age 5 and older who report speaking English less than ‘very well.’ This measures English-language access, not literacy."
+      : isCautionExample
+        ? name
       : "A scored tract measure.",
     domain: index < 3 ? "demographic" : "socioeconomic",
     dataYear: "2024 ACS 5-year",
     measurement: {
       state: "observed",
-      value: 25 + index,
+      value,
       unit: "percent",
       qualityStatus: "verified",
-      marginOfError: 1.5,
-      confidenceLow: null,
-      confidenceHigh: null,
+      marginOfError,
+      confidenceLow: Math.max(0, value - marginOfError),
+      confidenceHigh: Math.min(100, value + marginOfError),
+      confidenceLevel: 90,
+      reliability: isCautionExample ? "use_with_caution" : "reliable",
     },
     countyPercentile: 80 - index,
     effectiveWeight: 0.1,
@@ -48,8 +55,16 @@ function evidence(slug: string, name: string, index: number): AtlasEvidenceItem 
 }
 
 const equityDrivers = Array.from({length: 13}, (_, index) => evidence(
-  index === 0 ? "limited_english_proficiency" : `equity-${index}`,
-  index === 0 ? "Speaks English less than ‘very well,’ age 5+" : `Equity measure ${index}`,
+  index === 0
+    ? "limited_english_proficiency"
+    : index === 3
+      ? "housing_cost_burden"
+      : `equity-${index}`,
+  index === 0
+    ? "Speaks English less than ‘very well,’ age 5+"
+    : index === 3
+      ? "Housing cost burden"
+      : `Equity measure ${index}`,
   index,
 ));
 
@@ -98,6 +113,13 @@ describe("TractProfileContent", () => {
     expect(screen.getAllByText(/County comparison: .* percentile/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Verified data").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Margin of error: plus or minus/i).length).toBeGreaterThan(0);
+    expect(screen.getByText("Use with caution")).toBeInTheDocument();
+    expect(screen.getAllByText("Housing cost burden")).toHaveLength(1);
+    expect(screen.getByText(/Likely range \(Census 90% confidence\): 38.8% to 83.8%/i))
+      .toBeInTheDocument();
+    expect(screen.getByText(/county percentile uses the estimate above/i)).toBeInTheDocument();
+    expect(screen.getByText(/compare nearby tracts and confirm with local data and residents/i))
+      .toBeInTheDocument();
     expect(screen.getByText(/This does not mean the tract has no resources/i))
       .toBeInTheDocument();
     expect(screen.getByText("American Community Survey 5-year estimates")).toBeInTheDocument();
@@ -127,5 +149,28 @@ describe("TractProfileContent", () => {
     expect(screen.getByText(/NORTHRIDGE: 42.8% of the covered area/i)).toBeInTheDocument();
     expect(screen.getByText(/Other boundary slivers: 0.8%/i)).toBeInTheDocument();
     expect(screen.getByText(/not an official boundary/i)).toBeInTheDocument();
+  });
+
+  it.each([
+    ["high_uncertainty", "High uncertainty", /Do not use this measure by itself/i],
+    ["cv_not_computable", "Reliability unclear", /usual reliability check cannot be calculated/i],
+  ] as const)("explains the %s survey state without relying on color", (state, label, explanation) => {
+    render(<TractProfileContent
+      idPrefix="test"
+      profile={{
+        ...profile,
+        equityDrivers: profile.equityDrivers.map((item, index) => index === 0
+          ? {
+              ...item,
+              measurement: item.measurement.state === "observed"
+                ? {...item.measurement, reliability: state}
+                : item.measurement,
+            }
+          : item),
+      }}
+    />);
+
+    expect(screen.getByText(label)).toBeInTheDocument();
+    expect(screen.getByText(explanation)).toBeInTheDocument();
   });
 });

@@ -76,6 +76,15 @@ directs the reader to inspect the evidence, compare nearby areas, and talk with 
 groups. It also says the number does not choose a project, prove a cause, or automatically decide
 funding.
 
+ACS measure cards separate source quality from sampling reliability. “Verified data” means the
+source and pipeline checks passed; it does not claim that a survey estimate is exact. A second
+text label shows “More stable estimate,” “Use with caution,” “High uncertainty,” or “Reliability
+unclear” from the pipeline's stored reliability state. The card shows the estimate's Census 90%
+range, explains that the county percentile inherits the same uncertainty, and tells planners to
+compare nearby tracts and confirm with local data and residents before acting. Color is never the
+only reliability signal. The Data quality section explains that more survey responses can reduce
+uncertainty and that rounding or hiding the margin does not improve precision.
+
 Location context may show municipality, Census ZCTA, and the approved City of Milwaukee
 neighborhood reference as separate concepts. When the City reference covers at least half the
 tract and one neighborhood is a majority of the covered area, use “Mostly in {name}” followed by

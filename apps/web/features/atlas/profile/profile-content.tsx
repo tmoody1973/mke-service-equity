@@ -1,6 +1,7 @@
 import type {
   AtlasEvidenceItem,
   AtlasMeasurement,
+  AtlasReliabilityState,
   AtlasTractProfile,
 } from "@mke/contracts";
 import {Accordion, Card, Chip} from "@heroui/react";
@@ -87,6 +88,15 @@ function uncertaintyLabel(measurement: AtlasMeasurement): string | null {
   if (measurement.state !== "observed") {
     return null;
   }
+  if (
+    measurement.confidenceLevel === 90
+    && measurement.marginOfError !== null
+    && measurement.confidenceLow !== null
+    && measurement.confidenceHigh !== null
+  ) {
+    const unit = measurement.unit === "percent" ? "%" : ` ${labelWords(measurement.unit)}`;
+    return `Likely range (Census 90% confidence): ${formatNumber(measurement.confidenceLow)}${unit} to ${formatNumber(measurement.confidenceHigh)}${unit}. Margin of error: plus or minus ${formatNumber(measurement.marginOfError)} ${measurement.unit === "percent" ? "percentage points" : labelWords(measurement.unit)}.`;
+  }
   if (measurement.marginOfError !== null) {
     return `Margin of error: plus or minus ${formatNumber(measurement.marginOfError)} ${measurement.unit === "percent" ? "percentage points" : labelWords(measurement.unit)}.`;
   }
@@ -96,6 +106,38 @@ function uncertaintyLabel(measurement: AtlasMeasurement): string | null {
   return null;
 }
 
+const RELIABILITY_PRESENTATION: Record<AtlasReliabilityState, {
+  chipColor: "default" | "success" | "warning" | "danger";
+  description: string;
+  label: string;
+  needsPlanningCaution: boolean;
+}> = {
+  reliable: {
+    chipColor: "default",
+    description: "This survey estimate is relatively stable, but it is still an estimate rather than a count of every household.",
+    label: "More stable estimate",
+    needsPlanningCaution: false,
+  },
+  use_with_caution: {
+    chipColor: "warning",
+    description: "The Census surveys a sample, not every household. For this measure, the estimate is uncertain enough that the actual tract value could be meaningfully different.",
+    label: "Use with caution",
+    needsPlanningCaution: true,
+  },
+  high_uncertainty: {
+    chipColor: "danger",
+    description: "This survey estimate is very uncertain, so the actual tract value could be very different. Do not use this measure by itself to make a plan.",
+    label: "High uncertainty",
+    needsPlanningCaution: true,
+  },
+  cv_not_computable: {
+    chipColor: "default",
+    description: "The estimate is zero, so the usual reliability check cannot be calculated. Read the likely range before using this measure.",
+    label: "Reliability unclear",
+    needsPlanningCaution: true,
+  },
+};
+
 function EvidenceList({items, scoreName}: {
   items: ReadonlyArray<AtlasEvidenceItem>;
   scoreName: "Equity Baseline" | "Food Access Need";
@@ -104,23 +146,51 @@ function EvidenceList({items, scoreName}: {
     <ol className="space-y-3">
       {items.map((item) => {
         const uncertainty = uncertaintyLabel(item.measurement);
+        const reliability = item.measurement.state === "observed"
+          && item.measurement.reliability !== null
+          ? RELIABILITY_PRESENTATION[item.measurement.reliability]
+          : null;
         return (
           <li key={item.slug}>
-            <Card className="gap-2" variant="secondary">
+            <Card className="gap-2" data-evidence-slug={item.slug} variant="secondary">
               <Card.Header className="gap-1">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <Card.Title className="text-sm">{item.name}</Card.Title>
-                  <Chip size="sm" variant="soft">
-                    {qualityLabel(item.measurement.qualityStatus)}
-                  </Chip>
+                  <div className="flex flex-wrap justify-end gap-1.5">
+                    <Chip size="sm" variant="soft">
+                      {qualityLabel(item.measurement.qualityStatus)}
+                    </Chip>
+                    {reliability ? (
+                      <Chip color={reliability.chipColor} size="sm" variant="soft">
+                        {reliability.label}
+                      </Chip>
+                    ) : null}
+                  </div>
                 </div>
-                <Card.Description>{item.definition}</Card.Description>
+                {item.definition.trim().toLocaleLowerCase("en-US")
+                  !== item.name.trim().toLocaleLowerCase("en-US")
+                  ? <Card.Description>{item.definition}</Card.Description>
+                  : null}
               </Card.Header>
               <Card.Content className="space-y-1 text-sm">
                 <p className="font-semibold">{formatMeasurement(item.measurement)}</p>
                 <p>County comparison: {ordinal(item.countyPercentile)} percentile</p>
                 <p>Effect on {scoreName}: {contributionLabel(item.contribution)} points</p>
                 {uncertainty ? <p className="text-xs text-muted">{uncertainty}</p> : null}
+                {reliability?.needsPlanningCaution ? (
+                  <div
+                    aria-label={`Estimate reliability: ${reliability.label}`}
+                    className="mt-2 space-y-1 rounded-xl border border-warning/30 bg-warning-soft p-3 text-xs text-warning-soft-foreground"
+                  >
+                    <p>{reliability.description}</p>
+                    <p>
+                      The county percentile uses the estimate above, so treat that comparison with the same caution.
+                    </p>
+                    <p>
+                      <strong>Planning tip:</strong> Compare nearby tracts and confirm with local data and residents before making a plan.
+                    </p>
+                  </div>
+                ) : null}
                 {item.nearestResource ? (
                   <p className="text-xs">
                     Nearest approved grocery: <strong>{item.nearestResource.name}</strong>
@@ -251,7 +321,10 @@ export function TractProfileContent({idPrefix, profile}: TractProfileContentProp
       <section aria-labelledby={`${idPrefix}-quality`} className="space-y-2">
         <h2 className="text-base font-semibold" id={`${idPrefix}-quality`}>Data quality</h2>
         <p className="text-sm">
-          Each measure says whether the data was verified. It also shows a margin of error or confidence range when one is available. Missing information is not counted as zero.
+          “Verified data” means the source and data checks passed. It does not mean a survey estimate is exact. Census measures also show whether the estimate is more stable, should be used with caution, or has high uncertainty. The likely range shows how much the estimate could reasonably move. Missing information is not counted as zero.
+        </p>
+        <p className="text-sm">
+          A smaller margin of error usually requires more survey responses. A larger local survey can help. Looking at a larger combined area can also provide supporting context, but it does not replace this tract’s estimate. Rounding or hiding the margin of error does not make the data more precise.
         </p>
         <ul className="list-disc space-y-1 ps-5 text-sm">
           {profile.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}
