@@ -295,11 +295,14 @@ class PsycopgNeighborhoodRepository:
             reconciled = connection.execute(RECONCILE_SQL, parameters).fetchone()
             if reconciled != (True, True, True, True, True):
                 labels = ("versions", "tracts", "disjoint", "areas", "snapshot")
-                failed = ",".join(
-                    label
-                    for label, passed in zip(labels, reconciled or (), strict=False)
-                    if passed is not True
-                ) or "unknown"
+                failed = (
+                    ",".join(
+                        label
+                        for label, passed in zip(labels, reconciled or (), strict=False)
+                        if passed is not True
+                    )
+                    or "unknown"
+                )
                 raise NeighborhoodDatabaseError(
                     f"neighborhood persistence reconciliation failed: {failed}"
                 )

@@ -23,10 +23,7 @@ def main(argv: list[str] | None = None) -> int:
         database_url = require_development_environment()
         plan = build_persistence_plan(snapshot)
         PsycopgNeighborhoodRepository(database_url).execute(plan)
-        print(
-            f"loaded {len(snapshot.records)} neighborhoods; "
-            f"snapshot_id={plan.snapshot_id}"
-        )
+        print(f"loaded {len(snapshot.records)} neighborhoods; snapshot_id={plan.snapshot_id}")
         return 0
     print(
         f"fetched {len(snapshot.records)} neighborhoods; "

@@ -54,24 +54,26 @@ def test_normalizes_a_strict_browser_safe_snapshot_with_provenance() -> None:
     )
     assert result["features"] == {
         "type": "FeatureCollection",
-        "features": [{
-            "type": "Feature",
-            "id": "data-you-can-use:pantries-2026:18",
-            "geometry": {"type": "Point", "coordinates": [-87.947, 43.09]},
-            "properties": {
+        "features": [
+            {
+                "type": "Feature",
                 "id": "data-you-can-use:pantries-2026:18",
-                "name": "All Saints Catholic Church",
-                "siteType": "food_pantry",
-                "address": "4060 N. 26th St.",
-                "city": "Milwaukee",
-                "zipCode": "53209",
-                "phone": "414-444-5610",
-                "website": "https://example.org/pantry",
-                "details": "Pantry: Tuesday and Thursday",
-                "serviceArea": None,
-                "verificationStatus": "source_listed_check_before_visiting",
-            },
-        }],
+                "geometry": {"type": "Point", "coordinates": [-87.947, 43.09]},
+                "properties": {
+                    "id": "data-you-can-use:pantries-2026:18",
+                    "name": "All Saints Catholic Church",
+                    "siteType": "food_pantry",
+                    "address": "4060 N. 26th St.",
+                    "city": "Milwaukee",
+                    "zipCode": "53209",
+                    "phone": "414-444-5610",
+                    "website": "https://example.org/pantry",
+                    "details": "Pantry: Tuesday and Thursday",
+                    "serviceArea": None,
+                    "verificationStatus": "source_listed_check_before_visiting",
+                },
+            }
+        ],
     }
 
 

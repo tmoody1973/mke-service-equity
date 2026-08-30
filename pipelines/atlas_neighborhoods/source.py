@@ -17,7 +17,9 @@ from pipelines.common.artifacts import StoredSnapshot, preserve_snapshot, schema
 from pipelines.common.http import Opener, Sleeper, fetch_bytes
 
 SOURCE_KEY = "milwaukee_dcd_neighborhoods"
-SOURCE_URL = "https://milwaukeemaps.milwaukee.gov/arcgis/rest/services/AGO/neighborhoods/MapServer/0"
+SOURCE_URL = (
+    "https://milwaukeemaps.milwaukee.gov/arcgis/rest/services/AGO/neighborhoods/MapServer/0"
+)
 NEIGHBORHOOD_QUERY_URL = (
     SOURCE_URL
     + "/query?where=1%3D1&outFields=OBJECTID%2CNEIGHBORHD%2CNBHD_ID"
@@ -83,9 +85,7 @@ def _coordinates_valid(value: object, *, depth: int = 0) -> bool:
     if (
         isinstance(value, list)
         and value
-        and all(
-            isinstance(item, (int, float)) and not isinstance(item, bool) for item in value
-        )
+        and all(isinstance(item, (int, float)) and not isinstance(item, bool) for item in value)
     ):
         if len(value) != 2:
             return False
@@ -191,9 +191,7 @@ def validate_neighborhood_response(
         _geometry(
             feature.get("geometry"),
             position,
-            allow_known_repair=(
-                nbhd_id == KNOWN_REPAIR_NBHD_ID and name == KNOWN_REPAIR_NAME
-            ),
+            allow_known_repair=(nbhd_id == KNOWN_REPAIR_NBHD_ID and name == KNOWN_REPAIR_NAME),
         )
     return tuple(cast(Mapping[str, object], feature) for feature in features)
 
@@ -205,7 +203,9 @@ def normalize_neighborhoods(
 ) -> tuple[NeighborhoodRecord, ...]:
     """Validate and deterministically normalize neighborhood features by NBHD_ID."""
     records: list[NeighborhoodRecord] = []
-    for position, feature in enumerate(validate_neighborhood_response(content, expected_count=expected_count)):
+    for position, feature in enumerate(
+        validate_neighborhood_response(content, expected_count=expected_count)
+    ):
         properties = cast(Mapping[str, object], feature["properties"])
         geojson = _geometry(
             feature["geometry"],
@@ -243,6 +243,7 @@ def fetch_neighborhood_snapshot(
     max_bytes: int = MAX_RESPONSE_BYTES,
 ) -> StoredNeighborhoodSnapshot:
     """Fetch, validate, normalize, and preserve one exact neighborhood response."""
+
     def validator(value: bytes) -> None:
         validate_neighborhood_response(value, expected_count=expected_count)
 

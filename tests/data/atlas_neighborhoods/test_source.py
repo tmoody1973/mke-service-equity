@@ -94,18 +94,27 @@ def test_only_the_documented_land_bank_self_intersection_is_repaired() -> None:
     feature["properties"]["NEIGHBORHD"] = "LAND BANK"
     feature["geometry"] = {
         "type": "Polygon",
-        "coordinates": [[
-            [-88.00, 43.00], [-87.99, 43.00], [-87.99, 43.01],
-            [-88.00, 43.01], [-88.00, 43.00], [-88.01, 43.00],
-            [-88.01, 42.99], [-88.00, 42.99], [-88.00, 43.00],
-        ]],
+        "coordinates": [
+            [
+                [-88.00, 43.00],
+                [-87.99, 43.00],
+                [-87.99, 43.01],
+                [-88.00, 43.01],
+                [-88.00, 43.00],
+                [-88.01, 43.00],
+                [-88.01, 42.99],
+                [-88.00, 42.99],
+                [-88.00, 43.00],
+            ]
+        ],
     }
     content = json.dumps(document).encode()
 
     records = normalize_neighborhoods(content, expected_count=2)
-    assert next(record for record in records if record.nbhd_id == 30).geometry_geojson[
-        "type"
-    ] == "MultiPolygon"
+    assert (
+        next(record for record in records if record.nbhd_id == 30).geometry_geojson["type"]
+        == "MultiPolygon"
+    )
 
     feature["properties"]["NBHD_ID"] = 31
     with pytest.raises(NeighborhoodSourceError, match="geometry is empty or invalid"):

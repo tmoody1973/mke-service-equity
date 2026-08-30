@@ -88,13 +88,16 @@ def test_database_environment_fails_closed(
 
 
 def test_database_environment_accepts_only_explicit_unpooled_development_url() -> None:
-    assert require_development_environment(
-        {
-            "MKE_PIPELINE_ENV": "development",
-            "DATABASE_URL_UNPOOLED": "postgresql://example.invalid/neondb",
-            "DATABASE_URL": "postgresql://must-not-be-used/other",
-        }
-    ) == "postgresql://example.invalid/neondb"
+    assert (
+        require_development_environment(
+            {
+                "MKE_PIPELINE_ENV": "development",
+                "DATABASE_URL_UNPOOLED": "postgresql://example.invalid/neondb",
+                "DATABASE_URL": "postgresql://must-not-be-used/other",
+            }
+        )
+        == "postgresql://example.invalid/neondb"
+    )
 
 
 class QueryResult:

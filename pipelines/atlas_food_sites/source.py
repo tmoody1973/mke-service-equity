@@ -7,9 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse
 
-SOURCE_EXPERIENCE_URL = (
-    "https://experience.arcgis.com/experience/4883a0957d124294aa236d9e9cc696a5"
-)
+SOURCE_EXPERIENCE_URL = "https://experience.arcgis.com/experience/4883a0957d124294aa236d9e9cc696a5"
 SOURCE_LAYER_URL = (
     "https://services5.arcgis.com/3kr3fkJcIf6EOY6g/arcgis/rest/services/"
     "Pantries_2026/FeatureServer/57"
@@ -123,17 +121,13 @@ def _normalize_feature(feature: object) -> dict[str, object]:
                 properties.get("USER_Company_Business_Name"), field="name", required=True
             ),
             "siteType": _TYPE_MAP[source_type],
-            "address": _clean_text(
-                properties.get("USER_Address"), field="address", required=True
-            ),
+            "address": _clean_text(properties.get("USER_Address"), field="address", required=True),
             "city": _clean_text(properties.get("USER_City"), field="city", required=True),
             "zipCode": _zip_code(properties.get("USER_ZIP_Code")),
             "phone": _phone(properties.get("USER_Phone_Number")),
             "website": _website(properties.get("USER_Website")),
             "details": _clean_text(properties.get("USER_Notes"), field="details"),
-            "serviceArea": _clean_text(
-                properties.get("USER_Service_Area"), field="service area"
-            ),
+            "serviceArea": _clean_text(properties.get("USER_Service_Area"), field="service area"),
             "verificationStatus": "source_listed_check_before_visiting",
         },
     }
