@@ -282,6 +282,21 @@ The first implementation checkpoint includes:
 It deliberately excludes deep profile sections, address search, contextual resource points, and
 production publication. Those follow as separately verified tasks in the implementation plan.
 
+## 8.1 Complete tract profile and plain-language amendment
+
+After the approved first-slice review, the selected-tract view adds the deterministic Phase B
+profile without changing methodology. A complete tract shows all 13 Equity Baseline inputs and
+all 4 Food Access Need inputs, each with its observed value or explicit state, county percentile,
+score contribution, uncertainty when available, limitation, and exact source lineage. Incomplete
+and zero-population tracts never receive inferred evidence.
+
+Every public Atlas string receives a plain-language review. Sentences stay short, technical terms
+are defined near first use, “GEOID” is presented to residents as “Census tract ID,” and missing
+information is never phrased as zero. Exact approved method names remain unchanged. Contribution
+copy states that plus/minus values are composite-score points relative to the county midpoint—not
+raw percentages, changes over time, causes, or recommendations. Limited English proficiency is
+explained as English-language access and explicitly not literacy.
+
 ## 9. Verification and evidence
 
 Completion requires:

@@ -295,7 +295,7 @@ git commit -m "feat: complete MOO-754 first visible atlas slice"
   validated run data.
 - [x] Review screenshots at 375, 430, 768, 1024, and 1440 px.
 - [x] Run keyboard, touch-target, reduced-motion, forced-colors, and axe checks.
-- [ ] Obtain Tarik's review of the real first slice before Phase B.
+- [x] Obtain Tarik's review of the real first slice before Phase B.
 
 ```bash
 npm run verify
@@ -312,22 +312,22 @@ git commit -m "test: verify MOO-754 first atlas slice"
 
 **Files:** `packages/database/src/atlas/profile-repository.ts`, tests, contract refinements.
 
-- [ ] Write integration tests for exact component/value/snapshot/source joins for both scoring
+- [x] Write integration tests for exact component/value/snapshot/source joins for both scoring
   systems, including contribution, direction, state, unit, and quality.
-- [ ] Prove profile run and geography match the selected Atlas bundle.
-- [ ] Preserve missing/suppressed/conflicting states and reject duplicate lineage.
-- [ ] Return source-backed nearest-resource facts only when pinned by the scored metric.
+- [x] Prove profile run and geography match the selected Atlas bundle.
+- [x] Preserve missing/suppressed/conflicting states and reject duplicate lineage.
+- [x] Return source-backed nearest-resource facts only when pinned by the scored metric.
 
 ### Task 12: Render deterministic full profile and provenance
 
 **Files:** `apps/web/features/atlas/profile/**`, explanation helpers, tests.
 
-- [ ] Build summary, Why this result, Food evidence, Community context, Data quality, and
+- [x] Build summary, Why this result, Food evidence, Community context, Data quality, and
   Provenance sections.
-- [ ] Test approved plain-language explanation templates and contribution labels.
-- [ ] Clearly separate score inputs from context and avoid causal/policy claims.
-- [ ] Include source/methodology/version/validity limitations without dumping internal metadata.
-- [ ] Reuse content across wide panel and mobile sheet.
+- [x] Test approved plain-language explanation templates and contribution labels.
+- [x] Clearly separate score inputs from context and avoid causal/policy claims.
+- [x] Include source/methodology/version/validity limitations without dumping internal metadata.
+- [x] Reuse content across wide panel and mobile sheet.
 
 ---
 
@@ -365,6 +365,11 @@ git commit -m "test: verify MOO-754 first atlas slice"
 
 ### Task 16: Responsive, accessibility, design, and performance hardening
 
+- [x] Complete a plain-language audit of all currently implemented public Atlas copy, including
+  navigation, legend, tract list, summaries, errors, missing-data states, score explanations, and
+  provenance. Preserve exact method names while defining necessary technical terms.
+- [x] Verify the complete selected-tract profile with axe and screenshots at 375, 430, 768, 1024,
+  and 1440 px.
 - [ ] Run component/E2E tests at all required widths and across all data states.
 - [ ] Complete keyboard-only, screen-reader-oriented, focus, forced-colors, reduced-motion,
   contrast, and 44 px target review.

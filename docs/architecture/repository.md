@@ -6,6 +6,7 @@ mke-service-equity/
 ├── apps/web/
 │   ├── app/                  # App Router shell and server health route
 │   ├── components/           # HeroUI Pro application shell
+│   ├── features/atlas/       # Atlas state, exact tract profile, and plain-language presentation
 │   ├── features/map/         # Isolated MapLibre client lifecycle
 │   ├── public/map-style.json # Deterministic data-free style
 │   └── test/                 # Web-only test adapters
@@ -56,3 +57,9 @@ persisted with provenance but never enter score components.
 The Python boundary is intentionally deterministic and testable without a network or database.
 Live database tests are marked `integration`, require an isolated migrated development branch,
 and are excluded from the default offline suite.
+
+Plan 4 adds browser-safe Atlas contracts plus server-only exact-run repositories. The initial map
+payload contains bounded tract presentation data; the detailed profile is fetched only after a
+selection. `packages/database/src/atlas/profile-repository.ts` verifies Food and Equity component,
+snapshot, source, run, and geography lineage before `apps/web/app/api/atlas/tracts/[geoid]` returns
+the profile. Browser code renders those results but does not calculate scores or spatial facts.

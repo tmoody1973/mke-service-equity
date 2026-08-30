@@ -26,22 +26,27 @@ Header:
 
 - tract label
 - Food Equity Priority
-- municipality/context
 - population
-- Compare
-- Download
+- Food Access Need band
+- Equity Baseline band
 
 Sections:
 
-1. Overview
-2. People & Conditions
-3. Food Access
-4. Food Resources
-5. Mobility
-6. Nearby Opportunities
-7. Data & Sources
+1. What this means
+2. Why this result (13 Equity Baseline inputs)
+3. Food access evidence (4 Food Access Need inputs)
+4. Community context
+5. Data quality
+6. Data and sources
 
-The opening summary explains why the tract is prioritized using deterministic rules.
+The opening summary explains why the tract received its priority using deterministic rules. Each
+scoring input shows its value or explicit data state, county percentile, score-point contribution,
+uncertainty when available, and limitation. Community context is kept separate from scoring and
+remains unavailable when its exact snapshot is not tied to the run.
+
+Public copy uses “Census tract ID,” defines necessary technical terms, and explains that score
+contributions are not raw percentages, changes over time, causes, or recommendations. Compare and
+download controls are later-plan features, not part of the current profile.
 
 ## 3. Compare Areas
 

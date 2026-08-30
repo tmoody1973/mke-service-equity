@@ -1,18 +1,18 @@
-# Plan 4 Food Equity Atlas first-slice verification
+# Plan 4 Food Equity Atlas and tract-profile verification
 
 ## Status
 
 - Linear issue: `MOO-754`
 - Branch: `codex/moo-754-atlas-tract-profile`
 - Verification date: 2026-08-30
-- Current result: the first visible Atlas slice is review-ready; Phase B profile evidence and
-  provenance work remains
+- Current result: the map, selected-tract profile, exact evidence, provenance, responsive layouts,
+  and plain-language content pass verification; search and approved contextual layers remain
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
-This record verifies the first public-presentation boundary, map, URL state, priority legend,
-accessible tract list, summary, and responsive workspace. It does not claim that the complete
-MOO-754 tract profile is finished or that validated preview data has been published.
+This record verifies the public-presentation boundary, map, URL state, priority legend, accessible
+tract list, selected-tract summary, exact score evidence, provenance, and responsive profile. It
+does not claim that validated preview data has been published.
 
 ## Data and run boundary
 
@@ -39,6 +39,23 @@ Live repository reconciliation passed:
 The geography-first repository rejects missing score joins, run mismatches, baseline mismatches,
 invalid geometry, duplicate or missing canonical tracts, and contract-invalid values. Missing,
 insufficient, and zero-population states remain explicit; none are converted to zero.
+
+## Exact selected-tract profile
+
+The profile route loads only after a tract is selected. The repository requires the selected Food
+Equity run, its pinned Equity Baseline run, the same tract, and exact component-to-snapshot-to-source
+lineage before returning an available profile.
+
+For complete Census Tract 1.01 (`55079000101`), live reconciliation returned exactly 4 Food Access
+Need components and 13 Equity Baseline components. Separate live checks covered insufficient-data
+tract `55079187200` and zero-population tract `55079990000`; neither received inferred components
+or fake zero values. Context resources remain explicitly unavailable until their exact snapshot is
+tied to the run.
+
+The profile explains contribution values as composite-score points relative to the Milwaukee
+County midpoint. It explicitly says these values are not raw percentages, changes over time,
+causes, or recommendations. The Census language measure is labeled “Speaks English less than
+‘very well,’ age 5+” and described as English-language access, not reading or writing literacy.
 
 ## Public fail-closed behavior
 
@@ -77,10 +94,11 @@ The 1024 px review found and corrected an over-constrained four-column layout. T
 layout keeps the map primary until 1200 px, uses an overlay profile at 1200–1279 px, and uses the
 persistent right profile at 1280 px and wider.
 
-## Accessibility and error-state review
+## Accessibility, readability, and error-state review
 
-- Axe reported zero violations at 1440 px and at the open 430 px mobile explorer.
-- Axe also reported zero violations at 430 px with forced colors and reduced motion enabled.
+- Axe reported zero WCAG A/AA violations for the complete selected-tract profile at 375, 430, 768,
+  1024, and 1440 px.
+- The production public-mode suite also reported zero axe violations at all five widths.
 - A desktop muted-text contrast failure was corrected in the shared design token, then rescanned.
 - Priority and quality states are labeled in text and do not rely on color.
 - Map selection is mirrored by a semantic button list, so the map is not the only selection path.
@@ -90,6 +108,10 @@ persistent right profile at 1280 px and wider.
 - MapLibre setup and runtime errors produce a safe alert and leave the tract list available.
 - The loading message remains visible until the GeoJSON source reaches MapLibre idle/ready state.
 - Reduced-motion preference changes map reset duration to zero.
+- Public-facing map, legend, list, summary, loading, error, missing-data, profile, and source copy
+  received a plain-language edit. Technical identifiers are introduced as “Census tract ID,” and
+  technical terms that remain necessary are defined where they appear.
+- The legend now matches the approved method: Priority 1 is Highest and Priority 5 is Lowest.
 
 ## Automated verification
 
@@ -97,11 +119,13 @@ The final local gate passed:
 
 | Check | Result |
 |---|---|
-| Web unit/component tests | 41 passed |
-| Contracts tests | 17 passed |
-| Database unit tests | 63 passed |
+| Web unit/component tests | 47 passed |
+| Contracts tests | 22 passed |
+| Database unit tests | 71 passed |
 | Design-system tests | 1 passed |
-| Live database integration tests | 3 passed |
+| Live profile integration test | passed for complete, insufficient, and zero-population states |
+| Live profile Playwright + axe | 5 passed at the required widths |
+| Public production Playwright + axe | 10 passed, 5 preview-only checks skipped |
 | Workspace typechecks | passed |
 | ESLint | passed with generated MapLibre worker modules excluded |
 | Next.js production build | passed |
@@ -109,9 +133,14 @@ The final local gate passed:
 | Client bundle preview/secret scan | passed |
 | `git diff --check` | passed |
 
+The validated profile check runs only under the guarded Next development server because the
+application intentionally rejects validated-preview mode when `NODE_ENV=production`. The HeroUI
+Pro Sidebar currently emits a development-renderer-only React Aria ID hydration warning; the
+profile-specific check filters that one known warning. The production suite filters nothing and
+passes with zero browser console errors.
+
 ## Remaining MOO-754 work
 
-The first-slice review gate is ready for Tarik. Phase B still needs the complete tract evidence
-query and profile sections, search, additional contextual layers, full provenance/data-quality
-detail, remaining end-to-end coverage, final design review, and governed published-run validation.
-No deployment or publication is implied by this verification record.
+Authoritative tract/ZIP/municipality search, any approved address or neighborhood authority,
+approved contextual resource layers, final performance hardening, and the load-bearing completion
+review remain. No deployment or publication is implied by this verification record.

@@ -37,6 +37,18 @@ or:
 
 Quality states are part of the product UI.
 
+## Atlas profile quality boundary
+
+The selected-tract profile is available only when the server proves that the tract and both score
+systems belong to the same selected run lineage. A complete tract must have exactly 13 Equity
+Baseline inputs and 4 Food Access Need inputs with their exact metric, snapshot, and source links.
+Duplicate, missing, or mismatched lineage makes the detailed profile unavailable; the browser does
+not fill the gap.
+
+Each measure carries its own state, quality label, uncertainty, definition, limitation, and source.
+An unavailable Community context section means its snapshot is not tied to the run. It does not
+mean the tract has no resources.
+
 ## Food Equity quality contract
 
 Food scoring requires one observation for each of the four approved scoring slugs and each
