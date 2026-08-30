@@ -7,6 +7,7 @@ export {
   buildAtlasFeatureCollection,
   loadAtlasTracts,
   MILWAUKEE_CANONICAL_TRACT_COUNT,
+  MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE,
 } from "./atlas/atlas-repository";
 export type {AtlasRepositoryClient} from "./atlas/atlas-repository";
 export {parseAtlasMultiPolygon, serializedGeoJsonBytes} from "./atlas/geometry";

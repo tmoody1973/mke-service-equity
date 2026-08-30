@@ -17,7 +17,7 @@ function row(overrides: Record<string, unknown> = {}) {
     geoid: "55079000101",
     tract_name: "Census Tract 1.01",
     population: 2_430,
-    geography_vintage: "2020",
+    geography_vintage: "2020 TIGER/Line",
     geometry,
     geometry_valid: true,
     food_score_id: "193632b7-c8d3-52fc-8226-77d4eae10995",

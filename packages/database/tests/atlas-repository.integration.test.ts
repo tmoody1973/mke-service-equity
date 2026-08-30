@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {loadAtlasTracts, selectAtlasRun} from "../src/server";
+import {loadAtlasTracts, selectAtlasRun, serializedGeoJsonBytes} from "../src/server";
 
 const previewConfigured = process.env.DATABASE_URL
   && process.env.MKE_ATLAS_DATA_MODE === "validated_preview"
@@ -26,5 +26,6 @@ describe.skipIf(!previewConfigured)("Atlas repository integration", () => {
     expect(collection.features.filter(
       (feature) => feature.properties.qualityStatus === "ineligible_zero_population",
     )).toHaveLength(2);
+    expect(serializedGeoJsonBytes(collection)).toBeLessThanOrEqual(1_100_000);
   });
 });

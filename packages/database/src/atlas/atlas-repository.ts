@@ -13,6 +13,7 @@ import type {SelectedAtlasRun} from "./run-selector";
 type AtlasEnvironment = Record<string, string | undefined>;
 
 export const MILWAUKEE_CANONICAL_TRACT_COUNT = 302;
+export const MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE = "2020 TIGER/Line";
 
 export interface AtlasRepositoryClient {
   execute(query: SQL): PromiseLike<{rows: Array<Record<string, unknown>>}>;
@@ -191,7 +192,7 @@ export async function loadAtlasTracts(
     where geography.geography_type = 'tract'
       and geography.state_fips = '55'
       and geography.county_fips = '079'
-      and geography.vintage = '2020'
+      and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
     order by geography.geoid
   `);
 
