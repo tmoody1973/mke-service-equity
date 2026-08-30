@@ -257,6 +257,70 @@ def atomic_write_bytes(target: Path, content: bytes) -> bool:
     return True
 
 
+def _file_identity(path: Path) -> tuple[int, int, int, int]:
+    try:
+        stat = path.stat()
+    except OSError as error:
+        raise ArtifactWriteError(f"cannot inspect artifact {path.name}") from error
+    if not path.is_file():
+        raise ArtifactWriteError(f"artifact {path.name} is not a regular file")
+    return (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns)
+
+
+def _hash_file(path: Path) -> tuple[str, int]:
+    identity = _file_identity(path)
+    digest = hashlib.sha256()
+    byte_size = 0
+    try:
+        with path.open("rb") as source:
+            while chunk := source.read(1024 * 1024):
+                digest.update(chunk)
+                byte_size += len(chunk)
+    except OSError as error:
+        raise ArtifactWriteError(f"cannot read artifact {path.name}") from error
+    if _file_identity(path) != identity or byte_size != identity[2]:
+        raise ArtifactWriteError(f"artifact {path.name} changed while it was hashed")
+    return digest.hexdigest(), byte_size
+
+
+def _atomic_copy_file(target: Path, source: Path, *, digest: str, byte_size: int) -> bool:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        existing_digest, existing_size = _hash_file(target)
+        if existing_digest == digest and existing_size == byte_size:
+            return False
+        raise ArtifactCollisionError(f"content-addressed target collision at {target.name}")
+
+    source_identity = _file_identity(source)
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=target.parent,
+        prefix=f".{target.name}.",
+        suffix=".tmp",
+    )
+    temporary_path = Path(temporary_name)
+    copied_digest = hashlib.sha256()
+    copied_size = 0
+    try:
+        with source.open("rb") as source_file, os.fdopen(descriptor, "wb") as temporary_file:
+            while chunk := source_file.read(1024 * 1024):
+                temporary_file.write(chunk)
+                copied_digest.update(chunk)
+                copied_size += len(chunk)
+            temporary_file.flush()
+            os.fsync(temporary_file.fileno())
+        if _file_identity(source) != source_identity:
+            raise ArtifactWriteError(f"artifact {source.name} changed while it was copied")
+        if copied_digest.hexdigest() != digest or copied_size != byte_size:
+            raise ArtifactWriteError(f"artifact {source.name} changed after validation")
+        temporary_path.replace(target)
+    except Exception as error:
+        temporary_path.unlink(missing_ok=True)
+        if isinstance(error, ArtifactError):
+            raise
+        raise ArtifactWriteError(f"atomic copy failed for {target.name}") from error
+    return True
+
+
 def _manifest_from_bytes(content: bytes) -> SnapshotManifest:
     try:
         parsed: object = json.loads(content)
@@ -406,6 +470,85 @@ def preserve_snapshot(
     return StoredSnapshot(raw_path, manifest_path, manifest, reused=not raw_created)
 
 
+def preserve_file_snapshot(
+    *,
+    root: Path,
+    pipeline_slug: str,
+    source_key: str,
+    source_url: str,
+    dataset_version: str,
+    source_path: Path,
+    schema: object,
+    row_or_feature_count: int,
+    license: str,
+    methodology_reference: str,
+    request_metadata: object,
+    clock: Callable[[], datetime],
+) -> StoredSnapshot:
+    """Stream a validated local file into the immutable snapshot namespace."""
+
+    if row_or_feature_count < 0:
+        raise ArtifactError("row_or_feature_count cannot be negative")
+    if not license.strip() or not methodology_reference.strip():
+        raise ArtifactError("license and methodology_reference are required")
+    try:
+        source_path.resolve(strict=True).relative_to(root.resolve(strict=True))
+    except (OSError, ValueError) as error:
+        raise ArtifactError("source file must remain inside the workspace root") from error
+
+    digest, byte_size = _hash_file(source_path)
+    paths = ArtifactPaths.for_pipeline(root, pipeline_slug)
+    safe_source = _safe_segment(source_key, "source_key")
+    safe_version = _safe_segment(dataset_version, "dataset_version")
+    sanitized_request = sanitize_metadata(request_metadata)
+    if not isinstance(sanitized_request, dict):
+        raise ArtifactError("request_metadata must be an object")
+    sanitized_source_url = sanitize_url(source_url)
+    fingerprint = schema_fingerprint(schema)
+    relative_raw_path = (
+        Path("data/raw")
+        / pipeline_slug
+        / safe_source
+        / safe_version
+        / f"{digest}{_source_suffix(source_url)}"
+    )
+    raw_path = root / relative_raw_path
+    manifest_path = paths.manifests / safe_source / safe_version / f"{digest}.json"
+    raw_created = _atomic_copy_file(raw_path, source_path, digest=digest, byte_size=byte_size)
+
+    manifest = SnapshotManifest(
+        source_key=source_key,
+        source_url=sanitized_source_url,
+        dataset_version=dataset_version,
+        retrieved_at=_utc_timestamp(clock),
+        checksum_sha256=digest,
+        byte_size=byte_size,
+        storage_uri=relative_raw_path.as_posix(),
+        row_or_feature_count=row_or_feature_count,
+        schema_fingerprint=fingerprint,
+        request_metadata=sanitized_request,
+        license=license,
+        methodology_reference=methodology_reference,
+    )
+    manifest_content = canonical_json_bytes(manifest.as_dict())
+    if manifest_path.exists():
+        stored = _manifest_from_bytes(manifest_path.read_bytes())
+        if stored != manifest:
+            if stored.checksum_sha256 != digest or stored.byte_size != byte_size:
+                raise ArtifactCollisionError("stored manifest does not match snapshot file")
+            expected_without_time = {**manifest.as_dict(), "retrieved_at": stored.retrieved_at}
+            if stored.as_dict() != expected_without_time:
+                raise ArtifactCollisionError("stored manifest provenance does not match request")
+        return StoredSnapshot(raw_path, manifest_path, stored, reused=True)
+    try:
+        atomic_write_bytes(manifest_path, manifest_content)
+    except Exception:
+        if raw_created:
+            raw_path.unlink(missing_ok=True)
+        raise
+    return StoredSnapshot(raw_path, manifest_path, manifest, reused=not raw_created)
+
+
 __all__ = [
     "ArtifactCollisionError",
     "ArtifactError",
@@ -415,6 +558,7 @@ __all__ = [
     "StoredSnapshot",
     "atomic_write_bytes",
     "canonical_json_bytes",
+    "preserve_file_snapshot",
     "preserve_snapshot",
     "sanitize_metadata",
     "sanitize_url",

@@ -87,8 +87,9 @@ not source-registry documentation and must remain ignored.
 
 The complete proposed contract is
 [`2026-08-29-moo-753-food-equity-design.md`](../superpowers/specs/2026-08-29-moo-753-food-equity-design.md).
-Tarik explicitly approved this source and methodology contract on 2026-08-29. Executable Plan 3
-registry work must implement the approved contract without silent source substitution.
+Tarik explicitly approved this source and methodology contract on 2026-08-29 and approved the
+lossless source/schema amendment on 2026-08-29. Executable Plan 3 registry work must implement the
+approved contract without silent source substitution.
 
 ### Scoring sources
 
@@ -137,6 +138,12 @@ Emergency-food and public-investment artifacts are outside the Food score-input 
 They cannot change the Food Access Need score, band, or Food Equity Priority. Missing hours remain
 missing; narrative notes are not parsed into operating schedules.
 
+Contextual walking counts use separate 10-, 15-, and 20-minute metric slugs for grocery and
+emergency-food inventories because the database metric value is scalar. These six observations
+are never scoring inputs. Unknown emergency-resource activity remains null and makes the related
+context observation missing or conflicting; it is never coerced to inactive or to an observed
+zero. Missing source names also remain null.
+
 ### Source-specific validation
 
 - Every source snapshot records exact bytes or sanitized request metadata, SHA-256, byte size,
@@ -145,6 +152,9 @@ missing; narrative notes are not parsed into operating schedules.
   flags are not v1 scoring inputs.
 - FNS dates and status are parsed strictly. Unknown status never becomes active, and duplicate
   (`Record ID`, `Authorization Date`, `End Date`) version keys fail validation.
+- FNS source-derived `verified` classifications retain source and rule evidence without inventing
+  a verification timestamp. Dated timestamps remain mandatory for manual/partner overrides and
+  verified context events.
 - The OSM artifact is immutable; `wisconsin-latest.osm.pbf` is prohibited.
 - GTFS must pass the pinned validator and cover both explicit analysis dates. MCTS retrieval/last-
   update and valid-through dates must appear with any representation, along with the required

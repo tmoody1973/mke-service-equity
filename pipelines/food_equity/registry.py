@@ -5,11 +5,13 @@ from __future__ import annotations
 import hashlib
 import tomllib
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Never, TypeVar
 
+from pipelines.common.artifacts import canonical_json_bytes
 from pipelines.food_equity.errors import RegistryValidationError
 from pipelines.food_equity.models import (
     AccessPolicy,
@@ -23,6 +25,7 @@ from pipelines.food_equity.models import (
     ResourceCategory,
     SourceDefinition,
     SourceRole,
+    SourceStatus,
 )
 
 REGISTRY_PATH = Path(__file__).with_name("registry.toml")
@@ -39,7 +42,9 @@ APPROVED_SOURCE_KEYS = frozenset(
         "walking_network",
     }
 )
-EnumValue = TypeVar("EnumValue", SourceRole, Domain, MetricTreatment, ResourceCategory, BandLabel)
+EnumValue = TypeVar(
+    "EnumValue", SourceRole, SourceStatus, Domain, MetricTreatment, ResourceCategory, BandLabel
+)
 
 
 def _invalid(message: str) -> Never:
@@ -136,11 +141,20 @@ def _parse_sources(raw: object) -> tuple[SourceDefinition, ...]:
             SourceDefinition(
                 key=_string(table, "key", context),
                 name=_string(table, "name", context),
+                publisher=_string(table, "publisher", context),
                 vintage=_string(table, "vintage", context),
                 dataset_identifier=_string(table, "dataset_identifier", context),
                 source_url=_string(table, "source_url", context),
                 methodology_url=_string(table, "methodology_url", context),
                 license_notes=_string(table, "license_notes", context),
+                geography=_string(table, "geography", context),
+                update_frequency=_string(table, "update_frequency", context),
+                status=_enum(
+                    SourceStatus,
+                    _string(table, "status", context),
+                    context,
+                    "source status",
+                ),
                 role=_enum(SourceRole, role_text, context, "source role"),
                 freshness_policy=_string(table, "freshness_policy", context),
                 immutable=_boolean(table, "immutable", context),
@@ -201,6 +215,7 @@ def _parse_metrics(raw: object) -> tuple[MetricDefinition, ...]:
                 source_fields=_strings(table, "source_fields", context),
                 domain=domain,
                 weight=weight,
+                threshold_minutes=_optional_integer(table, "threshold_minutes", context),
             )
         )
     return tuple(metrics)
@@ -273,6 +288,14 @@ def _validate_sources(sources: tuple[SourceDefinition, ...]) -> None:
             _invalid(f"source {source.key!r} requires max_age_days")
         if source.role is SourceRole.SCORING and source.max_age_days is not None:
             _invalid(f"scoring source {source.key!r} cannot use contextual age tolerance")
+        if source.key == "equity_baseline":
+            if source.status is not SourceStatus.PINNED_VALIDATED_UNPUBLISHED:
+                _invalid("equity baseline source must remain validated and unpublished")
+        elif source.role is SourceRole.SCORING:
+            if source.status is not SourceStatus.APPROVED_SCORING:
+                _invalid(f"scoring source {source.key!r} must have approved scoring status")
+        elif source.status is not SourceStatus.STALE_UNVERIFIED_CONTEXT:
+            _invalid(f"contextual source {source.key!r} must remain stale and unverified")
 
 
 def _validate_classifications(
@@ -334,6 +357,25 @@ def _validate_metrics(
                 _invalid(f"scoring metric {metric.slug!r} references a contextual source")
         elif metric.domain is not None or metric.weight != 0:
             _invalid(f"contextual metric {metric.slug!r} cannot belong to a scoring domain")
+        if metric.treatment is MetricTreatment.SCORING and metric.threshold_minutes is not None:
+            _invalid(f"scoring metric {metric.slug!r} cannot be a contextual threshold count")
+    expected_context = {
+        f"full_service_grocery_count_{threshold}_min_context": ("snap_retailers", threshold)
+        for threshold in (10, 15, 20)
+    } | {
+        f"emergency_food_count_{threshold}_min_context": (
+            "emergency_food_context",
+            threshold,
+        )
+        for threshold in (10, 15, 20)
+    }
+    contextual = {
+        metric.slug: (metric.source, metric.threshold_minutes)
+        for metric in metrics
+        if metric.treatment is MetricTreatment.CONTEXTUAL
+    }
+    if contextual != expected_context:
+        _invalid("contextual metrics must define separate approved 10/15/20-minute counts")
     if len(scoring) != expected or expected != 4:
         _invalid("registry must contain exactly four scoring metrics")
 
@@ -387,6 +429,116 @@ def registry_sha256(path: Path = REGISTRY_PATH) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _decimal_text(value: Decimal) -> str:
+    rendered = format(value, "f")
+    if "." in rendered:
+        rendered = rendered.rstrip("0").rstrip(".")
+    return "0" if value == 0 else rendered
+
+
+def _scoring_registry_document(registry: MethodologyRegistry) -> dict[str, object]:
+    scoring_sources = tuple(
+        source for source in registry.sources if source.role is SourceRole.SCORING
+    )
+    scoring_classifications = tuple(
+        rule
+        for rule in registry.classifications
+        if rule.source == "snap_retailers"
+        and (
+            rule.scoring_eligible
+            or rule.requires_override
+            or rule.category
+            in {ResourceCategory.FULL_SERVICE_GROCERY, ResourceCategory.CANDIDATE_FULL_SERVICE}
+        )
+    )
+    scoring_metrics = tuple(
+        metric for metric in registry.metrics if metric.treatment is MetricTreatment.SCORING
+    )
+    return {
+        "access": {
+            "inaccessible_ranking": registry.access.inaccessible_ranking,
+            "origin_source": registry.access.origin_source,
+            "projected_crs": registry.access.projected_crs,
+            "review_buffer_miles": _decimal_text(registry.access.review_buffer_miles),
+            "snap_tolerance_m": _decimal_text(registry.access.snap_tolerance_m),
+            "transit_stop_threshold_minutes": registry.access.transit_stop_threshold_minutes,
+            "transit_weekdays": list(registry.access.transit_weekdays),
+            "transit_window_end": registry.access.transit_window_end,
+            "transit_window_start": registry.access.transit_window_start,
+            "walk_speed_m_per_minute": _decimal_text(registry.access.walk_speed_m_per_minute),
+            "walk_threshold_minutes": list(registry.access.walk_threshold_minutes),
+        },
+        "bands": [
+            {
+                "includes_maximum": band.includes_maximum,
+                "label": band.label.value,
+                "maximum": _decimal_text(band.maximum),
+                "minimum": _decimal_text(band.minimum),
+            }
+            for band in registry.bands
+        ],
+        "classifications": [
+            {
+                "category": rule.category.value,
+                "requires_override": rule.requires_override,
+                "scoring_eligible": rule.scoring_eligible,
+                "source": rule.source,
+                "source_value": rule.source_value,
+            }
+            for rule in scoring_classifications
+        ],
+        "completeness_rule": registry.completeness_rule,
+        "domain_weights": {
+            domain.value: _decimal_text(registry.domain_weights[domain]) for domain in Domain
+        },
+        "methodology_version": registry.methodology_version,
+        "metrics": [
+            {
+                "domain": metric.domain.value if metric.domain is not None else None,
+                "higher_is_worse": metric.higher_is_worse,
+                "slug": metric.slug,
+                "source": metric.source,
+                "source_fields": list(metric.source_fields),
+                "treatment": metric.treatment.value,
+                "unit": metric.unit,
+                "weight": _decimal_text(metric.weight),
+            }
+            for metric in scoring_metrics
+        ],
+        "priority_matrix": [
+            {
+                "equity_band": equity.value,
+                "food_need_band": food_need.value,
+                "priority": registry.priority_matrix[(equity, food_need)],
+            }
+            for equity in BandLabel
+            for food_need in BandLabel
+        ],
+        "single_geography_percentile": _decimal_text(registry.single_geography_percentile),
+        "sources": [
+            {
+                "dataset_identifier": source.dataset_identifier,
+                "freshness_policy": source.freshness_policy,
+                "immutable": source.immutable,
+                "key": source.key,
+                "methodology_url": source.methodology_url,
+                "published_checksum": source.published_checksum,
+                "role": source.role.value,
+                "source_url": source.source_url,
+                "vintage": source.vintage,
+            }
+            for source in scoring_sources
+        ],
+        "tie_method": registry.tie_method,
+    }
+
+
+def compute_scoring_sha256(registry: MethodologyRegistry) -> str:
+    """Hash only registry fields that can affect access, scoring, or scoring lineage."""
+
+    return hashlib.sha256(canonical_json_bytes(_scoring_registry_document(registry))).hexdigest()
+
+
 def load_registry(path: Path = REGISTRY_PATH) -> MethodologyRegistry:
     """Parse and validate declarative methodology without evaluating it."""
 
@@ -422,7 +574,7 @@ def load_registry(path: Path = REGISTRY_PATH) -> MethodologyRegistry:
     if _string(root, "tie_method", "registry") != "average":
         _invalid("registry must use average ranks for ties")
 
-    return MethodologyRegistry(
+    registry = MethodologyRegistry(
         methodology_version=_string(root, "methodology_version", "registry"),
         completeness_rule="all_required",
         tie_method="average",
@@ -434,8 +586,10 @@ def load_registry(path: Path = REGISTRY_PATH) -> MethodologyRegistry:
         domain_weights=domain_weights,
         bands=bands,
         priority_matrix=matrix,
+        scoring_sha256="",
         sha256=hashlib.sha256(raw_bytes).hexdigest(),
     )
+    return replace(registry, scoring_sha256=compute_scoring_sha256(registry))
 
 
-__all__ = ["REGISTRY_PATH", "load_registry", "registry_sha256"]
+__all__ = ["REGISTRY_PATH", "compute_scoring_sha256", "load_registry", "registry_sha256"]

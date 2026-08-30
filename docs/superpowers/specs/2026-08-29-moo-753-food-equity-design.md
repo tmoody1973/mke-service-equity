@@ -508,7 +508,12 @@ The 2026-08-29 approval covers all of these load-bearing choices:
 9. equal indicator/domain weights, average-rank percentiles, fixed bands, complete-case rule, and
    no weight redistribution;
 10. the complete 5×5 Food Equity Priority matrix; and
-11. development-only use of the pinned validated, unpublished Equity Baseline run.
+11. development-only use of the pinned validated, unpublished Equity Baseline run; and
+12. the 2026-08-29 lossless persistence amendment: nullable source names and active states,
+    historical resource-version identity including nullable validity endpoints, source-derived
+    classification verification without an invented timestamp, dated override/context evidence,
+    separate scalar 10/15/20-minute contextual metric slugs, and persisted score-exclusion
+    reasons.
 
 Any change to those choices requires a methodology version change, documentation, tests, and a
 new run. Approval does not authorize publication or production mutation.

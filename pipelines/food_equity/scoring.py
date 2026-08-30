@@ -621,7 +621,7 @@ def _input_fingerprint(
     }
     document: dict[str, JsonValue] = {
         "methodology_version": registry.methodology_version,
-        "registry_sha256": registry.sha256,
+        "scoring_registry_sha256": registry.scoring_sha256,
         "baseline_run": _baseline_run_document(baseline_run),
         "provenance": {
             "source_snapshot_sha256s": {
@@ -680,7 +680,7 @@ def _canonical_output(
 ) -> bytes:
     document: dict[str, JsonValue] = {
         "methodology_version": registry.methodology_version,
-        "registry_sha256": registry.sha256,
+        "scoring_registry_sha256": registry.scoring_sha256,
         "baseline_run": _baseline_run_document(baseline_run),
         "score_input_fingerprint": score_input_fingerprint,
         "components": [

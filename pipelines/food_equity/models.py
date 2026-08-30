@@ -13,6 +13,12 @@ class SourceRole(StrEnum):
     CONTEXTUAL = "contextual"
 
 
+class SourceStatus(StrEnum):
+    APPROVED_SCORING = "approved_scoring"
+    PINNED_VALIDATED_UNPUBLISHED = "pinned_validated_unpublished"
+    STALE_UNVERIFIED_CONTEXT = "stale_unverified_context"
+
+
 class Domain(StrEnum):
     RETAIL_ACCESS = "retail_access"
     TRANSPORTATION_CONSTRAINT = "transportation_constraint"
@@ -56,11 +62,15 @@ class BandLabel(StrEnum):
 class SourceDefinition:
     key: str
     name: str
+    publisher: str
     vintage: str
     dataset_identifier: str
     source_url: str
     methodology_url: str
     license_notes: str
+    geography: str
+    update_frequency: str
+    status: SourceStatus
     role: SourceRole
     freshness_policy: str
     immutable: bool
@@ -88,6 +98,7 @@ class MetricDefinition:
     source_fields: tuple[str, ...]
     domain: Domain | None = None
     weight: Decimal = Decimal(0)
+    threshold_minutes: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,6 +137,7 @@ class MethodologyRegistry:
     domain_weights: Mapping[Domain, Decimal]
     bands: tuple[PriorityBand, ...]
     priority_matrix: Mapping[tuple[BandLabel, BandLabel], int]
+    scoring_sha256: str
     sha256: str
 
     def priority(self, equity_band: BandLabel, food_need_band: BandLabel) -> int:

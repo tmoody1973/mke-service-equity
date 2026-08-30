@@ -87,10 +87,22 @@ specialty groceries, convenience stores, and operating availability are contextu
 presence does not reduce Food Access Need. Context-snapshot quality is retained independently of
 resource rows, so an empty stale or unverified inventory cannot become a verified zero.
 
+Contextual walking counts are stored as separate scalar observations for each inclusive threshold:
+`full_service_grocery_count_10_min_context`, `_15_min_context`, and `_20_min_context`, plus the
+equivalent `emergency_food_count_*_context` observations. They remain outside score components and
+the score-input fingerprint. A count is observed only when the contributing inventory has an
+explicit source-backed active state. Unknown activity produces a missing or conflicting context
+state, never an observed zero.
+
 The Milwaukee Food Council/Data You Can Use ArcGIS emergency-food layer is structured but stale
 and has no published reuse terms. It may be evaluated as `stale_unverified_context` in
 development; public redistribution is blocked pending partner confirmation and a current
 verification date. Missing hours remain missing and narrative notes are not parsed into hours.
+Missing resource names and active states remain null in persistence. Source-derived FNS
+classifications use their source snapshot and classification evidence for verification; only
+manual/partner overrides and context verification events require a separate `verified_at`
+timestamp. Historical retailer identity is (`Record ID`, source snapshot, `Authorization Date`,
+`End Date`), including explicit null endpoints, so multiple source-backed intervals are retained.
 
 ## Calculation
 
@@ -116,6 +128,8 @@ unequal band populations.
 
 Every result exposes raw values, county percentiles, definitions, sources, vintages, quality
 states, domain values, methodology version, and score-run identity.
+Excluded tracts also retain their deterministic exclusion reasons in the scored artifact and
+database row; an absent indicator is never reduced to a generic null without its reason.
 
 ## Food Equity Priority
 

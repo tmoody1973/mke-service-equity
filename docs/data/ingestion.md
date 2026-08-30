@@ -134,6 +134,21 @@ transaction back. If a draft already exists, a separate transaction may record a
 correcting the source, configuration, or validation failure; never force a status or partially
 replay SQL.
 
+## Food Equity commands and lossless resource rules
+
+Plan 3 exposes only `fetch`, `validate`, `normalize`, `classify`, `accessibility`, `load`, `score`,
+`validate-run`, and `run --through validated [--verify-existing]`. The final three stages require
+`MKE_PIPELINE_ENV=development` and `DATABASE_URL_UNPOOLED`. Every valid invocation writes a
+secret-free report under `data/reports/food-equity/`; there is no publish or production-status
+command.
+
+Source rows are persisted without display defaults. A blank resource name or unknown active state
+remains null. Multiple FNS validity intervals in the same immutable snapshot remain separate
+versions. Source-derived FNS classification relies on the exact snapshot and declarative rule;
+manual/partner overrides and verified context require dated verification evidence. Contextual
+10-, 15-, and 20-minute counts are separate scalar metrics and cannot enter Food Access Need or
+Priority. Score exclusions are retained verbatim for audit and recovery.
+
 ## Update rhythm
 
 - ACS: annual

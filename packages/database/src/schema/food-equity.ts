@@ -123,7 +123,7 @@ export const foodResourceVersions = pgTable(
     snapshotId: uuid("snapshot_id").notNull(),
     versionFingerprint: char("version_fingerprint", {length: 64}).notNull(),
     category: foodResourceCategoryEnum("category").notNull(),
-    name: text("name").notNull(),
+    name: text("name"),
     subtype: text("subtype"),
     address: text("address"),
     city: text("city"),
@@ -137,7 +137,7 @@ export const foodResourceVersions = pgTable(
     classificationEvidence: jsonb("classification_evidence").notNull(),
     fullServiceGrocery: boolean("full_service_grocery").notNull(),
     snapAuthorized: boolean("snap_authorized"),
-    active: boolean("active").notNull(),
+    active: boolean("active"),
     validFrom: timestamp("valid_from", {withTimezone: true}),
     validTo: timestamp("valid_to", {withTimezone: true}),
     verifiedAt: timestamp("verified_at", {withTimezone: true}),
@@ -155,10 +155,9 @@ export const foodResourceVersions = pgTable(
       foreignColumns: [sourceSnapshots.id],
     }).onDelete("restrict"),
     unique("food_resource_versions_fingerprint_unique").on(table.versionFingerprint),
-    unique("food_resource_versions_resource_snapshot_unique").on(
-      table.resourceId,
-      table.snapshotId,
-    ),
+    unique("food_resource_versions_identity_unique")
+      .on(table.resourceId, table.snapshotId, table.validFrom, table.validTo)
+      .nullsNotDistinct(),
     check(
       "food_resource_versions_hash_check",
       sql`${table.versionFingerprint} ~ '^[0-9a-f]{64}$'`,
@@ -191,7 +190,7 @@ export const foodResourceVersions = pgTable(
     ),
     check(
       "food_resource_versions_verified_at_check",
-      sql`${table.verificationStatus} NOT IN ('verified', 'override_verified', 'verified_context') OR ${table.verifiedAt} IS NOT NULL`,
+      sql`${table.verificationStatus} NOT IN ('override_verified', 'verified_context') OR ${table.verifiedAt} IS NOT NULL`,
     ),
     index("food_resource_versions_geometry_gist").using("gist", table.geometry),
     index("food_resource_versions_resource_idx").on(table.resourceId),
@@ -443,6 +442,7 @@ export const foodScores = pgTable(
     equityBaselineBand: equityBaselineBandEnum("equity_baseline_band"),
     priority: integer("priority"),
     qualityStatus: scoreQualityStatusEnum("quality_status").notNull(),
+    exclusionReasons: jsonb("exclusion_reasons").notNull(),
     createdAt: timestamp("created_at", {withTimezone: true}).notNull(),
   },
   (table) => [
@@ -472,6 +472,15 @@ export const foodScores = pgTable(
     check(
       "food_scores_priority_check",
       sql`${table.priority} IS NULL OR ${table.priority} BETWEEN 1 AND 5`,
+    ),
+    check(
+      "food_scores_exclusion_reasons_check",
+      sql`CASE
+        WHEN jsonb_typeof(${table.exclusionReasons}) = 'array'
+        THEN (${table.qualityStatus} = 'complete' AND jsonb_array_length(${table.exclusionReasons}) = 0)
+          OR (${table.qualityStatus} <> 'complete' AND jsonb_array_length(${table.exclusionReasons}) > 0)
+        ELSE false
+      END`,
     ),
     check(
       "food_scores_output_quality_check",

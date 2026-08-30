@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import tomllib
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -12,9 +13,15 @@ from pipelines.food_equity.models import (
     Domain,
     MetricTreatment,
     ResourceCategory,
+    SourceStatus,
     SourceRole,
 )
-from pipelines.food_equity.registry import REGISTRY_PATH, load_registry, registry_sha256
+from pipelines.food_equity.registry import (
+    REGISTRY_PATH,
+    compute_scoring_sha256,
+    load_registry,
+    registry_sha256,
+)
 
 
 def _mutated_registry(tmp_path: Path, old: str, new: str, *, count: int = 1) -> Path:
@@ -52,6 +59,14 @@ def test_registry_locks_the_approved_sources_and_roles() -> None:
         "data edited 2024-08-07; schema/layer edited 2024-08-27"
     )
     assert sources["emergency_food_context"].max_age_days == 90
+    assert sources["tract_origins"].publisher == "U.S. Census Bureau"
+    assert sources["tract_origins"].geography == "Wisconsin 2020 census tracts"
+    assert sources["tract_origins"].update_frequency == "decennial"
+    assert sources["tract_origins"].published_checksum == (
+        "sha256:59d8e6e0d6c84267cd845da984e3623e68eae61f3418cc94488865c5f37d3e2c"
+    )
+    assert sources["equity_baseline"].status is SourceStatus.PINNED_VALIDATED_UNPUBLISHED
+    assert sources["emergency_food_context"].status is (SourceStatus.STALE_UNVERIFIED_CONTEXT)
     assert all(
         source.role is SourceRole.SCORING
         for key, source in sources.items()
@@ -65,8 +80,12 @@ def test_registry_locks_taxonomy_metrics_weights_and_directions() -> None:
     classifications = {item.source_value: item for item in registry.classifications}
 
     assert set(metrics) == {
-        "emergency_food_access_context",
-        "full_service_grocery_counts_context",
+        "emergency_food_count_10_min_context",
+        "emergency_food_count_15_min_context",
+        "emergency_food_count_20_min_context",
+        "full_service_grocery_count_10_min_context",
+        "full_service_grocery_count_15_min_context",
+        "full_service_grocery_count_20_min_context",
         "full_service_grocery_walk_access",
         "households_no_vehicle",
         "scheduled_transit_service_intensity",
@@ -82,8 +101,12 @@ def test_registry_locks_taxonomy_metrics_weights_and_directions() -> None:
     assert metrics["households_no_vehicle"].weight == Decimal("0.5")
     assert metrics["scheduled_transit_service_intensity"].weight == Decimal("0.5")
     assert metrics["scheduled_transit_service_intensity"].higher_is_worse is False
-    assert metrics["emergency_food_access_context"].treatment is MetricTreatment.CONTEXTUAL
-    assert metrics["emergency_food_access_context"].domain is None
+    for prefix in ("full_service_grocery", "emergency_food"):
+        for threshold in (10, 15, 20):
+            metric = metrics[f"{prefix}_count_{threshold}_min_context"]
+            assert metric.treatment is MetricTreatment.CONTEXTUAL
+            assert metric.domain is None
+            assert metric.threshold_minutes == threshold
     assert classifications["Supermarket"].category is ResourceCategory.FULL_SERVICE_GROCERY
     assert classifications["Large Grocery Store"].category is (
         ResourceCategory.FULL_SERVICE_GROCERY
@@ -209,6 +232,71 @@ def test_registry_sha256_hashes_exact_committed_bytes() -> None:
     assert registry.sha256 == registry_sha256()
     assert registry.sha256 == registry_sha256(REGISTRY_PATH)
     assert len(registry.sha256) == 64
+    assert registry.scoring_sha256 == compute_scoring_sha256(registry)
+    assert len(registry.scoring_sha256) == 64
+
+
+def test_scoring_hash_excludes_contextual_metadata_and_metric_slugs() -> None:
+    registry = load_registry()
+    changed_sources = tuple(
+        replace(
+            source,
+            name=f"Changed display name for {source.key}",
+            publisher=f"Changed publisher display for {source.key}",
+            geography=f"Changed geography display for {source.key}",
+            update_frequency=f"Changed update display for {source.key}",
+            license_notes=f"Changed license display for {source.key}",
+        )
+        for source in registry.sources
+    )
+    changed_metrics = tuple(
+        replace(
+            metric,
+            name=f"Changed display name for {metric.slug}",
+            slug=(
+                f"changed_{metric.slug}"
+                if metric.treatment is MetricTreatment.CONTEXTUAL
+                else metric.slug
+            ),
+        )
+        for metric in registry.metrics
+    )
+    contextual_change = replace(
+        registry,
+        sources=changed_sources,
+        metrics=changed_metrics,
+        scoring_sha256="forged-cache-value",
+    )
+
+    assert compute_scoring_sha256(contextual_change) == registry.scoring_sha256
+
+
+def test_scoring_hash_changes_for_scoring_source_metric_and_matrix_contracts() -> None:
+    registry = load_registry()
+    scoring_source_change = replace(
+        registry,
+        sources=tuple(
+            replace(source, vintage="changed-scoring-vintage") if source.key == "sram" else source
+            for source in registry.sources
+        ),
+    )
+    scoring_metric_change = replace(
+        registry,
+        metrics=tuple(
+            replace(metric, unit="changed-unit")
+            if metric.slug == "households_no_vehicle"
+            else metric
+            for metric in registry.metrics
+        ),
+    )
+    changed_matrix = dict(registry.priority_matrix)
+    changed_matrix[(BandLabel.VERY_LOW, BandLabel.VERY_LOW)] = 1
+
+    assert compute_scoring_sha256(scoring_source_change) != registry.scoring_sha256
+    assert compute_scoring_sha256(scoring_metric_change) != registry.scoring_sha256
+    assert compute_scoring_sha256(replace(registry, priority_matrix=changed_matrix)) != (
+        registry.scoring_sha256
+    )
 
 
 @pytest.mark.parametrize(

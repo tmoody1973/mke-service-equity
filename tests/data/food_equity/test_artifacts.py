@@ -9,6 +9,7 @@ from pipelines.common.artifacts import (
     ArtifactCollisionError,
     ArtifactError,
     ArtifactPaths,
+    preserve_file_snapshot,
     preserve_snapshot,
 )
 from pipelines.equity_baseline.artifacts import ArtifactPaths as EquityArtifactPaths
@@ -75,6 +76,93 @@ def test_food_snapshot_detects_content_address_collision(tmp_path: Path) -> None
 
     with pytest.raises(ArtifactCollisionError, match="collision"):
         _preserve(tmp_path)
+
+
+def test_file_snapshot_streams_and_reuses_exact_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "inputs/network.pbf"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"network-bytes")
+
+    original_read_bytes = Path.read_bytes
+
+    def fail_source_read_bytes(path: Path) -> bytes:
+        if path == source:
+            raise AssertionError("large source files must not be loaded with read_bytes")
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", fail_source_read_bytes)
+    first = preserve_file_snapshot(
+        root=tmp_path,
+        pipeline_slug="food-equity",
+        source_key="walking_network",
+        source_url="https://example.test/network.pbf",
+        dataset_version="2026-08-27",
+        source_path=source,
+        schema={"format": "osm-pbf"},
+        row_or_feature_count=1,
+        license="ODbL",
+        methodology_reference="food-equity-v1",
+        request_metadata={"source_path": "inputs/network.pbf"},
+        clock=lambda: NOW,
+    )
+    second = preserve_file_snapshot(
+        root=tmp_path,
+        pipeline_slug="food-equity",
+        source_key="walking_network",
+        source_url="https://example.test/network.pbf",
+        dataset_version="2026-08-27",
+        source_path=source,
+        schema={"format": "osm-pbf"},
+        row_or_feature_count=1,
+        license="ODbL",
+        methodology_reference="food-equity-v1",
+        request_metadata={"source_path": "inputs/network.pbf"},
+        clock=lambda: NOW,
+    )
+
+    assert first.raw_path.open("rb").read() == b"network-bytes"
+    assert first.reused is False
+    assert second.reused is True
+    assert first.manifest == second.manifest
+
+
+def test_file_snapshot_detects_existing_content_address_collision(tmp_path: Path) -> None:
+    source = tmp_path / "inputs/network.pbf"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"network-bytes")
+    stored = preserve_file_snapshot(
+        root=tmp_path,
+        pipeline_slug="food-equity",
+        source_key="walking_network",
+        source_url="https://example.test/network.pbf",
+        dataset_version="2026-08-27",
+        source_path=source,
+        schema={"format": "osm-pbf"},
+        row_or_feature_count=1,
+        license="ODbL",
+        methodology_reference="food-equity-v1",
+        request_metadata={},
+        clock=lambda: NOW,
+    )
+    stored.raw_path.write_bytes(b"tampered")
+
+    with pytest.raises(ArtifactCollisionError, match="collision"):
+        preserve_file_snapshot(
+            root=tmp_path,
+            pipeline_slug="food-equity",
+            source_key="walking_network",
+            source_url="https://example.test/network.pbf",
+            dataset_version="2026-08-27",
+            source_path=source,
+            schema={"format": "osm-pbf"},
+            row_or_feature_count=1,
+            license="ODbL",
+            methodology_reference="food-equity-v1",
+            request_metadata={},
+            clock=lambda: NOW,
+        )
 
 
 @pytest.mark.parametrize("pipeline_slug", ["", "..", "food/equity"])

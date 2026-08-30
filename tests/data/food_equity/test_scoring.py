@@ -796,7 +796,7 @@ def test_context_and_public_investment_changes_cannot_change_scores_or_fingerpri
     assert before.score_input_fingerprint == after.score_input_fingerprint
     contextual = MetricInput(
         geoid=baseline_scores[0].geoid,
-        metric_slug="emergency_food_access_context",
+        metric_slug="emergency_food_count_10_min_context",
         value=Decimal("999"),
         state="observed",
         quality_status="stale_unverified_context",

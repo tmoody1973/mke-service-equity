@@ -81,26 +81,32 @@ EPSG:4326.
 ## food_resources
 
 - id
-- name
-- resource_type
-- subtype
-- address
-- city
-- zip
-- latitude
-- longitude
-- geometry
-- full_service_grocery
-- snap_authorized
-- hours_json
-- eligibility
-- website
-- phone
 - source_id
 - source_record_id
+- canonical_resource_key
+
+`food_resources` holds stable source identity. Display and validity fields belong to immutable
+resource versions.
+
+## food_resource_versions
+
+- id
+- resource_id
+- snapshot_id
+- version_fingerprint
+- category
+- name (nullable when the source is blank)
+- address, city, postal_code, website, phone, hours
+- geometry and coordinate_status
+- verification_status and classification_evidence
+- full_service_grocery and snap_authorized
+- active (nullable when the source does not establish activity)
+- valid_from and valid_to
 - verified_at
-- verification_status
-- active
+
+Historical identity is resource, source snapshot, and the validity interval with null endpoints
+treated as values. Source-derived `verified` classification does not require an invented
+`verified_at`; override and verified-context states do.
 
 ## access_metrics
 
@@ -115,6 +121,17 @@ EPSG:4326.
 - vehicle_access_indicator
 - calculation_version
 - calculated_at
+
+The physical tables are `food_access_metric_values` and
+`food_access_metric_snapshots`. Each scalar metric value links every contributing immutable
+snapshot. Context counts use distinct 10-, 15-, and 20-minute slugs and remain outside scoring.
+
+## food_scores
+
+Food score rows link the Plan 3 run, canonical geography, and exact Equity Baseline score. They
+store both domain scores, raw and percentile Food Access Need, both bands, Priority, quality
+status, and `exclusion_reasons`. The reasons remain present for insufficient and zero-population
+rows even though their analytical values are null.
 
 ## score_runs
 

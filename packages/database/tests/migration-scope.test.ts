@@ -124,3 +124,46 @@ describe("Plan 3 food-equity migration scope", () => {
     expect(migration).not.toMatch(/public[_ ]investment/i);
   });
 });
+
+describe("Plan 3 food-equity contract amendment", () => {
+  it("applies the approved nullable, identity, verification, and score-provenance changes", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0003_food_equity_contract_amendment.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+
+    expect(migration).toMatch(
+      /ALTER TABLE "food_resource_versions" ALTER COLUMN "name" DROP NOT NULL/i,
+    );
+    expect(migration).toMatch(
+      /ALTER TABLE "food_resource_versions" ALTER COLUMN "active" DROP NOT NULL/i,
+    );
+    expect(migration).toContain("DROP CONSTRAINT \"food_resource_versions_resource_snapshot_unique\"");
+    expect(migration).toMatch(
+      /food_resource_versions_identity_unique[\s\S]*UNIQUE NULLS NOT DISTINCT\s*\("resource_id","snapshot_id","valid_from","valid_to"\)/i,
+    );
+    expect(migration).toMatch(
+      /verification_status" NOT IN \('override_verified', 'verified_context'\)[\s\S]*verified_at" IS NOT NULL/i,
+    );
+    expect(migration).toMatch(
+      /ADD COLUMN "exclusion_reasons" jsonb[\s\S]*ALTER COLUMN "exclusion_reasons" SET NOT NULL/i,
+    );
+    expect(migration).toContain(
+      "cannot amend existing incomplete food_scores without source-backed exclusion reasons",
+    );
+    expect(migration).toMatch(/jsonb_array_length[\s\S]*quality_status/i);
+    expect(migration).toContain("food_scores_exclusion_reasons_check");
+    expect(migration).not.toMatch(/DROP TABLE|DROP TYPE/i);
+
+    const journalPath = fileURLToPath(new URL("../drizzle/meta/_journal.json", import.meta.url));
+    const journal = JSON.parse(await readFile(journalPath, "utf8")) as {
+      entries: {idx: number; tag: string}[];
+    };
+    expect(journal.entries.map(({idx, tag}) => ({idx, tag}))).toEqual([
+      {idx: 0, tag: "0000_enable_postgis"},
+      {idx: 1, tag: "0001_equity_baseline"},
+      {idx: 2, tag: "0002_food_equity"},
+      {idx: 3, tag: "0003_food_equity_contract_amendment"},
+    ]);
+  });
+});

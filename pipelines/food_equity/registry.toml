@@ -24,11 +24,15 @@ inaccessible_ranking = "above_finite_tied"
 [[sources]]
 key = "sram"
 name = "USDA ERS SNAP-authorized Retailer Access Map"
+publisher = "U.S. Department of Agriculture, Economic Research Service"
 vintage = "2025 SRAM updated 2026-07-27"
 dataset_identifier = "2025-sram"
 source_url = "https://www.ers.usda.gov/media/29395/2025-snap-authorized-retailer-access-map-sram-data.zip?v=81233"
 methodology_url = "https://www.ers.usda.gov/data-products/food-access-research-atlas/documentation"
 license_notes = "USDA public data; preserve source and reference-guide attribution."
+geography = "2020 census tracts in the 50 states and District of Columbia"
+update_frequency = "periodic_not_guaranteed_annual"
+status = "approved_scoring"
 role = "scoring"
 freshness_policy = "pinned_vintage"
 immutable = false
@@ -36,11 +40,15 @@ immutable = false
 [[sources]]
 key = "snap_retailers"
 name = "USDA FNS historical SNAP retailer locator"
+publisher = "USDA Food and Nutrition Administration"
 vintage = "current through 2025-12-31"
 dataset_identifier = "snap-retailer-locator-data2005-2025"
 source_url = "https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-retailer-locator-data2005-2025.zip"
 methodology_url = "https://fns-prod.azureedge.us/snap/store-definitions"
 license_notes = "USDA public administrative data; preserve source and snapshot-date attribution."
+geography = "United States; Milwaukee County plus two-mile review buffer"
+update_frequency = "pinned_periodic_snapshot"
+status = "approved_scoring"
 role = "scoring"
 freshness_policy = "pinned_vintage"
 immutable = true
@@ -78,11 +86,15 @@ duplicate_version_policy = "fail"
 [[sources]]
 key = "acs_vehicle"
 name = "2024 ACS 5-Year Detailed Tables vehicle availability"
+publisher = "U.S. Census Bureau"
 vintage = "2024 ACS 5-year"
 dataset_identifier = "acs/acs5/B08201"
 source_url = "https://api.census.gov/data/2024/acs/acs5"
 methodology_url = "https://www.census.gov/data/developers/data-sets/acs-5year/2024.html"
 license_notes = "United States Census Bureau public data; preserve source attribution."
+geography = "Wisconsin 55, Milwaukee County 079, 2020 census tracts"
+update_frequency = "annual"
+status = "approved_scoring"
 role = "scoring"
 freshness_policy = "pinned_vintage"
 immutable = false
@@ -90,23 +102,32 @@ immutable = false
 [[sources]]
 key = "tract_origins"
 name = "2020 Census tract mean centers of population for Wisconsin"
+publisher = "U.S. Census Bureau"
 vintage = "2020 Census"
 dataset_identifier = "CenPop2020_Mean_TR55"
 source_url = "https://www2.census.gov/geo/docs/reference/cenpop2020/tract/CenPop2020_Mean_TR55.txt"
 methodology_url = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.html"
 license_notes = "United States Census Bureau public data; preserve source attribution."
+geography = "Wisconsin 2020 census tracts"
+update_frequency = "decennial"
+status = "approved_scoring"
 role = "scoring"
 freshness_policy = "pinned_vintage"
 immutable = true
+published_checksum = "sha256:59d8e6e0d6c84267cd845da984e3623e68eae61f3418cc94488865c5f37d3e2c"
 
 [[sources]]
 key = "mcts_gtfs"
 name = "Milwaukee County Transit System static GTFS"
+publisher = "Milwaukee County Transit System, operated by Milwaukee Transport Services"
 vintage = "snapshot at execution"
 dataset_identifier = "google_transit"
 source_url = "https://kamino.mcts.org/gtfs/google_transit.zip"
 methodology_url = "https://www.ridemcts.com/policies/developer-terms"
 license_notes = "MCTS developer terms require not-sponsored wording and last-updated and valid-through dates."
+geography = "Scheduled MCTS service represented by the feed"
+update_frequency = "mutable_operational_feed"
+status = "approved_scoring"
 role = "scoring"
 freshness_policy = "service_dates"
 immutable = false
@@ -114,11 +135,15 @@ immutable = false
 [[sources]]
 key = "walking_network"
 name = "Geofabrik Wisconsin OpenStreetMap PBF"
+publisher = "OpenStreetMap contributors; distributed by Geofabrik GmbH"
 vintage = "2026-08-27"
 dataset_identifier = "wisconsin-260827.osm.pbf"
 source_url = "https://download.geofabrik.de/north-america/us/wisconsin-260827.osm.pbf"
 methodology_url = "https://download.geofabrik.de/north-america/us/wisconsin.html"
 license_notes = "ODbL 1.0; attribute OpenStreetMap contributors and Geofabrik and preserve derived-database obligations."
+geography = "Wisconsin; clipped to Milwaukee County plus two miles"
+update_frequency = "pinned_immutable_snapshot"
+status = "approved_scoring"
 role = "scoring"
 freshness_policy = "pinned_vintage"
 immutable = true
@@ -127,11 +152,15 @@ published_checksum = "md5:87c18ce0608499afd91ed0f2a5ee8eef"
 [[sources]]
 key = "equity_baseline"
 name = "Approved Equity Baseline v1 development run"
+publisher = "MKE Service Equity"
 vintage = "validated verified unpublished"
 dataset_identifier = "502e2a04-b013-53cd-8b09-c9144862701a"
 source_url = "database:equity-score-run"
 methodology_url = "docs/methodology/equity-baseline.md"
 license_notes = "Internal deterministic derived data; preserve complete source and methodology lineage."
+geography = "Approved 2020 Milwaukee County census tract universe"
+update_frequency = "pinned_run"
+status = "pinned_validated_unpublished"
 role = "scoring"
 freshness_policy = "pinned_run"
 immutable = true
@@ -139,11 +168,15 @@ immutable = true
 [[sources]]
 key = "emergency_food_context"
 name = "Milwaukee Food Council and Data You Can Use emergency-food layer"
+publisher = "Milwaukee Food Council and Data You Can Use"
 vintage = "data edited 2024-08-07; schema/layer edited 2024-08-27"
 dataset_identifier = "303b7e4385a6450fa7d36d76a1ba5a67/0"
 source_url = "https://services5.arcgis.com/3kr3fkJcIf6EOY6g/ArcGIS/rest/services/EmergencyFood_MKE/FeatureServer/0"
 methodology_url = "https://www.mkefoodcouncil.org/mapping"
 license_notes = "Public query access but no published reuse terms; non-public stale development context only."
+geography = "Milwaukee County points"
+update_frequency = "unknown_partner_verification_required"
+status = "stale_unverified_context"
 role = "contextual"
 freshness_policy = "verified_within_days"
 max_age_days = 90
@@ -341,22 +374,64 @@ higher_is_worse = false
 weight = "0.5"
 
 [[metrics]]
-slug = "full_service_grocery_counts_context"
-name = "Full-service grocery counts within walking thresholds"
+slug = "full_service_grocery_count_10_min_context"
+name = "Full-service grocery count within a 10-minute walk"
 treatment = "contextual"
 source = "snap_retailers"
 source_fields = ["Record ID", "Store Type", "Latitude", "Longitude"]
 unit = "count"
 higher_is_worse = false
+threshold_minutes = 10
 
 [[metrics]]
-slug = "emergency_food_access_context"
-name = "Emergency-food resources and walking access"
+slug = "full_service_grocery_count_15_min_context"
+name = "Full-service grocery count within a 15-minute walk"
+treatment = "contextual"
+source = "snap_retailers"
+source_fields = ["Record ID", "Store Type", "Latitude", "Longitude"]
+unit = "count"
+higher_is_worse = false
+threshold_minutes = 15
+
+[[metrics]]
+slug = "full_service_grocery_count_20_min_context"
+name = "Full-service grocery count within a 20-minute walk"
+treatment = "contextual"
+source = "snap_retailers"
+source_fields = ["Record ID", "Store Type", "Latitude", "Longitude"]
+unit = "count"
+higher_is_worse = false
+threshold_minutes = 20
+
+[[metrics]]
+slug = "emergency_food_count_10_min_context"
+name = "Emergency-food resource count within a 10-minute walk"
 treatment = "contextual"
 source = "emergency_food_context"
 source_fields = ["ObjectID", "USER_Type", "USER_Notes", "geometry"]
-unit = "count_and_quality_state"
+unit = "count"
 higher_is_worse = false
+threshold_minutes = 10
+
+[[metrics]]
+slug = "emergency_food_count_15_min_context"
+name = "Emergency-food resource count within a 15-minute walk"
+treatment = "contextual"
+source = "emergency_food_context"
+source_fields = ["ObjectID", "USER_Type", "USER_Notes", "geometry"]
+unit = "count"
+higher_is_worse = false
+threshold_minutes = 15
+
+[[metrics]]
+slug = "emergency_food_count_20_min_context"
+name = "Emergency-food resource count within a 20-minute walk"
+treatment = "contextual"
+source = "emergency_food_context"
+source_fields = ["ObjectID", "USER_Type", "USER_Notes", "geometry"]
+unit = "count"
+higher_is_worse = false
+threshold_minutes = 20
 
 [[bands]]
 label = "Very Low"

@@ -107,12 +107,28 @@ describe("food-equity schema contract", () => {
     expect(config(foodResources).uniqueConstraints.map((item) => item.getName())).toContain(
       "food_resources_source_record_unique",
     );
-    expect(config(foodResourceVersions).uniqueConstraints.map((item) => item.getName())).toEqual(
+    const versionConstraints = config(foodResourceVersions).uniqueConstraints;
+    expect(versionConstraints.map((item) => item.getName())).toEqual(
       expect.arrayContaining([
         "food_resource_versions_fingerprint_unique",
-        "food_resource_versions_resource_snapshot_unique",
+        "food_resource_versions_identity_unique",
       ]),
     );
+    expect(
+      versionConstraints.find(
+        (item) => item.getName() === "food_resource_versions_identity_unique",
+      ),
+    ).toMatchObject({
+      columns: [
+        {name: "resource_id"},
+        {name: "snapshot_id"},
+        {name: "valid_from"},
+        {name: "valid_to"},
+      ],
+      nullsNotDistinct: true,
+    });
+    expect(foodResourceVersions.name.notNull).toBe(false);
+    expect(foodResourceVersions.active.notNull).toBe(false);
     expect(foodResourceVersions.geometry.getSQLType()).toMatch(/geometry\(point/i);
     expect(config(foodResourceVersions).indexes.map((item) => [item.config.name, item.config.method]))
       .toContainEqual(["food_resource_versions_geometry_gist", "gist"]);
@@ -171,9 +187,11 @@ describe("food-equity schema contract", () => {
       expect.arrayContaining([
         "food_scores_numeric_range_check",
         "food_scores_priority_check",
+        "food_scores_exclusion_reasons_check",
         "food_scores_output_quality_check",
       ]),
     );
+    expect(foodScores.exclusionReasons.notNull).toBe(true);
     expect(config(foodScores).uniqueConstraints.map((item) => item.getName())).toContain(
       "food_scores_run_geography_unique",
     );
