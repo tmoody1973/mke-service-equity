@@ -7,6 +7,12 @@ export {
   loadComparison,
 } from "./analyze/compare-repository";
 export type {ComparisonRepositoryClient} from "./analyze/compare-repository";
+export {
+  buildOpportunityResponse,
+  loadOpportunity,
+  OpportunityDataIntegrityError,
+} from "./analyze/opportunity-repository";
+export type {OpportunityRepositoryClient} from "./analyze/opportunity-repository";
 export {readAtlasDataMode} from "./atlas/data-mode";
 export {
   AtlasDataIntegrityError,
