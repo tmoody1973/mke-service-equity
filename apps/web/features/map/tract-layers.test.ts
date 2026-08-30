@@ -1,11 +1,13 @@
 import {describe, expect, it, vi} from "vitest";
 import {
   addTractLayers,
+  applyTractPriorityFilter,
   PRIORITY_COLORS,
   TRACT_FILL_LAYER_ID,
   TRACT_INSUFFICIENT_LINE_LAYER_ID,
   TRACT_LINE_LAYER_ID,
   TRACT_SOURCE_ID,
+  tractVisibilityFilter,
 } from "./tract-layers";
 
 describe("addTractLayers", () => {
@@ -52,5 +54,20 @@ describe("addTractLayers", () => {
     expect(expression).toContain("selected");
     expect(expression).toContain("hovered");
     expect(expression.indexOf("selected")).toBeLessThan(expression.indexOf("hovered"));
+  });
+});
+
+describe("tract priority filtering", () => {
+  it("shows everything when no priority filter is active", () => {
+    expect(tractVisibilityFilter([])).toBeNull();
+  });
+
+  it("keeps explicit non-score states visible while filtering priorities", () => {
+    expect(JSON.stringify(tractVisibilityFilter([4, 5]))).toContain("qualityStatus");
+    expect(JSON.stringify(tractVisibilityFilter([4, 5]))).toContain("foodEquityPriority");
+
+    const setFilter = vi.fn();
+    applyTractPriorityFilter({setFilter}, [4, 5]);
+    expect(setFilter).toHaveBeenCalledTimes(2);
   });
 });

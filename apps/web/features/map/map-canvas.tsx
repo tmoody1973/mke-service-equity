@@ -11,10 +11,16 @@ import {
 } from "maplibre-gl";
 import {useCallback, useEffect, useRef} from "react";
 import {resetMilwaukeeExtent} from "./map-camera";
-import {addTractLayers, TRACT_FILL_LAYER_ID, TRACT_SOURCE_ID} from "./tract-layers";
+import {
+  addTractLayers,
+  applyTractPriorityFilter,
+  TRACT_FILL_LAYER_ID,
+  TRACT_SOURCE_ID,
+} from "./tract-layers";
 
 type MapCanvasProps = {
   onSelectTract?: (geoid: string) => void;
+  priorities?: Array<number>;
   selectedTract?: string | null;
   styleUrl: string;
   tracts?: AtlasTractFeatureCollection | undefined;
@@ -32,6 +38,7 @@ function featureGeoid(event: MapLayerMouseEvent): string | null {
 
 export function MapCanvas({
   onSelectTract,
+  priorities = [],
   selectedTract = null,
   styleUrl,
   tracts,
@@ -43,6 +50,7 @@ export function MapCanvas({
   const selectedTractRef = useRef<string | null>(selectedTract);
   const tractsRef = useRef(tracts);
   const onSelectTractRef = useRef(onSelectTract);
+  const prioritiesRef = useRef(priorities);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -103,6 +111,7 @@ export function MapCanvas({
 
     const handleLoad = () => {
       addTractLayers(map, tractsRef.current ?? emptyTracts);
+      applyTractPriorityFilter(map, prioritiesRef.current);
       map.on("mousemove", TRACT_FILL_LAYER_ID, handlePointerMove);
       map.on("mouseleave", TRACT_FILL_LAYER_ID, handlePointerLeave);
       map.on("click", TRACT_FILL_LAYER_ID, handleSelect);
@@ -162,6 +171,14 @@ export function MapCanvas({
   useEffect(() => {
     onSelectTractRef.current = onSelectTract;
   }, [onSelectTract]);
+
+  useEffect(() => {
+    prioritiesRef.current = priorities;
+    const map = mapRef.current;
+    if (map?.getSource(TRACT_SOURCE_ID)) {
+      applyTractPriorityFilter(map, priorities);
+    }
+  }, [priorities]);
 
   const handleReset = useCallback(() => {
     const map = mapRef.current;

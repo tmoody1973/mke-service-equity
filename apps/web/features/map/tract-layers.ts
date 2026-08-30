@@ -1,5 +1,5 @@
 import type {AtlasTractFeatureCollection} from "@mke/contracts";
-import type {AddLayerObject, GeoJSONSourceSpecification} from "maplibre-gl";
+import type {AddLayerObject, FilterSpecification, GeoJSONSourceSpecification} from "maplibre-gl";
 
 export const TRACT_SOURCE_ID = "atlas-tracts";
 export const TRACT_FILL_LAYER_ID = "atlas-tract-fill";
@@ -20,6 +20,10 @@ export const ZERO_POPULATION_COLOR = "#d1d5db";
 type TractLayerMap = {
   addSource(id: string, source: GeoJSONSourceSpecification): unknown;
   addLayer(layer: AddLayerObject): unknown;
+};
+
+type TractFilterMap = {
+  setFilter(layerId: string, filter: FilterSpecification | null): unknown;
 };
 
 type TractGeoJson = AtlasTractFeatureCollection | {
@@ -105,4 +109,25 @@ export function addTractLayers(map: TractLayerMap, tracts: TractGeoJson): void {
       "line-width": 1.5,
     },
   });
+}
+
+export function tractVisibilityFilter(priorities: ReadonlyArray<number>): FilterSpecification | null {
+  if (priorities.length === 0) {
+    return null;
+  }
+
+  return [
+    "any",
+    ["!=", ["get", "qualityStatus"], "complete"],
+    ["in", ["get", "foodEquityPriority"], ["literal", priorities]],
+  ];
+}
+
+export function applyTractPriorityFilter(
+  map: TractFilterMap,
+  priorities: ReadonlyArray<number>,
+): void {
+  const filter = tractVisibilityFilter(priorities);
+  map.setFilter(TRACT_FILL_LAYER_ID, filter);
+  map.setFilter(TRACT_LINE_LAYER_ID, filter);
 }

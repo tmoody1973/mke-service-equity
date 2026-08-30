@@ -18,6 +18,7 @@ const {
   mapFitBounds,
   mapRemove,
   mapResize,
+  mapSetFilter,
   mapSetFeatureState,
 } = vi.hoisted(() => {
   const remove = vi.fn();
@@ -27,6 +28,7 @@ const {
   const addSource = vi.fn();
   const fitBounds = vi.fn();
   const setFeatureState = vi.fn();
+  const setFilter = vi.fn();
   const setData = vi.fn();
   const handlers = new globalThis.Map<string, (event?: unknown) => void>();
   const on = vi.fn((event: string, layerOrHandler: string | ((event?: unknown) => void), handler?: (event?: unknown) => void) => {
@@ -56,12 +58,14 @@ const {
         on,
         remove,
         resize,
+        setFilter,
         setFeatureState,
       };
     }),
     mapFitBounds: fitBounds,
     mapRemove: remove,
     mapResize: resize,
+    mapSetFilter: setFilter,
     mapSetFeatureState: setFeatureState,
   };
 });
@@ -146,6 +150,7 @@ describe("MapShell", () => {
 
     expect(mapAddSource).toHaveBeenCalledOnce();
     expect(mapAddLayer).toHaveBeenCalledTimes(3);
+    expect(mapSetFilter).toHaveBeenCalled();
     expect(mapSetFeatureState).toHaveBeenCalledWith(
       {source: "atlas-tracts", id: "55079000101"},
       {selected: true},
