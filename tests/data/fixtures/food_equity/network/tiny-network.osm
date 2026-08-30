@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="synthetic-task-8-fixture">
+  <bounds minlat="43.0000" minlon="-88.0000" maxlat="43.0040" maxlon="-87.9960"/>
+  <node id="1" lat="43.0000" lon="-88.0000"/>
+  <node id="2" lat="43.0000" lon="-87.9990"/>
+  <node id="3" lat="43.0000" lon="-87.9980"/>
+  <node id="4" lat="43.0010" lon="-87.9990"/>
+  <node id="5" lat="43.0020" lon="-87.9990"/>
+  <node id="6" lat="43.0010" lon="-87.9980"/>
+  <node id="7" lat="43.0030" lon="-87.9990"/>
+  <node id="8" lat="43.0040" lon="-87.9990"/>
+  <node id="9" lat="43.0000" lon="-87.9970"/>
+  <node id="10" lat="43.0000" lon="-87.9960"/>
+
+  <!-- Generic vehicle oneway is deliberately walkable in both directions. -->
+  <way id="100">
+    <nd ref="1"/><nd ref="2"/>
+    <tag k="highway" v="residential"/><tag k="oneway" v="yes"/>
+  </way>
+  <!-- Parallel pedestrian edge must be retained under its own stable way ID. -->
+  <way id="101">
+    <nd ref="1"/><nd ref="2"/>
+    <tag k="highway" v="footway"/>
+  </way>
+  <way id="102">
+    <nd ref="2"/><nd ref="3"/>
+    <tag k="highway" v="footway"/><tag k="foot" v="no"/>
+  </way>
+  <way id="103">
+    <nd ref="2"/><nd ref="4"/>
+    <tag k="highway" v="steps"/>
+  </way>
+  <way id="104">
+    <nd ref="4"/><nd ref="6"/>
+    <tag k="highway" v="residential"/><tag k="access" v="private"/>
+    <tag k="foot" v="designated"/>
+  </way>
+  <way id="105">
+    <nd ref="3"/><nd ref="6"/>
+    <tag k="highway" v="motorway"/>
+  </way>
+  <way id="106">
+    <nd ref="4"/><nd ref="5"/>
+    <tag k="highway" v="residential"/><tag k="oneway:foot" v="yes"/>
+  </way>
+  <way id="107">
+    <nd ref="5"/><nd ref="7"/>
+    <tag k="highway" v="residential"/>
+    <tag k="foot:forward" v="no"/><tag k="foot:backward" v="yes"/>
+  </way>
+  <way id="108">
+    <nd ref="7"/><nd ref="8"/>
+    <tag k="highway" v="residential"/><tag k="area" v="yes"/>
+  </way>
+  <way id="109">
+    <nd ref="3"/><nd ref="9"/>
+    <tag k="highway" v="construction"/>
+  </way>
+  <way id="110">
+    <nd ref="9"/><nd ref="10"/>
+    <tag k="highway" v="residential"/><tag k="access" v="private"/>
+  </way>
+  <!-- Node 3 sits exactly on the synthetic clip boundary. -->
+  <way id="111">
+    <nd ref="6"/><nd ref="3"/>
+    <tag k="highway" v="service"/>
+  </way>
+  <way id="112">
+    <nd ref="7"/><nd ref="8"/>
+    <tag k="highway" v="abandoned"/>
+  </way>
+  <way id="113">
+    <nd ref="7"/><nd ref="8"/>
+    <tag k="highway" v="path"/><tag k="oneway:foot" v="-1"/>
+  </way>
+  <way id="114">
+    <nd ref="8"/><nd ref="6"/>
+    <tag k="highway" v="path"/>
+    <tag k="foot:forward" v="yes"/><tag k="foot:backward" v="private"/>
+  </way>
+</osm>

@@ -81,26 +81,32 @@ EPSG:4326.
 ## food_resources
 
 - id
-- name
-- resource_type
-- subtype
-- address
-- city
-- zip
-- latitude
-- longitude
-- geometry
-- full_service_grocery
-- snap_authorized
-- hours_json
-- eligibility
-- website
-- phone
 - source_id
 - source_record_id
+- canonical_resource_key
+
+`food_resources` holds stable source identity. Display and validity fields belong to immutable
+resource versions.
+
+## food_resource_versions
+
+- id
+- resource_id
+- snapshot_id
+- version_fingerprint
+- category
+- name (nullable when the source is blank)
+- address, city, postal_code, website, phone, hours
+- geometry and coordinate_status
+- verification_status and classification_evidence
+- full_service_grocery and snap_authorized
+- active (nullable when the source does not establish activity)
+- valid_from and valid_to
 - verified_at
-- verification_status
-- active
+
+Historical identity is resource, source snapshot, and the validity interval with null endpoints
+treated as values. Source-derived `verified` classification does not require an invented
+`verified_at`; override and verified-context states do.
 
 ## access_metrics
 
@@ -115,6 +121,17 @@ EPSG:4326.
 - vehicle_access_indicator
 - calculation_version
 - calculated_at
+
+The physical tables are `food_access_metric_values` and
+`food_access_metric_snapshots`. Each scalar metric value links every contributing immutable
+snapshot. Context counts use distinct 10-, 15-, and 20-minute slugs and remain outside scoring.
+
+## food_scores
+
+Food score rows link the Plan 3 run, canonical geography, and exact Equity Baseline score. They
+store both domain scores, raw and percentile Food Access Need, both bands, Priority, quality
+status, and `exclusion_reasons`. The reasons remain present for insufficient and zero-population
+rows even though their analytical values are null.
 
 ## score_runs
 
@@ -189,6 +206,30 @@ must introduce its own reviewed lifecycle migration rather than bypass this trig
 other deterministic inputs for one run. `output_hash` identifies the canonical scored output.
 An existing fingerprint is reused; `--verify-existing` also requires a matching independently
 recomputed output hash.
+
+## Plan 3 integrity and lifecycle
+
+Migration `0002_food_equity.sql` introduces stable resources, immutable resource versions,
+scalar access metrics, many-to-many snapshot lineage, Food score runs, components, and scores.
+Forward-only migration `0003_food_equity_contract_amendment.sql` makes source-blank names and
+unknown activity nullable, changes resource-version identity to include both validity endpoints
+with `NULLS NOT DISTINCT`, adds dated-verification checks, and requires structured score
+exclusion reasons.
+
+Foreign keys prevent resource/source, version/resource, version/snapshot, metric/geography,
+metric/snapshot, component/run, component/geography, score/run, score/geography, and pinned
+baseline orphans. Resource geometry is a non-empty EPSG:4326 point only when the coordinate state
+supports one. Metric state/value and quality checks preserve observed zero, unreachable, and
+missing as different facts. The production write plan reconciles a 302-by-10 persisted metric
+grid, a 302-by-4 scoring grid, all metric/snapshot links, 1,196 components, and 302 scores before
+validation. The exact Food score shape is 299 complete, one attributable `insufficient_data`, and
+two `ineligible_zero_population` rows.
+
+The separate Food lifecycle permits only `draft -> validated` and `draft -> failed`; it contains
+no `published` value. Each run pins the exact validated Equity Baseline ID and output hash. Base
+records are conflict-safe and reusable, while analytical rows and the lifecycle transition share
+one transaction. A failed transaction leaves no partial draft. A pre-existing draft may be
+marked failed only through the guarded, redacted repository path.
 
 ## public_investments
 

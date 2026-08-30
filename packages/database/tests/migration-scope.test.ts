@@ -72,3 +72,98 @@ describe("Plan 2 equity-baseline migration scope", () => {
     expect(migration).toMatch(/CREATE TRIGGER score_runs_plan2_transition_trigger/i);
   });
 });
+
+describe("Plan 3 food-equity migration scope", () => {
+  it("creates exactly the approved food-equity tables", async () => {
+    const migrationDirectory = fileURLToPath(new URL("../drizzle", import.meta.url));
+    const migrationName = (await readdir(migrationDirectory)).find((name) =>
+      name.endsWith("_food_equity.sql"),
+    );
+
+    expect(migrationName).toBeDefined();
+    const migration = await readFile(`${migrationDirectory}/${migrationName}`, "utf8");
+    const tableNames = [...migration.matchAll(/CREATE TABLE "([a-z_]+)"/g)].map(
+      ([, tableName]) => tableName,
+    );
+
+    expect(tableNames.sort()).toEqual([
+      "food_access_metric_snapshots",
+      "food_access_metric_values",
+      "food_resource_versions",
+      "food_resources",
+      "food_score_components",
+      "food_score_runs",
+      "food_scores",
+    ]);
+    expect(migration).not.toMatch(/CREATE TABLE "public_investments"/i);
+  });
+
+  it("enforces lineage, geometry, output, and closed lifecycle invariants", async () => {
+    const migrationDirectory = fileURLToPath(new URL("../drizzle", import.meta.url));
+    const migrationName = (await readdir(migrationDirectory)).find((name) =>
+      name.endsWith("_food_equity.sql"),
+    );
+
+    expect(migrationName).toBeDefined();
+    const migration = await readFile(`${migrationDirectory}/${migrationName}`, "utf8");
+
+    expect(migration).toMatch(/geometry\(point,4326\)/i);
+    expect(migration).toContain("food_resource_versions_geometry_gist");
+    expect(migration).toContain("food_resource_versions_geometry_srid_check");
+    expect(migration).toContain("food_resource_versions_geometry_not_empty_check");
+    expect(migration).toContain("food_access_metric_values_value_state_check");
+    expect(migration).toContain("food_access_metric_values_quality_check");
+    expect(migration).toContain("food_score_runs_equity_baseline_run_id_score_runs_id_fk");
+    expect(migration).toContain("food_score_components_metric_value_geography_fk");
+    expect(migration).toContain("food_scores_equity_baseline_score_geography_fk");
+    expect(migration).toContain("food_scores_output_quality_check");
+    expect(migration).toMatch(/CREATE OR REPLACE FUNCTION enforce_plan3_food_score_run_transition/i);
+    expect(migration).toMatch(/TG_OP = 'INSERT'.*NEW\.status <> 'draft'/s);
+    expect(migration).toMatch(/OLD\.status = 'draft'.*NEW\.status IN \('validated', 'failed'\)/s);
+    expect(migration).not.toMatch(/food_score_run_status[^;]*(published|superseded)/i);
+    expect(migration).not.toMatch(/public[_ ]investment/i);
+  });
+});
+
+describe("Plan 3 food-equity contract amendment", () => {
+  it("applies the approved nullable, identity, verification, and score-provenance changes", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0003_food_equity_contract_amendment.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+
+    expect(migration).toMatch(
+      /ALTER TABLE "food_resource_versions" ALTER COLUMN "name" DROP NOT NULL/i,
+    );
+    expect(migration).toMatch(
+      /ALTER TABLE "food_resource_versions" ALTER COLUMN "active" DROP NOT NULL/i,
+    );
+    expect(migration).toContain("DROP CONSTRAINT \"food_resource_versions_resource_snapshot_unique\"");
+    expect(migration).toMatch(
+      /food_resource_versions_identity_unique[\s\S]*UNIQUE NULLS NOT DISTINCT\s*\("resource_id","snapshot_id","valid_from","valid_to"\)/i,
+    );
+    expect(migration).toMatch(
+      /verification_status" NOT IN \('override_verified', 'verified_context'\)[\s\S]*verified_at" IS NOT NULL/i,
+    );
+    expect(migration).toMatch(
+      /ADD COLUMN "exclusion_reasons" jsonb[\s\S]*ALTER COLUMN "exclusion_reasons" SET NOT NULL/i,
+    );
+    expect(migration).toContain(
+      "cannot amend existing incomplete food_scores without source-backed exclusion reasons",
+    );
+    expect(migration).toMatch(/jsonb_array_length[\s\S]*quality_status/i);
+    expect(migration).toContain("food_scores_exclusion_reasons_check");
+    expect(migration).not.toMatch(/DROP TABLE|DROP TYPE/i);
+
+    const journalPath = fileURLToPath(new URL("../drizzle/meta/_journal.json", import.meta.url));
+    const journal = JSON.parse(await readFile(journalPath, "utf8")) as {
+      entries: {idx: number; tag: string}[];
+    };
+    expect(journal.entries.map(({idx, tag}) => ({idx, tag}))).toEqual([
+      {idx: 0, tag: "0000_enable_postgis"},
+      {idx: 1, tag: "0001_equity_baseline"},
+      {idx: 2, tag: "0002_food_equity"},
+      {idx: 3, tag: "0003_food_equity_contract_amendment"},
+    ]);
+  });
+});

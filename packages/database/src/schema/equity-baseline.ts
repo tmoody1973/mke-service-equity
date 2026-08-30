@@ -21,7 +21,7 @@ import {
 
 const analyticalNumeric = {precision: 15, scale: 12} as const;
 
-const postgisGeometry = customType<{
+export const postgisGeometry = customType<{
   data: string;
   driverData: string;
   config: {type: "MultiPolygon" | "Point"; srid: 4326};
@@ -410,6 +410,7 @@ export const scores = pgTable(
       foreignColumns: [geographies.id],
     }).onDelete("restrict"),
     unique("scores_run_geography_unique").on(table.scoreRunId, table.geographyId),
+    unique("scores_id_geography_unique").on(table.id, table.geographyId),
     check(
       "scores_numeric_range_check",
       sql`(${table.demographicScore} IS NULL OR ${table.demographicScore} BETWEEN 0 AND 100)

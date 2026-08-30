@@ -24,7 +24,7 @@ Never silently substitute a lower-quality source because it is easier to query.
 | Transit | MCTS GTFS | Stops/routes/frequency |
 | City GIS/assets | Map Milwaukee | Local geography/assets |
 | County GIS/assets | Milwaukee County Open Data | County assets/parcels |
-| Emergency food | Hunger Task Force / trusted partner export | Food resource inventory |
+| Emergency food | Hunger Task Force / trusted partner structured export; Milwaukee Food Council/Data You Can Use layer as stale development context | Food resource inventory |
 
 ## Partner data
 
@@ -82,3 +82,95 @@ Every committed manifest must retain publisher, dataset version, retrieval times
 URL without credentials, checksum, byte size, row/feature count, schema fingerprint, license,
 methodology reference, and sanitized request metadata. Raw responses and normalized records are
 not source-registry documentation and must remain ignored.
+
+## Food Access Need v1 approved lock (MOO-753)
+
+The complete proposed contract is
+[`2026-08-29-moo-753-food-equity-design.md`](../superpowers/specs/2026-08-29-moo-753-food-equity-design.md).
+Tarik explicitly approved this source and methodology contract on 2026-08-29 and approved the
+lossless source/schema amendment on 2026-08-29. Executable Plan 3 registry work must implement the
+approved contract without silent source substitution.
+
+### Scoring sources
+
+| Key | Publisher and exact version | Structured artifact | Approved scoring fields/use |
+|---|---|---|---|
+| `sram` | USDA ERS 2025 SNAP-authorized Retailer Access Map; updated 2026-07-27 | `https://www.ers.usda.gov/media/29395/2025-snap-authorized-retailer-access-map-sram-data.zip?v=81233` | `CensusTract20`, `DD_SRAM_lapop1`, `DD_SRAM_lapop1share`; one-driving-mile SNAP access benchmark |
+| `snap_retailers` | USDA FNS historical SNAP retailer locator, current through 2025-12-31 | `https://fns-prod.azureedge.us/sites/default/files/resource-files/snap-retailer-locator-data2005-2025.zip` | Record ID, official store type, location, authorization/end dates; active retailer inventory and full-service evidence |
+| `acs_vehicle` | 2024 ACS 5-Year Detailed Tables, group `B08201` | `https://api.census.gov/data/2024/acs/acs5` | `B08201_001E/M` total households and `B08201_002E/M` no vehicle available |
+| `tract_origins` | 2020 Census tract mean centers of population, Wisconsin | `https://www2.census.gov/geo/docs/reference/cenpop2020/tract/CenPop2020_Mean_TR55.txt` | State `55`, county `079`; deterministic population-weighted access origin |
+| `mcts_gtfs` | Current MCTS static GTFS snapshot at execution | `https://kamino.mcts.org/gtfs/google_transit.zip` | Stops and scheduled unique trip departures; exact bytes, retrieval time, feed validity range, and analysis dates are manifested |
+| `walking_network` | Geofabrik/OpenStreetMap Wisconsin 2026-08-27 PBF | `https://download.geofabrik.de/north-america/us/wisconsin-260827.osm.pbf` | Pedestrian-permitted network clipped to Milwaukee County plus two miles; published MD5 `87c18ce0608499afd91ed0f2a5ee8eef`, plus computed SHA-256 |
+| `equity_baseline` | Approved Equity Baseline v1 development run | database run `502e2a04-b013-53cd-8b09-c9144862701a` | Validated, verified, unpublished run ID, output hash, band, and lineage for Priority lookup |
+
+The MCTS feed is validated with MobilityData GTFS Validator `v8.0.1`; the pinned CLI JAR SHA-256
+is `19293ddd9b6f954f216d4f12054bd8a3232921751c4484339e339764a91000e2`. Walking-network
+processing pins `osmium==4.3.1` and `networkx==3.6.1`.
+
+`snap_retailers` is not a complete inventory of non-SNAP food retail. FNS `Supermarket` and
+`Large Grocery Store` qualify as full-service in v1. `Super Store` requires a recorded
+non-membership/non-restricted evidence override. No store is classified by name alone.
+
+The pinned FNS archive contract is exact:
+
+- archive `snap-retailer-locator-data2005-2025.zip`, SHA-256
+  `872a6f814a63514a1f1b0c4517a90309a9fbb01d97d6e4dbb1e8b20421c08cce`;
+- sole member `Historical SNAP Retailer Locator Data 2005-2025.csv`, SHA-256
+  `4af9a16811b7d906a2ad077eb59d3f1c7e99a32a87d2bca0900f8d14033c7b9e`;
+- UTF-8 BOM, exact 15-field registry header/order, 703,441 data rows, and snapshot date
+  2025-12-31;
+- `Record ID` as stable retailer identity and (`Record ID`, `Authorization Date`, `End Date`) as
+  historical version identity; duplicate version keys fail validation.
+
+The classification registry uses only exact values observed in that member. This includes
+`Super Store`, `Bakery Specialty`, `Fruits/Veg Specialty`, `Meat/Poultry Specialty`,
+`Seafood Specialty`, and ASCII `Farmers' Market`. `Food Buying Co-op`, `Wholesaler`, and `Unknown`
+are explicitly `unverified`, contextual, and non-scoring. Unobserved source-label aliases are not
+accepted silently.
+
+### Context-only source
+
+| Key | Publisher and version | Structured artifact | Status and use |
+|---|---|---|---|
+| `emergency_food_context` | Milwaukee Food Council/Data You Can Use `EmergencyFood_MKE_2024`; data edited 2024-08-07, schema/layer edited 2024-08-27 | `https://services5.arcgis.com/3kr3fkJcIf6EOY6g/ArcGIS/rest/services/EmergencyFood_MKE/FeatureServer/0` | `stale_unverified_context` in non-public development only; no score effect; public redistribution blocked pending partner-confirmed terms and freshness |
+
+Emergency-food and public-investment artifacts are outside the Food score-input fingerprint.
+They cannot change the Food Access Need score, band, or Food Equity Priority. Missing hours remain
+missing; narrative notes are not parsed into operating schedules.
+
+Contextual walking counts use separate 10-, 15-, and 20-minute metric slugs for grocery and
+emergency-food inventories because the database metric value is scalar. These six observations
+are never scoring inputs. Unknown emergency-resource activity remains null and makes the related
+context observation missing or conflicting; it is never coerced to inactive or to an observed
+zero. Missing source names also remain null.
+
+### Source-specific validation
+
+- Every source snapshot records exact bytes or sanitized request metadata, SHA-256, byte size,
+  schema fingerprint, row/feature count, retrieval time, validity interval, and license/terms.
+- SRAM must use `DD_SRAM_lapop1share` as percentage points; its low-income and vehicle-combined
+  flags are not v1 scoring inputs.
+- FNS dates and status are parsed strictly. Unknown status never becomes active, and duplicate
+  (`Record ID`, `Authorization Date`, `End Date`) version keys fail validation.
+- FNS source-derived `verified` classifications retain source and rule evidence without inventing
+  a verification timestamp. Dated timestamps remain mandatory for manual/partner overrides and
+  verified context events.
+- The OSM artifact is immutable; `wisconsin-latest.osm.pbf` is prohibited.
+- GTFS must pass the pinned validator and cover both explicit analysis dates. MCTS retrieval/last-
+  update and valid-through dates must appear with any representation, along with the required
+  not-sponsored/not-operated statement.
+- Census API keys are never stored in URLs, manifests, logs, fixtures, or committed files.
+
+### Operational source resolution
+
+Live acquisition resolves the exact local PBF, reviewed classification evidence, and GTFS
+Validator JAR through the environment names in the ingestion guide. Those paths and the evidence
+checksum are runtime configuration, not source substitutions. The pipeline validates each local
+artifact against its separately approved identity before making a new bundle pointer.
+
+The Food bundle contains exactly seven persisted source manifests: SRAM, FNS retailers, ACS
+vehicle access, tract origins, MCTS GTFS, walking network, and emergency-food context.
+Classification evidence has its own immutable manifest and fingerprint because it is verification
+evidence rather than a source metric. The Plan 2 TIGER snapshot remains separate canonical
+geography lineage and must match the Food fetch pointer. No stage may resolve a source by
+`latest`, substitute a fixture, or accept a caller-provided geography predicate.

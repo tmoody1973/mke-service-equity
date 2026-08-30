@@ -15,6 +15,20 @@
       "when": 1787900111680,
       "tag": "0001_equity_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788032574055,
+      "tag": "0002_food_equity",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788051221521,
+      "tag": "0003_food_equity_contract_amendment",
+      "breakpoints": true
     }
   ]
 }

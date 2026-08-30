@@ -1,0 +1,3 @@
+route_id,agency_id,route_short_name,route_long_name,route_type
+R2,MCTS,2,Synthetic Crosstown,3
+R1,MCTS,1,Synthetic Mainline,3

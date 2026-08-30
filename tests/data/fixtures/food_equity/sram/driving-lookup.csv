@@ -1,0 +1,3 @@
+Field,LongName,Description
+DD_SRAM_lapop1,"Driving Distance, SNAP-authorized Retailer Access Map, Low access, population at 1 mile, number","Population count beyond 1 mile from SNAP-authorized foodstore, calculated using driving (network-based) distance"
+DD_SRAM_lapop1share,"Driving Distance, SNAP-authorized Retailer Access Map, Low access, population at 1 mile, share","Share of tract population that are beyond 1 mile from SNAP-authorized foodstore, calculated using driving (network-based) distance"

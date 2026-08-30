@@ -1,0 +1,45 @@
+{
+  "artifact": "wisconsin-260827.osm.pbf",
+  "source_sha256": "3e4a59bae5e7eb0f6f175a8645b3b2be16c276a5082f3732566d4e3aeaee6842",
+  "graph_sha256": "a7e4bf2230e4b38cc5126d45c16f96270814bfd48caa15f698c81d5d580e17fa",
+  "graph_node_count": 623268,
+  "directed_edge_count": 1557006,
+  "projected_crs": "EPSG:3071",
+  "clip_rule": "both_osm_segment_endpoints_covered_by_inclusive_milwaukee_county_plus_3218.688m_predicate",
+  "verified_on": "2026-08-29",
+  "routes": [
+    {
+      "route_id": "downtown",
+      "origin_wgs84": [-87.9099, 43.0416],
+      "destination_wgs84": [-87.9067, 43.0344],
+      "origin_node_id": 806809572,
+      "destination_node_id": 5583388579,
+      "origin_snap_m": "13.562375274429577477628903693124351926374360751566",
+      "destination_snap_m": "3.4024778686754719105475365428683018829394052404711",
+      "network_distance_m": "951.9137492987109242",
+      "directed_edge_count": 84
+    },
+    {
+      "route_id": "north_side",
+      "origin_wgs84": [-87.9407, 43.0603],
+      "destination_wgs84": [-87.9473, 43.0673],
+      "origin_node_id": 12961460378,
+      "destination_node_id": 7967094123,
+      "origin_snap_m": "21.042080387454737386000038426470769761537796227244",
+      "destination_snap_m": "1.0430581404287493490612968111631410417986371267898",
+      "network_distance_m": "1040.5783979324663608",
+      "directed_edge_count": 40
+    },
+    {
+      "route_id": "west_allis",
+      "origin_wgs84": [-88.0, 43.0167],
+      "destination_wgs84": [-87.9888, 43.015],
+      "origin_node_id": 5865529481,
+      "destination_node_id": 9503423504,
+      "origin_snap_m": "2.3325938237820458287453212384122059139578666141817",
+      "destination_snap_m": "8.5930661739736913788523681777743348249735738647380",
+      "network_distance_m": "1111.9763321428076578",
+      "directed_edge_count": 56
+    }
+  ]
+}

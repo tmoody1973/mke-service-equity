@@ -95,6 +95,34 @@ Plan 2 can create only `draft`, `validated`, or `failed` runs; it cannot publish
 The authoritative live run and its sanitized manifests are recorded separately
 from the [offline verification](docs/verification/plan-2-data-pipeline-equity-baseline.md).
 
+## Food Equity pipeline
+
+Plan 3 adds the deterministic Food Access Need and Food Equity Priority pipeline. Its executable
+registry is [`pipelines/food_equity/registry.toml`](pipelines/food_equity/registry.toml), while
+formulas and source limits remain authoritative in
+[`docs/methodology/food-equity.md`](docs/methodology/food-equity.md). The closed command boundary
+is:
+
+```bash
+uv run python -m pipelines.food_equity fetch
+uv run python -m pipelines.food_equity validate
+uv run python -m pipelines.food_equity normalize
+uv run python -m pipelines.food_equity classify
+uv run python -m pipelines.food_equity accessibility
+uv run python -m pipelines.food_equity load
+uv run python -m pipelines.food_equity score
+uv run python -m pipelines.food_equity validate-run
+uv run python -m pipelines.food_equity run --through validated --verify-existing
+```
+
+`fetch` requires the Census key plus paths to the exact reviewed walking-network PBF,
+classification-evidence file, and pinned GTFS Validator JAR. Database stages require a confirmed
+disposable branch, `MKE_PIPELINE_ENV=development`, and server-only `DATABASE_URL_UNPOOLED`. The
+pipeline preserves exact snapshots, rebuilds stage-only commands from immutable manifests, and
+can create only `draft`, `validated`, or `failed` development runs. It cannot publish. See the
+[ingestion guide](docs/data/ingestion.md), [database guide](docs/development/database.md), and
+[Plan 3 verification record](docs/verification/plan-3-food-data-accessibility-priority.md).
+
 ## License
 
 Original project code and documentation are licensed under the [MIT License](LICENSE).

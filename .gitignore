@@ -34,6 +34,9 @@ __pycache__/
 .mypy_cache/
 .uv-cache/
 
+# Local external validators. Versions and checksums are documented; binaries are not committed.
+.tools/
+
 # Generated local data. Source data is never committed in Plan 1.
 data/raw/
 data/interim/

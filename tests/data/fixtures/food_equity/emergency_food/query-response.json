@@ -1,0 +1,209 @@
+{
+  "objectIdFieldName": "ObjectID",
+  "uniqueIdField": {
+    "name": "ObjectID",
+    "isSystemMaintained": true
+  },
+  "globalIdFieldName": "",
+  "geometryType": "esriGeometryPoint",
+  "spatialReference": {
+    "wkid": 4326,
+    "latestWkid": 4326
+  },
+  "fields": [
+    {
+      "name": "ObjectID",
+      "type": "esriFieldTypeOID",
+      "alias": "ObjectID"
+    },
+    {
+      "name": "USER_Company_Business_Name",
+      "type": "esriFieldTypeString",
+      "alias": "Company/Business Name"
+    },
+    {
+      "name": "USER_Address",
+      "type": "esriFieldTypeString",
+      "alias": "Address"
+    },
+    {
+      "name": "USER_City",
+      "type": "esriFieldTypeString",
+      "alias": "City"
+    },
+    {
+      "name": "USER_Zip_Code",
+      "type": "esriFieldTypeDouble",
+      "alias": "Zip Code"
+    },
+    {
+      "name": "USER_Phone_Number",
+      "type": "esriFieldTypeString",
+      "alias": "Phone Number"
+    },
+    {
+      "name": "USER_Type",
+      "type": "esriFieldTypeString",
+      "alias": "Type"
+    },
+    {
+      "name": "USER_Notes",
+      "type": "esriFieldTypeString",
+      "alias": "Notes"
+    },
+    {
+      "name": "USER_Website",
+      "type": "esriFieldTypeString",
+      "alias": "Website"
+    },
+    {
+      "name": "USER_Service_Area",
+      "type": "esriFieldTypeString",
+      "alias": "Service Area"
+    }
+  ],
+  "features": [
+    {
+      "attributes": {
+        "ObjectID": 101,
+        "USER_Company_Business_Name": "Community Food Bank",
+        "USER_Address": "100 W North Ave",
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": 53212.0,
+        "USER_Phone_Number": "414-555-0101",
+        "USER_Type": "Food Bank",
+        "USER_Notes": "Warehouse distribution only.",
+        "USER_Website": "https://example.test/bank",
+        "USER_Service_Area": "Milwaukee County"
+      },
+      "geometry": {
+        "x": -87.9065,
+        "y": 43.0601
+      }
+    },
+    {
+      "attributes": {
+        "ObjectID": 102,
+        "USER_Company_Business_Name": "Neighborhood Pantry",
+        "USER_Address": "2000 S 5th St",
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": 53204.0,
+        "USER_Phone_Number": "414-555-0102",
+        "USER_Type": "Food Pantry",
+        "USER_Notes": "Open Mondays 9 a.m.-noon; bring identification and proof of address.",
+        "USER_Website": null,
+        "USER_Service_Area": "Residents of ZIP codes 53204 and 53215"
+      },
+      "geometry": {
+        "x": -87.9162,
+        "y": 43.0089
+      }
+    },
+    {
+      "attributes": {
+        "ObjectID": 103,
+        "USER_Company_Business_Name": "Recovery Pantry",
+        "USER_Address": "300 W Center St",
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": 53212.0,
+        "USER_Phone_Number": "414-555-0103",
+        "USER_Type": "Food Pantry and Recovery",
+        "USER_Notes": "Recovery program participants and neighbors may visit.",
+        "USER_Website": "https://example.test/recovery",
+        "USER_Service_Area": "North side neighborhoods"
+      },
+      "geometry": {
+        "x": -87.914,
+        "y": 43.068
+      }
+    },
+    {
+      "attributes": {
+        "ObjectID": 104,
+        "USER_Company_Business_Name": "Community Meal Hall",
+        "USER_Address": "400 E Wisconsin Ave",
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": 53202.0,
+        "USER_Phone_Number": "414-555-0104",
+        "USER_Type": "Meal Program",
+        "USER_Notes": "Evening meal service.",
+        "USER_Website": "https://example.test/meals",
+        "USER_Service_Area": "No geographic restriction stated"
+      },
+      "geometry": {
+        "x": -87.902,
+        "y": 43.039
+      }
+    },
+    {
+      "attributes": {
+        "ObjectID": 105,
+        "USER_Company_Business_Name": "Mobile Distribution Route",
+        "USER_Address": null,
+        "USER_City": null,
+        "USER_Zip_Code": 0.0,
+        "USER_Phone_Number": null,
+        "USER_Type": "Food Pantry",
+        "USER_Notes": "Call for the next mobile distribution location.",
+        "USER_Website": null,
+        "USER_Service_Area": null
+      },
+      "geometry": null
+    },
+    {
+      "attributes": {
+        "ObjectID": 106,
+        "USER_Company_Business_Name": "Shared Service Site",
+        "USER_Address": "900 W Center St",
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": 53206.0,
+        "USER_Phone_Number": null,
+        "USER_Type": "Food Pantry",
+        "USER_Notes": "Partner listing A.",
+        "USER_Website": null,
+        "USER_Service_Area": "Milwaukee"
+      },
+      "geometry": {
+        "x": -87.923,
+        "y": 43.067
+      }
+    },
+    {
+      "attributes": {
+        "ObjectID": 107,
+        "USER_Company_Business_Name": "shared service site",
+        "USER_Address": "900 w center st",
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": 53206.0,
+        "USER_Phone_Number": null,
+        "USER_Type": "Meal Program",
+        "USER_Notes": "Partner listing B.",
+        "USER_Website": null,
+        "USER_Service_Area": "Milwaukee"
+      },
+      "geometry": {
+        "x": -87.923,
+        "y": 43.067
+      }
+    },
+    {
+      "attributes": {
+        "ObjectID": 108,
+        "USER_Company_Business_Name": null,
+        "USER_Address": null,
+        "USER_City": "Milwaukee",
+        "USER_Zip_Code": null,
+        "USER_Phone_Number": null,
+        "USER_Type": null,
+        "USER_Notes": null,
+        "USER_Website": null,
+        "USER_Service_Area": null
+      },
+      "geometry": {
+        "x": -190.0,
+        "y": 43.0
+      }
+    }
+  ],
+  "exceededTransferLimit": false
+}

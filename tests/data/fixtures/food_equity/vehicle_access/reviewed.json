@@ -1,0 +1,7 @@
+{
+  "denominator": ["100", "6"],
+  "geoid": "55079000101",
+  "numerator": ["50", "10"],
+  "expected_value": "50",
+  "expected_moe_radicand": "91"
+}

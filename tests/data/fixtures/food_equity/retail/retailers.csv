@@ -1,0 +1,23 @@
+﻿Record ID,Store Name,Store Type,Street Number,Street Name,Additional Address,City,State,Zip Code,Zip4,County,Latitude,Longitude,Authorization Date,End Date
+R-100,Fresh Market,Supermarket,100,W Greenfield Ave,,Milwaukee,WI,53204,,Milwaukee,43.015,-87.950,5/8/2006,
+R-101,Large Market,Large Grocery Store,200,W National Ave,Suite 1,Milwaukee,WI,53204,1234,Milwaukee,43.020,-87.940,3/1/2016,
+R-102,Open Super Center,Super Store,300,W North Ave,,Milwaukee,WI,53212,,Milwaukee,43.060,-87.930,1/2/2020,
+R-103,Members Club,Super Store,400,W Capitol Dr,,Milwaukee,WI,53206,,Milwaukee,43.090,-87.960,1/2/2020,
+R-104,Neighborhood Supermarket Name,Convenience Store,500,W Center St,,Milwaukee,WI,53210,,Milwaukee,43.070,-87.970,2/3/2021,
+R-105,Medium Market,Medium Grocery Store,600,S Cesar E Chavez Dr,,Milwaukee,WI,53204,,Milwaukee,43.010,-88.100,2/3/2021,
+R-106,Seasonal Stand,Farmers' Market,700,E Locust St,,Milwaukee,WI,53212,,Milwaukee,43.070,-87.900,4/1/2025,
+R-107,Delivery Foods,Delivery Route,,,,Milwaukee,WI,53202,,Milwaukee,,,7/1/2020,
+R-108,Closed Grocery,Supermarket,800,W Fond du Lac Ave,,Milwaukee,WI,53205,,Milwaukee,43.050,-87.950,1/1/2010,12/31/2025
+R-109,Bad Date Grocery,Supermarket,900,W Lisbon Ave,,Milwaukee,WI,53208,,Milwaukee,43.050,-87.980,2020-01-01,
+R-110,,,,,,,WI,,,Milwaukee,,,,
+R-111,Outside Grocery,Supermarket,1000,Far Away Rd,,Milwaukee,WI,53202,,Milwaukee,43.070,-89.390,1/1/2020,
+R-112,Invalid Coordinate Grocery,Supermarket,1100,W Oklahoma Ave,,Milwaukee,WI,53215,,Milwaukee,143.000,-87.930,1/1/2020,
+R-113,Reopened Grocery,Supermarket,1200,W Burleigh St,,Milwaukee,WI,53210,,Milwaukee,43.075,-87.955,1/1/2010,6/30/2020
+R-113,Reopened Grocery,Supermarket,1200,W Burleigh St,,Milwaukee,WI,53210,,Milwaukee,43.075,-87.955,7/1/2020,
+R-114,Live Source Super Store,Super Store,1300,W Vliet St,,Milwaukee,WI,53205,,Milwaukee,43.048,-87.965,1/1/2020,
+R-115,SUPERMARKET SUPER STORE,Food Buying Co-op,1400,S 1st St,,Milwaukee,WI,53204,,Milwaukee,43.010,-87.910,1/1/2020,
+R-116,Base Commissary,Military Commissary,1500,S Restricted Rd,,Milwaukee,WI,53207,,Milwaukee,42.990,-87.900,1/1/2020,
+R-117,Wholesale Market,Wholesaler,,,,Milwaukee,WI,53202,,Milwaukee,,,1/1/2020,
+R-118,Bread Shop,Bakery Specialty,1600,N Bakery St,,Milwaukee,WI,53212,,Milwaukee,43.065,-87.925,1/1/2020,
+R-119,Unclassified Market,Unknown,1700,N Unknown St,,Milwaukee,WI,53212,,Milwaukee,43.066,-87.926,1/1/2020,
+R-120,Out Of Area Grocery,Supermarket,1800,State St,,Madison,WI,53703,,Dane,43.070,-89.380,1/1/2020,
