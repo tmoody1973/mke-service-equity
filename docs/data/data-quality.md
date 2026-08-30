@@ -68,3 +68,16 @@ metadata, primary snapshot, and exact set of contributing source snapshots. Befo
 validate, database reconciliation proves that persisted fingerprints, lineage pairs, components,
 and scores equal the reviewed in-memory write plan. Context metrics may later be displayed with
 their warnings, but are prohibited from the scoring adapter and score-input fingerprint.
+
+## Neighborhood-reference quality boundary
+
+Neighborhood context comes only from a manifested snapshot of the approved City of Milwaukee DCD
+reference. It is not an official City or neighborhood-association boundary, is not maintained on
+an ongoing basis, and does not cover all Milwaukee County municipalities. The UI must carry those
+limitations anywhere the names or boundaries could be interpreted as authoritative jurisdiction.
+
+PostGIS retains exact positive-area overlaps and City-reference coverage. Percentages describe
+polygon area within the portion covered by the City reference, not population, identity,
+membership, or service jurisdiction. Sub-1% boundary slivers may be grouped for display but remain
+auditable. Missing coverage is never converted into a nearest, centroid-selected, or ZIP-inferred
+neighborhood.

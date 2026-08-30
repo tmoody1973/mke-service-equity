@@ -344,11 +344,18 @@ git commit -m "test: verify MOO-754 first atlas slice"
 
 ### Task 14: Decide and implement address/neighborhood authority
 
-- [ ] Document candidate provider terms, privacy, limits, attribution, production suitability, and
+- [x] Approve the City of Milwaukee DCD Neighborhood Identification Project snapshot as the
+  City-published neighborhood reference, with its non-official, association-boundary, freshness,
+  and City-only limitations recorded.
+- [x] Approve deterministic PostGIS tract-overlap, coverage, display-threshold, ordering, and
+  plain-language labeling rules without centroid or ZIP inference.
+- [ ] Ingest, manifest, validate, and persist the approved neighborhood snapshot and overlap audit
+  rows before enabling neighborhood search or labels.
+- [ ] Document address-provider terms, privacy, limits, attribution, production suitability, and
   failure behavior; obtain approval before sending user queries externally.
 - [ ] Use PostGIS containment for an approved geocoded point.
-- [ ] Enable neighborhood search only with an approved reliable boundary/name source.
-- [ ] If unresolved, retain transparent unavailable copy and close the task without guessing.
+- [ ] Enable neighborhood search only from the persisted approved snapshot; retain transparent
+  unavailable copy if that snapshot or its lineage is not valid.
 
 ### Task 15: Audit and add only approved contextual resource layers
 

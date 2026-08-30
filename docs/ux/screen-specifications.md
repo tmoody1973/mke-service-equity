@@ -48,6 +48,15 @@ Public copy uses “Census tract ID,” defines necessary technical terms, and e
 contributions are not raw percentages, changes over time, causes, or recommendations. Compare and
 download controls are later-plan features, not part of the current profile.
 
+Location context may show municipality, Census ZCTA, and the approved City of Milwaukee
+neighborhood reference as separate concepts. When the City reference covers at least half the
+tract and one neighborhood is a majority of the covered area, use “Mostly in {name}” followed by
+all other reportable overlaps. Otherwise use “Spans {names},” “Partly covered by the City
+neighborhood reference,” or “No City of Milwaukee neighborhood reference for this tract.” Each
+percentage is labeled as an area share of the covered portion, not a population share. An info
+disclosure explains that the City-published reference is not an official or neighborhood-
+association boundary and is not continuously updated.
+
 ## 3. Compare Areas
 
 Support 2–5 tracts.

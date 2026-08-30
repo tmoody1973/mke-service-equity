@@ -174,3 +174,58 @@ Classification evidence has its own immutable manifest and fingerprint because i
 evidence rather than a source metric. The Plan 2 TIGER snapshot remains separate canonical
 geography lineage and must match the Food fetch pointer. No stage may resolve a source by
 `latest`, substitute a fixture, or accept a caller-provided geography predicate.
+
+## Atlas neighborhood reference approval (MOO-754)
+
+Tarik explicitly approved the following source and tract-overlap rule on 2026-08-30. This is a
+context and search contract only. Neighborhood names and overlaps cannot change an Equity
+Baseline score, Food Access Need score, or Food Equity Priority.
+
+| Key | Publisher and reference | Structured artifact | Approved use |
+|---|---|---|---|
+| `milwaukee_dcd_neighborhoods` | City of Milwaukee Department of City Development, Milwaukee Neighborhood Identification Project of 2000; City download catalog last labels the data updated January 2007 | ArcGIS `AGO/neighborhoods/MapServer/0`: `https://milwaukeemaps.milwaukee.gov/arcgis/rest/services/AGO/neighborhoods/MapServer/0` | City-of-Milwaukee neighborhood-reference search, tract context, and optional boundary display only |
+
+The live service exposed 190 polygon features at approval time, with stable source fields
+`NBHD_ID` and `NEIGHBORHD`, source coordinate system EPSG:32054, and attribution to “City of
+Milwaukee DCD and ITMD-GIS.” Ingestion must snapshot the complete response rather than making
+public results depend on the mutable service. The snapshot manifest records the exact query URL,
+retrieval time, SHA-256, byte size, feature count, schema fingerprint, source coordinate system,
+attribution, and the source limitation below. A changed feature count, schema, or duplicate/missing
+identifier fails validation until reviewed.
+
+The City says these boundaries were developed using subdivisions, major streets, physical
+barriers, community participation, housing characteristics, historic areas, and residents'
+opinions. The City also says they are not official City boundaries, do not necessarily match
+neighborhood-association boundaries, and are not updated on an ongoing basis. Therefore public
+copy calls this dataset the **City of Milwaukee neighborhood reference** or **City-published
+neighborhood reference**, never “official neighborhood boundaries.” It covers the City of
+Milwaukee, not every municipality in Milwaukee County. A tract without City-layer coverage shows
+municipality and Census ZCTA context when available and says that no City neighborhood reference
+is available; the application never invents a neighborhood.
+
+### Approved tract-overlap rule
+
+All spatial calculations run in PostGIS in a suitable projected coordinate system; the browser
+does not calculate polygon relationships.
+
+1. Intersect each canonical 2020 Census tract with the unioned, validated City neighborhood
+   snapshot and preserve every positive-area intersection in audit data.
+2. Compute `city_reference_coverage` as covered polygon area divided by tract polygon area.
+   Compute each neighborhood's share using the tract area covered by the City reference as the
+   denominator. These are area shares, not population shares.
+3. Keep exact unrounded values for ordering and audit. Public results show overlaps of at least
+   1.0%; smaller numerical/boundary slivers are combined as “Other boundary slivers” rather than
+   silently reassigned. Sort by unrounded share descending, then normalized neighborhood name and
+   `NBHD_ID` for deterministic ties.
+4. If City-reference coverage is at least 50% and the largest neighborhood is at least 50% of the
+   covered area, say “Mostly in {name}” and list every other reportable overlap. If coverage is at
+   least 50% but no neighborhood has a majority, say “Spans {names}.”
+5. If City-reference coverage is below 50%, do not assign a primary neighborhood. Say “Partly
+   covered by the City neighborhood reference” and list the reportable overlaps. With no positive
+   overlap, say “No City of Milwaukee neighborhood reference for this tract.”
+6. Always explain percentages as “share of the part of this tract covered by the City neighborhood
+   reference.” Never use centroid-only assignment, ZIP-to-neighborhood inference, population
+   inference, or a single forced neighborhood label.
+
+This approval does not approve an address geocoder, a USPS ZIP boundary, or a street-reference
+publication source. Those contracts remain separately gated.

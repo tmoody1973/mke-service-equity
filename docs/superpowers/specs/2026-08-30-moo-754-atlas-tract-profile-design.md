@@ -226,10 +226,22 @@ Address search is implemented only after a structured geocoder/provider and its 
 attribution, privacy behavior, rate limits, and production use are documented. The returned point
 is resolved to a tract with PostGIS containment, not browser point-in-polygon logic.
 
-Neighborhood search is enabled only if an approved, reliable neighborhood boundary/name source
-exists. A colloquial neighborhood is never inferred from a tract name or ZIP code. If address or
-neighborhood authority is unresolved, the UI says what can be searched instead of shipping a
-fake result.
+Neighborhood search and context use the approved City of Milwaukee DCD Neighborhood
+Identification Project reference snapshot. The source is City-published but explicitly not an
+official City or neighborhood-association boundary and is not updated continuously. Public copy
+therefore says “City of Milwaukee neighborhood reference,” exposes the source limitation, and
+never implies that every Milwaukee County tract has a neighborhood label.
+
+PostGIS preserves every positive tract/neighborhood intersection and calculates City-reference
+coverage plus each neighborhood's share of the covered tract area. Public output combines only
+sub-1% numerical/boundary slivers, lists every other overlap, and never forces a single label by
+centroid or ZIP. “Mostly in” is allowed only when the City reference covers at least half of the
+tract polygon and one neighborhood covers at least half of that covered area. Otherwise the UI
+says “Spans,” “Partly covered,” or “No City of Milwaukee neighborhood reference,” as specified in
+the source registry. These area shares are context only and never score inputs.
+
+Address authority remains unresolved. Address search is not enabled until its separate provider,
+terms, attribution, privacy, and production-use review is approved.
 
 ## 6. States, accessibility, and safety
 

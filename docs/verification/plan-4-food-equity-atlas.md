@@ -141,6 +141,9 @@ passes with zero browser console errors.
 
 ## Remaining MOO-754 work
 
-Authoritative tract/ZIP/municipality search, any approved address or neighborhood authority,
-approved contextual resource layers, final performance hardening, and the load-bearing completion
-review remain. No deployment or publication is implied by this verification record.
+The City of Milwaukee DCD neighborhood reference and deterministic tract-overlap rule were
+explicitly approved on 2026-08-30. Snapshot ingestion, lineage validation, server-side overlap
+materialization, neighborhood search/UI, authoritative tract/ZCTA/municipality search, address
+authority, approved contextual resource layers, final performance hardening, and the load-bearing
+completion review remain. The approval does not make the mutable live service a production
+dependency and does not imply deployment or publication.
