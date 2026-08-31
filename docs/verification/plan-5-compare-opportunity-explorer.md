@@ -3,9 +3,9 @@
 ## Status
 
 - Linear issue: `MOO-756`
-- Branch: `codex/moo-756-preview-public-proof`
+- Branch: `codex/moo-756-analysis-documentation`
 - Verification date: 2026-08-31
-- Current checkpoint: Task 15 exact-preview and public fail-closed verification
+- Current checkpoint: Task 16 documentation reconciliation
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -284,4 +284,54 @@ npm run test:e2e -- --grep "Compare Areas|Opportunity Explorer" --workers=1
 # Clean production build and separate public server on port 3012
 npm run build --workspace @mke/web
 npm run test:e2e -- --grep "Analyze public fail-closed" --workers=1
+```
+
+## Task 16 documentation reconciliation
+
+Task 16 reconciled the README and current product, architecture, repository, information
+architecture, screen, accessibility, responsive, data-quality, and verification documents with
+the implemented Plan 5 behavior. The current documentation now records:
+
+- exact `/analyze/compare` and `/analyze/opportunity` routes and canonical URL parameters;
+- exact-run/publication selection and the strict separation from `MOO-768`;
+- server-owned joins, parameterized filtering, ordering, population summaries, and missing-data
+  classification versus browser-owned pending controls and presentation;
+- Compare's 2–5 ordered tract contract, responsive matrix/cards, progressive evidence, and
+  deterministic 20-point/five-item Differences rules;
+- Opportunity's OR-within/AND-across inclusive filters, applied-versus-draft state, missing-filter
+  tri-state rule, canonical order, non-map equivalence, and 1024/1440 layout distinction;
+- 500 KB Compare, 150 KB geometry-free Opportunity, and 1.1 MB shared Atlas GeoJSON caps; and
+- five-width keyboard, Sheet, forced-colors, reduced-motion, target-size, axe, screenshot, exact-
+  preview, and public fail-closed evidence.
+
+Current limitations remain explicit: no governed Food Equity publication exists yet; public
+Analyze therefore shows `no_published_run`. Contextual food sites, public land, and public
+investment are not filters. Address/ZIP/municipality authority remains separately gated. Export
+is Plan 6 work. Published immutable caching remains `MOO-768` work. No ranking, recommendation,
+causal claim, browser analytical GIS, score recalculation, or AI is present.
+
+| Task 16 verification | Result |
+|---|---:|
+| Repository lint | passed |
+| All workspace typechecks | passed |
+| Web tests with four workers / 15-second ceiling | 179 passed |
+| Contracts tests | 84 passed |
+| Database offline tests | 125 passed |
+| Design-system tests | 1 passed |
+| Next.js production build | passed |
+| Production client asset scan | 32 assets, no findings |
+| `git diff --check` | passed |
+
+The first unconstrained `npm run verify` invocation reached all lint/typecheck gates and the test
+phase, where 15 UI tests exceeded Vitest's default five-second timeout under local worker
+contention. The same complete 179-test web suite then passed with the already documented
+four-worker, 15-second ceiling; contracts, database, and design-system suites passed unchanged.
+The production build and bundle scan were rerun after the bounded suite and passed. No application,
+contract, database, methodology, source, publication, or export behavior changed in Task 16.
+
+```text
+npm run verify
+npm test --workspace @mke/web -- --maxWorkers=4 --testTimeout=15000
+npm run build --workspace @mke/web
+git diff --check
 ```

@@ -58,8 +58,8 @@ uncertainty when available, and limitation. Community context is kept separate f
 remains unavailable when its exact snapshot is not tied to the run.
 
 Public copy uses “Census tract ID,” defines necessary technical terms, and explains that score
-contributions are not raw percentages, changes over time, causes, or recommendations. Compare and
-download controls are later-plan features, not part of the current profile.
+contributions are not raw percentages, changes over time, causes, or recommendations. **Compare
+this tract** now hands the selected tract to Compare Areas; download remains later Plan 6 work.
 
 The Equity Baseline band has a visible “How to read Equity Baseline” explanation beside the result.
 It says that the baseline combines 13 measures covering income and housing costs, education and
@@ -96,37 +96,67 @@ association boundary and is not continuously updated.
 
 ## 3. Compare Areas
 
-Support 2–5 tracts.
+Route: `/analyze/compare`.
 
-Desktop:
-comparison table/matrix.
+Repeated `tract` parameters store two to five unique Census tract IDs in selection order. Zero or
+one selected tract shows setup guidance and keeps authoritative tract/neighborhood search usable.
+Invalid, duplicate, unknown, and more-than-five values never create a partial comparison. Clearly
+named remove controls update the URL without reordering the remaining selection.
 
-Mobile:
-swipeable or stacked cards plus Differences view.
+The first evidence view contains population, Food Equity Priority, Equity Baseline and band, Food
+Access Need and band, SNAP retailer access share, nearest full-service-grocery walking state,
+households without a vehicle, and scheduled transit service intensity. Accordions reveal the same
+13 Equity Baseline indicators, definitions, percentiles, contributions, uncertainty, limitations,
+vintages, and sources used by the tract profile.
 
-Differences summary is deterministic, not LLM-generated.
+At 1024 and 1440 pixels, use a semantic comparison matrix with measures as rows and tracts as
+column headings. At 375, 430, and 768 pixels, use consistently ordered stacked tract cards. The
+summary, expanded evidence, selection controls, and Differences meaning remain equivalent without
+horizontal table squeezing or swipe-only evidence.
+
+Differences is deterministic and not LLM-generated. It considers Priority, Equity Baseline band,
+Food Access Need band, and approved measure gaps of at least 20 county-percentile points. Category
+items use fixed order; numeric items use descending gap with a stable presentation-order tie-break.
+Show at most five neutral statements. Missing values never become zero or create a gap, and stored
+uncertainty follows an included measure. When no rule is met, say no large differences were found
+under these rules—not that the tracts are identical.
 
 ## 4. Opportunity Explorer
 
-Use structured filters rather than a generic GIS query builder.
+Route: `/analyze/opportunity`.
 
-Example fields:
+Use structured controls for Food Equity Priority, Equity Baseline band/percentile, Food Access
+Need band/percentile, no-vehicle share, SNAP retailer access share, full-service-grocery walking
+time/reachability, and scheduled transit service intensity. Food sites, public land, and public
+investment are not filters. Do not show disabled or “Coming soon” controls for them.
 
-- Priority
-- no-vehicle threshold
-- grocery access
-- walking access
-- resource availability
-- public land nearby
+The canonical URL parameter order is `priorities`, `equity-bands`,
+`equity-percentile-minimum`, `food-need-bands`, `food-need-percentile-minimum`,
+`no-vehicle-minimum-percent`, `snap-low-access-minimum-percent`,
+`grocery-walk-minimum-minutes`, `include-unreachable-grocery`, and
+`transit-maximum-trips-per-hour`. Categorical values repeat their parameter. Invalid values do
+not produce partial results, and equivalent valid conditions normalize to one stable URL.
 
-Output:
+Choices within one category use OR. Separate categories use AND. Numeric minimum/maximum
+thresholds are inclusive. Editing creates pending state; **Apply filters** alone commits the draft
+to the normalized URL and refreshes the map, list, count, and population together. Applied chips
+are individually removable, and **Clear all** returns to the complete canonical tract set.
 
-- matching count
-- estimated population
-- synchronized map
-- result list
+Output includes matching tract count, known population living in matching tracts, a separate
+missing-population count when needed, missing-filter-data exclusions when needed, a synchronized
+map, and a complete non-map list. Missing filter data is counted only when every other evaluable
+active condition matches. Observed zero remains zero; missing and unreachable remain distinct.
 
-No undocumented ranking.
+Results use canonical tract-name/Census-tract-ID order and are never ranked. Selecting a map shape
+or list item opens the same tract evidence. At 375, 430, and 768 pixels, the map remains visible
+while HeroUI Pro sheets contain filters and results with initial focus, containment, Escape close,
+and focus return. At 1024 pixels, filters and map share the first row and results use the readable
+area below. At 1440 pixels, filters, map, and results use three columns. Sheet changes preserve
+pending/applied filters, selection, and map context.
+
+Unavailable publication, invalid links, no matches, and missing-data states use plain-language
+recovery copy. A validated development preview is visibly marked **Validated preview — not
+published**. Public mode with no governed publication shows no validated evidence.
 
 ## 5. Methodology
 

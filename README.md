@@ -64,6 +64,27 @@ County midpoint—not causes or policy recommendations.
 The public app reads only a published score run. A guarded local development preview may read one
 exact validated run for review, but it cannot turn that run into published data.
 
+## Analyze workflows
+
+Plan 5 adds two focused, responsive routes under **Analyze**:
+
+- `/analyze/compare` compares two to five census tracts using a shared summary, expandable
+  evidence, and a deterministic Differences explanation.
+- `/analyze/opportunity` finds census tracts matching explicit Priority, Equity Baseline, Food
+  Access Need, vehicle-access, grocery-access, walking-access, and transit conditions.
+
+Compare stores ordered tract IDs in repeated `tract` URL parameters. Opportunity stores only
+applied filters in normalized URL parameters; pending edits remain local until **Apply filters**.
+The server selects the exact data bundle, validates every contract, performs filtering in
+parameterized SQL, and returns bounded presentation data. MapLibre only shows and highlights the
+server result. A complete non-map result list provides the same essential evidence.
+
+Results are **matching areas**, not recommendations. Population means the known population living
+in matching tracts, with missing population reported separately. Missing filter values are never
+treated as zero. Contextual food sites, public land, and public investment do not filter results,
+and no ranking, recommendation, score recalculation, or AI is used. See the
+[Plan 5 verification record](docs/verification/plan-5-compare-opportunity-explorer.md).
+
 ## Development foundation
 
 Plan 1 establishes the repository, application, database, Python, testing, and
