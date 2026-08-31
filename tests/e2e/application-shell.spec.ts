@@ -65,7 +65,7 @@ test("renders and operates the shell at the configured width", async ({page}, te
     expect(sheetBox?.width).toBeCloseTo(Math.min(width * 0.8, 500), 0);
 
     const primaryNavigation = page.locator('nav[aria-label="Primary"]:visible');
-    const menu = primaryNavigation.getByRole("treegrid", {name: "Atlas"});
+    const menu = primaryNavigation.getByRole("treegrid", {name: "Explore"});
     const atlas = primaryNavigation.getByRole("row", {name: "Atlas"});
     await expect(menu).toBeVisible();
     await expect(atlas).toHaveAttribute("data-current", "true");
