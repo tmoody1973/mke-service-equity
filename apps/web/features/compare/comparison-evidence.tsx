@@ -132,7 +132,7 @@ function MetricTractEvidence({
               <p>Data version: {source.datasetVersion}</p>
               <p>Accessed: {new Date(source.retrievedAt).toLocaleDateString("en-US")}</p>
               <a
-                className="inline-flex min-h-11 items-center font-medium text-accent underline underline-offset-2"
+                className="inline-flex min-h-11 items-center font-medium text-foreground underline underline-offset-2"
                 href={source.sourceUrl}
                 rel="noreferrer"
                 target="_blank"
@@ -141,7 +141,7 @@ function MetricTractEvidence({
               </a>
               {source.methodologyUrl ? (
                 <a
-                  className="flex min-h-11 items-center font-medium text-accent underline underline-offset-2"
+                  className="flex min-h-11 items-center font-medium text-foreground underline underline-offset-2"
                   href={source.methodologyUrl}
                   rel="noreferrer"
                   target="_blank"

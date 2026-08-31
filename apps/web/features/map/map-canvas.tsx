@@ -338,7 +338,6 @@ export function MapCanvas({
   return (
     <>
       <div
-        aria-label="Interactive map of Milwaukee County census tracts"
         className="absolute inset-0"
         data-food-site-count={foodSites?.features.length ?? 0}
         data-food-sites-visible={showFoodSites ? "true" : "false"}

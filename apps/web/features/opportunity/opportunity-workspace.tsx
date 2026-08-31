@@ -72,12 +72,12 @@ export function OpportunityWorkspace({
     <div className="space-y-4">
       <OpportunityFilterStatus message={filterController.statusMessage} />
       <div
-        className="grid gap-4 lg:grid-cols-[minmax(10rem,0.75fr)_minmax(18rem,1.5fr)_minmax(11rem,1fr)] lg:items-start xl:gap-6"
+        className="grid gap-4 lg:grid-cols-2 lg:items-start xl:grid-cols-3 xl:gap-6"
         data-testid="opportunity-wide-workspace"
       >
         <aside
           aria-label="Opportunity filters"
-          className="hidden max-h-[48rem] overflow-y-auto lg:block"
+          className="hidden max-h-[48rem] overflow-y-auto lg:col-start-1 lg:row-start-1 lg:block"
         >
           <OpportunityFilterPanel
             appliedFilters={response.filters}
@@ -88,7 +88,7 @@ export function OpportunityWorkspace({
           />
         </aside>
 
-        <div className="min-w-0 space-y-4 lg:col-start-2">
+        <div className="min-w-0 space-y-4 lg:col-start-2 lg:row-start-1">
           <div
             aria-label="Opportunity Explorer tools"
             className="grid grid-cols-2 gap-3 lg:hidden"
@@ -97,6 +97,7 @@ export function OpportunityWorkspace({
             <Sheet
               isHandleOnly
               isOpen={filterSheetOpen}
+              shouldAutoFocus
               snapPoints={[1]}
               onOpenChange={setFilterSheetOpen}
             >
@@ -113,7 +114,11 @@ export function OpportunityWorkspace({
                 <Sheet.Content className="mx-auto max-w-3xl lg:hidden">
                   <Sheet.Dialog aria-label="Choose conditions">
                     <Sheet.Handle />
-                    <Sheet.CloseTrigger aria-label="Close filters" />
+                    <Sheet.CloseTrigger
+                      autoFocus
+                      aria-label="Close filters"
+                      className="size-11"
+                    />
                     <Sheet.Header>
                       <Sheet.Heading>Choose conditions</Sheet.Heading>
                     </Sheet.Header>
@@ -133,6 +138,7 @@ export function OpportunityWorkspace({
             <Sheet
               isHandleOnly
               isOpen={resultsSheetOpen}
+              shouldAutoFocus
               snapPoints={[1]}
               onOpenChange={setResultsSheetOpen}
             >
@@ -149,7 +155,11 @@ export function OpportunityWorkspace({
                 <Sheet.Content className="mx-auto max-w-3xl lg:hidden">
                   <Sheet.Dialog aria-label="Matching areas">
                     <Sheet.Handle />
-                    <Sheet.CloseTrigger aria-label="Close matching areas" />
+                    <Sheet.CloseTrigger
+                      autoFocus
+                      aria-label="Close matching areas"
+                      className="size-11"
+                    />
                     <Sheet.Header>
                       <Sheet.Heading>Matching areas</Sheet.Heading>
                     </Sheet.Header>
@@ -192,7 +202,7 @@ export function OpportunityWorkspace({
 
         <aside
           aria-label="Matching areas and selected-area evidence"
-          className="hidden max-h-[48rem] space-y-4 overflow-y-auto lg:col-start-3 lg:block"
+          className="hidden max-h-[48rem] space-y-4 overflow-y-auto lg:col-span-2 lg:row-start-2 lg:block xl:col-span-1 xl:col-start-3 xl:row-start-1"
         >
           <OpportunityResults
             idPrefix="opportunity-desktop-results"

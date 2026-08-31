@@ -3,9 +3,9 @@
 ## Status
 
 - Linear issue: `MOO-756`
-- Branch: `codex/moo-756-analysis-boundaries`
+- Branch: `codex/moo-756-responsive-accessibility`
 - Verification date: 2026-08-31
-- Current checkpoint: Task 13 payload and cache boundaries
+- Current checkpoint: Task 14 responsive and accessibility verification
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -143,6 +143,77 @@ git diff --check
 ```
 
 The live integration command requires the documented development-preview guards and read-only
-connection to the disposable Neon branch. Task 14 still owns the complete five-width Compare and
-Opportunity interaction, keyboard, axe, forced-colors, reduced-motion, screenshot, and browser
-error matrix.
+connection to the disposable Neon branch. At the Task 13 checkpoint, the complete five-width
+Compare and Opportunity interaction, keyboard, axe, forced-colors, reduced-motion, screenshot,
+and browser-error matrix remained for Task 14 below.
+
+## Task 14 responsive and accessibility matrix
+
+Task 14 ran the complete Analyze browser suite against the guarded local validated preview at the
+five approved viewport sizes. The browser process received only the exact preview-run identifier;
+the database connection remained in the isolated Next.js server process and was neither printed
+nor written to an artifact. This checkpoint did not publish, supersede, or mutate a score run.
+
+| Route | 375 × 812 | 430 × 932 | 768 × 1024 | 1024 × 900 | 1440 × 1000 |
+|---|---:|---:|---:|---:|---:|
+| Compare Areas | passed | passed | passed | passed | passed |
+| Opportunity Explorer | passed | passed | passed | passed | passed |
+
+All 10 cases passed with zero axe WCAG A/AA violations. Each case also asserted no horizontal
+page overflow, meaningful route headings and landmarks, visible keyboard focus, practical 44-pixel
+targets, reduced-motion behavior, forced-colors rendering, and visible text for priority, preview,
+missing-data, and non-recommendation states. The exact HeroUI Pro development-only Sidebar
+hydration warning was excluded from this guarded `next dev` error collector; every other console
+error and page error remained fatal. Task 15 still owns the separate production-mode zero-error
+proof.
+
+Compare coverage exercised two and five tracts; maximum selection; keyboard add/remove; stable
+selection order; expanded indicator evidence; Differences; invalid links without partial data;
+copied URLs; reload; and browser Back/Forward. It proved the desktop table and narrow stacked cards
+use the same evidence contract and that the share URL contains no run identity.
+
+Opportunity coverage exercised draft versus applied state; Priority 1 or 2 within one category;
+an Equity band across categories; keyboard chip removal and Clear all; zero-match results; three
+tracts excluded for missing filter data; map controls; non-map result selection; selected-profile
+evidence; invalid filters without partial results; copied URLs; reload; and browser Back/Forward.
+At 375, 430, and 768 pixels it also proved Sheet initial focus, focus containment, Escape return,
+draft persistence, and 44-pixel triggers/close controls. At 1024 pixels the reviewed layout uses
+filters beside the map with matching areas below so text remains readable; 1440 pixels retains the
+three-column planning workspace.
+
+The first browser pass identified and Task 14 fixed three concrete issues:
+
+- expanded Compare source links used a low-contrast accent color;
+- mobile Opportunity sheets did not request initial focus and their close controls were smaller
+  than the practical touch target; and
+- the shared MapLibre container placed `aria-label` on a plain `div`, which axe correctly rejected.
+
+The visual review then corrected the cramped 1024-pixel three-column Opportunity layout and added
+browser position assertions for the two-column 1024 and three-column 1440 contracts.
+
+Reviewed screenshots are generated locally at:
+
+```text
+artifacts/plan-5/task-14/compare/width-375.png
+artifacts/plan-5/task-14/compare/width-430.png
+artifacts/plan-5/task-14/compare/width-768.png
+artifacts/plan-5/task-14/compare/width-1024.png
+artifacts/plan-5/task-14/compare/width-1440.png
+artifacts/plan-5/task-14/opportunity/width-375.png
+artifacts/plan-5/task-14/opportunity/width-430.png
+artifacts/plan-5/task-14/opportunity/width-768.png
+artifacts/plan-5/task-14/opportunity/width-1024.png
+artifacts/plan-5/task-14/opportunity/width-1440.png
+```
+
+The Task 14 browser command was:
+
+```text
+PLAYWRIGHT_BASE_URL=http://localhost:3011 \
+MKE_ATLAS_PREVIEW_RUN_ID=<exact validated run supplied locally> \
+npm run test:e2e -- --grep "Compare Areas|Opportunity Explorer" --workers=1
+```
+
+Final Task 14 gates also passed: 179 web unit tests across 45 files, web lint, web
+typecheck, the Next.js production build, a 32-asset production client scan with no
+server-only or secret findings, and `git diff --check`.

@@ -140,6 +140,8 @@ describe("OpportunityWorkspace", () => {
     expect(screen.getAllByTestId("opportunity-map")).toHaveLength(1);
     expect(screen.getByTestId("opportunity-wide-workspace").className)
       .toContain("lg:grid-cols-");
+    expect(screen.getByTestId("opportunity-wide-workspace").className)
+      .toContain("xl:grid-cols-");
     expect(screen.getByRole("complementary", {name: "Opportunity filters"}))
       .toBeInTheDocument();
     expect(screen.getByRole("complementary", {
