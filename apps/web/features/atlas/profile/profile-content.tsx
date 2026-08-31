@@ -5,6 +5,7 @@ import type {
   AtlasTractProfile,
 } from "@mke/contracts";
 import {Accordion, Card, Chip} from "@heroui/react";
+import Link from "next/link";
 import {TractSummary} from "../tract-summary";
 
 type TractProfileContentProps = {
@@ -215,6 +216,13 @@ export function TractProfileContent({idPrefix, profile}: TractProfileContentProp
   return (
     <div className="space-y-6" data-profile-tract={profile.tract.geoid}>
       <TractSummary idPrefix={`${idPrefix}-profile`} tract={profile.tract} />
+
+      <Link
+        className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        href={`/analyze/compare?tract=${profile.tract.geoid}`}
+      >
+        Compare this tract
+      </Link>
 
       <section aria-labelledby={`${idPrefix}-meaning`} className="space-y-2">
         <h2 className="text-base font-semibold" id={`${idPrefix}-meaning`}>What this means</h2>

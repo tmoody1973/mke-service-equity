@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 
 import {render, screen} from "@testing-library/react";
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({push: vi.fn()}),
+}));
 import {parseCompareUrlState} from "./compare-url-state";
 import {ComparePage} from "./compare-page";
 
@@ -16,10 +20,16 @@ describe("ComparePage", () => {
     );
 
     expect(screen.getByRole("heading", {level: 1, name: "Compare Areas"})).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Validated preview — not published");
+    expect(screen.getByText("Validated preview — not published")).toHaveAttribute(
+      "role",
+      "status",
+    );
     expect(screen.getByRole("heading", {level: 2, name: "Add one more area"}))
       .toBeInTheDocument();
     expect(screen.getByText(/Census tract ID 55079000101 is selected/)).toBeInTheDocument();
+    expect(screen.getByRole("region", {name: "Choose comparison areas"})).toBeInTheDocument();
+    expect(screen.getByRole("searchbox", {name: "Find a tract or neighborhood"}))
+      .toBeInTheDocument();
   });
 
   it("fails closed when no public release exists", () => {

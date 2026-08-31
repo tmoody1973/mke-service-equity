@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import type {AnalysisAvailability} from "../analyze/server/load-analysis-availability";
 import {AnalysisUnavailableState} from "../analyze/analysis-unavailable-state";
+import {ComparePicker, type ComparePickerTract} from "./compare-picker";
 import {
   compareHref,
   type CompareUrlParseResult,
@@ -31,6 +32,24 @@ export function ComparePage({availability, comparison, urlState}: ComparePagePro
   const preview = availability?.state === "available"
     ? availability.mode === "validated_preview"
     : comparison?.state === "available" && comparison.mode === "validated_preview";
+  const unavailableReason = availability?.state === "unavailable"
+    ? availability.reason
+    : comparison?.state === "unavailable"
+      ? comparison.reason
+      : null;
+  const pickerBlocked = unavailableReason === "no_published_run"
+    || unavailableReason === "preview_not_allowed"
+    || unavailableReason === "run_not_found"
+    || unavailableReason === "run_not_validated";
+  const selectedTracts: Array<ComparePickerTract> = urlState.state === "invalid"
+    ? []
+    : urlState.value.tracts.map((geoid) => ({
+        geoid,
+        name: comparison?.state === "available"
+          ? comparison.tracts.find((candidate) => candidate.tract.geoid === geoid)?.tract.name
+          : undefined,
+      }));
+  const showPicker = urlState.state !== "invalid" && !pickerBlocked;
 
   let content;
   if (urlState.state === "invalid") {
@@ -132,6 +151,12 @@ export function ComparePage({availability, comparison, urlState}: ComparePagePro
             </p>
           </div>
         </header>
+        {showPicker ? (
+          <ComparePicker
+            currentSearchParams={urlState.canonicalSearchParams.toString()}
+            selectedTracts={selectedTracts}
+          />
+        ) : null}
         {content}
       </div>
     </div>

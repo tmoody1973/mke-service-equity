@@ -5,6 +5,7 @@ import {Button, Description, Label, SearchField} from "@heroui/react";
 import {useEffect, useState} from "react";
 
 type AtlasSearchProps = {
+  disabledGeoids?: ReadonlyArray<string>;
   idPrefix?: string;
   onSelect: (geoid: string) => void;
 };
@@ -38,7 +39,11 @@ function statusText(
     : `${count} City neighborhood search is unavailable for this data version.`;
 }
 
-export function AtlasSearch({idPrefix = "atlas", onSelect}: AtlasSearchProps) {
+export function AtlasSearch({
+  disabledGeoids = [],
+  idPrefix = "atlas",
+  onSelect,
+}: AtlasSearchProps) {
   const [query, setQuery] = useState("");
   const [stored, setStored] = useState<StoredSearch | null>(null);
   const normalizedQuery = query.trim();
@@ -92,20 +97,26 @@ export function AtlasSearch({idPrefix = "atlas", onSelect}: AtlasSearchProps) {
       </p>
       {response?.state === "available" && response.results.length > 0 ? (
         <ol aria-label="Search results" className="max-h-64 space-y-1 overflow-y-auto pe-1">
-          {response.results.map((result) => (
-            <li key={result.id}>
-              <Button
-                className="h-auto min-h-11 w-full justify-start px-2 py-2 text-left"
-                variant="ghost"
-                onPress={() => onSelect(result.geoid)}
-              >
-                <span className="min-w-0">
-                  <span className="block truncate font-medium">{result.title}</span>
-                  <span className="block text-xs font-normal text-muted">{result.subtitle}</span>
-                </span>
-              </Button>
-            </li>
-          ))}
+          {response.results.map((result) => {
+            const isAlreadySelected = disabledGeoids.includes(result.geoid);
+            return (
+              <li key={result.id}>
+                <Button
+                  className="h-auto min-h-11 w-full justify-start px-2 py-2 text-left"
+                  isDisabled={isAlreadySelected}
+                  variant="ghost"
+                  onPress={() => onSelect(result.geoid)}
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{result.title}</span>
+                    <span className="block text-xs font-normal text-muted">
+                      {isAlreadySelected ? "Already selected" : result.subtitle}
+                    </span>
+                  </span>
+                </Button>
+              </li>
+            );
+          })}
         </ol>
       ) : null}
     </section>
