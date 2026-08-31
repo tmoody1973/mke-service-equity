@@ -23,6 +23,7 @@ const {
   mapSetFilter,
   mapSetFeatureState,
   mapSetLayoutProperty,
+  mapSetPaintProperty,
 } = vi.hoisted(() => {
   const remove = vi.fn();
   const resize = vi.fn();
@@ -33,6 +34,7 @@ const {
   const setFeatureState = vi.fn();
   const setFilter = vi.fn();
   const setLayoutProperty = vi.fn();
+  const setPaintProperty = vi.fn();
   const setData = vi.fn();
   const queryRenderedFeatures = vi.fn(() => [] as Array<unknown>);
   const handlers = new globalThis.Map<string, (event?: unknown) => void>();
@@ -74,6 +76,7 @@ const {
         setFilter,
         setFeatureState,
         setLayoutProperty,
+        setPaintProperty,
       };
     }),
     mapFitBounds: fitBounds,
@@ -84,6 +87,7 @@ const {
     mapSetFilter: setFilter,
     mapSetFeatureState: setFeatureState,
     mapSetLayoutProperty: setLayoutProperty,
+    mapSetPaintProperty: setPaintProperty,
   };
 });
 
@@ -204,6 +208,49 @@ describe("MapShell", () => {
 
     await user.click(screen.getByRole("button", {name: "Reset map"}));
     expect(mapFitBounds).toHaveBeenCalledTimes(2);
+  });
+
+  it("synchronizes server matches without creating another map", () => {
+    const {rerender} = render(
+      <section>
+        <MapCanvas
+          matchingGeoids={["55079000101", "55079000201"]}
+          styleUrl="/fixtures/map-style.json"
+          tracts={tracts}
+        />
+      </section>,
+    );
+
+    expect(mapConstructor).toHaveBeenCalledOnce();
+    expect(mapSetPaintProperty).toHaveBeenCalledWith(
+      "atlas-tract-fill",
+      "fill-opacity",
+      expect.any(Array),
+    );
+    expect(mapSetFeatureState).toHaveBeenCalledWith(
+      {source: "atlas-tracts", id: "55079000101"},
+      {matching: true},
+    );
+
+    rerender(
+      <section>
+        <MapCanvas
+          matchingGeoids={["55079000201", "55079000301"]}
+          styleUrl="/fixtures/map-style.json"
+          tracts={tracts}
+        />
+      </section>,
+    );
+
+    expect(mapConstructor).toHaveBeenCalledOnce();
+    expect(mapSetFeatureState).toHaveBeenCalledWith(
+      {source: "atlas-tracts", id: "55079000101"},
+      {matching: false},
+    );
+    expect(mapSetFeatureState).toHaveBeenCalledWith(
+      {source: "atlas-tracts", id: "55079000301"},
+      {matching: true},
+    );
   });
 
   it("renders, toggles, and selects a food site without changing tract scoring", () => {

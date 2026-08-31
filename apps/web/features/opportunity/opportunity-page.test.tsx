@@ -14,6 +14,8 @@ describe("OpportunityPage", () => {
     render(
       <OpportunityPage
         response={{state: "unavailable", reason: "no_published_run"}}
+        styleUrl="/map-style.json"
+        tracts={null}
         urlState={parseOpportunityUrlState(new URLSearchParams())}
       />,
     );
@@ -27,6 +29,8 @@ describe("OpportunityPage", () => {
     render(
       <OpportunityPage
         response={null}
+        styleUrl="/map-style.json"
+        tracts={null}
         urlState={parseOpportunityUrlState(new URLSearchParams(
           "utm_source=partner&priorities=1&priorities=9",
         ))}

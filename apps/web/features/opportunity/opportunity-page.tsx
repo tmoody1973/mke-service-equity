@@ -1,9 +1,10 @@
 import {EmptyState} from "@heroui-pro/react";
-import type {OpportunityResponse} from "@mke/contracts";
+import type {AtlasTractFeatureCollection, OpportunityResponse} from "@mke/contracts";
 import Link from "next/link";
 
 import {AnalysisUnavailableState} from "../analyze/analysis-unavailable-state";
 import {OpportunityFilterWorkspace} from "./opportunity-filter-workspace";
+import {OpportunityWorkspace} from "./opportunity-workspace";
 import {
   opportunityHref,
   type OpportunityUrlParseResult,
@@ -11,10 +12,12 @@ import {
 
 type OpportunityPageProps = {
   response: OpportunityResponse | null;
+  styleUrl: string;
+  tracts: AtlasTractFeatureCollection | null;
   urlState: OpportunityUrlParseResult;
 };
 
-export function OpportunityPage({response, urlState}: OpportunityPageProps) {
+export function OpportunityPage({response, styleUrl, tracts, urlState}: OpportunityPageProps) {
   const recoveryHref = opportunityHref(
     "/analyze/opportunity",
     urlState.canonicalSearchParams,
@@ -57,29 +60,14 @@ export function OpportunityPage({response, urlState}: OpportunityPageProps) {
         startOverHref="/analyze/opportunity"
       />
     );
-  } else if (response?.state === "available") {
+  } else if (response?.state === "available" && tracts) {
     content = (
-      <section
-        aria-labelledby="matching-areas-heading"
-        className="rounded-[var(--mke-radius-panel)] border border-divider bg-background p-6"
-      >
-        <h2 className="text-xl font-semibold text-foreground" id="matching-areas-heading">
-          Matching areas
-        </h2>
-        <p className="mt-3 text-3xl font-semibold tracking-[-0.025em] text-foreground">
-          {response.summary.matchingTractCount.toLocaleString("en-US")} Census tracts
-        </p>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Known population living in matching tracts:{" "}
-          {response.summary.knownPopulationLivingInMatchingTracts.toLocaleString("en-US")}.
-        </p>
-        {response.summary.excludedForMissingFilterData > 0 ? (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-            {response.summary.excludedForMissingFilterData.toLocaleString("en-US")} tracts were
-            left out because a value required by the filters was missing.
-          </p>
-        ) : null}
-      </section>
+      <OpportunityWorkspace
+        currentSearchParams={urlState.canonicalSearchParams.toString()}
+        response={response}
+        styleUrl={styleUrl}
+        tracts={tracts}
+      />
     );
   } else {
     content = (
@@ -109,13 +97,11 @@ export function OpportunityPage({response, urlState}: OpportunityPageProps) {
             </p>
           </div>
         </header>
-        {urlState.state === "valid" ? (
+        {urlState.state === "valid" && response?.state !== "available" ? (
           <OpportunityFilterWorkspace
             appliedFilters={urlState.filters}
             currentSearchParams={urlState.canonicalSearchParams.toString()}
-            matchingTractCount={response?.state === "available"
-              ? response.summary.matchingTractCount
-              : null}
+            matchingTractCount={null}
           />
         ) : null}
         {content}

@@ -1,27 +1,27 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 
-const mocks = vi.hoisted(() => ({loadOpportunity: vi.fn()}));
+const mocks = vi.hoisted(() => ({loadOpportunityWorkspace: vi.fn()}));
 
-vi.mock("../../../features/opportunity/server/load-opportunity", () => ({
-  loadOpportunity: mocks.loadOpportunity,
+vi.mock("../../../features/opportunity/server/load-opportunity-workspace", () => ({
+  loadOpportunityWorkspace: mocks.loadOpportunityWorkspace,
 }));
 
 import OpportunityRoute, {metadata} from "./page";
 
 describe("OpportunityRoute", () => {
   beforeEach(() => {
-    mocks.loadOpportunity.mockReset();
-    mocks.loadOpportunity.mockResolvedValue({
-      state: "unavailable",
-      reason: "no_published_run",
+    mocks.loadOpportunityWorkspace.mockReset();
+    mocks.loadOpportunityWorkspace.mockResolvedValue({
+      response: {state: "unavailable", reason: "no_published_run"},
+      tracts: null,
     });
   });
 
   it("loads the real no-filter result instead of a fabricated setup state", async () => {
     await OpportunityRoute({searchParams: Promise.resolve({})});
 
-    expect(mocks.loadOpportunity).toHaveBeenCalledOnce();
-    expect(mocks.loadOpportunity).toHaveBeenCalledWith({
+    expect(mocks.loadOpportunityWorkspace).toHaveBeenCalledOnce();
+    expect(mocks.loadOpportunityWorkspace).toHaveBeenCalledWith({
       priorities: [],
       equityBands: [],
       equityPercentileMinimum: null,
@@ -41,7 +41,7 @@ describe("OpportunityRoute", () => {
       utm_source: "partner",
     })});
 
-    expect(mocks.loadOpportunity).not.toHaveBeenCalled();
+    expect(mocks.loadOpportunityWorkspace).not.toHaveBeenCalled();
   });
 
   it("defines the route-specific document title", () => {

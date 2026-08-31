@@ -7,7 +7,8 @@ import {
 } from "../../../features/analyze/next-search-params";
 import {OpportunityPage} from "../../../features/opportunity/opportunity-page";
 import {parseOpportunityUrlState} from "../../../features/opportunity/opportunity-url-state";
-import {loadOpportunity} from "../../../features/opportunity/server/load-opportunity";
+import {loadOpportunityWorkspace} from "../../../features/opportunity/server/load-opportunity-workspace";
+import {getMapStyleUrl} from "../../../features/map/map-config";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +23,9 @@ type OpportunityRouteProps = {
 
 export default async function OpportunityRoute({searchParams}: OpportunityRouteProps) {
   const urlState = parseOpportunityUrlState(toUrlSearchParams(await searchParams));
-  const response = urlState.state === "valid"
-    ? await loadOpportunity(urlState.filters)
-    : null;
+  const workspace = urlState.state === "valid"
+    ? await loadOpportunityWorkspace(urlState.filters)
+    : {response: null, tracts: null};
 
   return (
     <ApplicationShell
@@ -32,7 +33,12 @@ export default async function OpportunityRoute({searchParams}: OpportunityRouteP
       pageTitle="Opportunity Explorer"
       skipLinkLabel="Skip to Opportunity Explorer"
     >
-      <OpportunityPage response={response} urlState={urlState} />
+      <OpportunityPage
+        response={workspace.response}
+        styleUrl={getMapStyleUrl()}
+        tracts={workspace.tracts}
+        urlState={urlState}
+      />
     </ApplicationShell>
   );
 }
