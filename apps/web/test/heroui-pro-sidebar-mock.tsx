@@ -250,3 +250,75 @@ export const EmptyState = Object.assign(EmptyStateRoot, {
   Media: SheetElement,
   Title: EmptyStateTitle,
 });
+
+type CheckboxButtonGroupContextValue = {
+  name: string | undefined;
+  onChange: ((value: Array<string>) => void) | undefined;
+  value: Array<string>;
+};
+
+const CheckboxButtonGroupContext = createContext<CheckboxButtonGroupContextValue | null>(null);
+
+function CheckboxButtonGroupRoot({
+  children,
+  name,
+  onChange,
+  value = [],
+  ...props
+}: ComponentPropsWithoutRef<"div"> & {
+  layout?: string;
+  name?: string;
+  onChange?: (value: Array<string>) => void;
+  value?: Array<string>;
+  variant?: string;
+}) {
+  const {layout, variant, ...elementProps} = props;
+  void layout;
+  void variant;
+  return (
+    <CheckboxButtonGroupContext.Provider value={{name, onChange, value}}>
+      <div role="group" {...elementProps}>{children}</div>
+    </CheckboxButtonGroupContext.Provider>
+  );
+}
+
+function CheckboxButtonGroupItem({
+  children,
+  value,
+  ...props
+}: ComponentPropsWithoutRef<"div"> & {value: string}) {
+  const context = useContext(CheckboxButtonGroupContext);
+  if (!context) throw new Error("CheckboxButtonGroup.Item must be inside CheckboxButtonGroup");
+  const checked = context.value.includes(value);
+  return (
+    <div {...props}>
+      <input
+        aria-label={props["aria-label"]}
+        checked={checked}
+        name={context.name}
+        type="checkbox"
+        value={value}
+        onChange={() => context.onChange?.(
+          checked
+            ? context.value.filter((selected) => selected !== value)
+            : [...context.value, value],
+        )}
+      />
+      {children}
+    </div>
+  );
+}
+
+function CheckboxButtonGroupElement(props: ComponentPropsWithoutRef<"div">) {
+  return <div {...props} />;
+}
+
+function CheckboxButtonGroupIndicator(props: ComponentPropsWithoutRef<"span">) {
+  return <span aria-hidden="true" {...props} />;
+}
+
+export const CheckboxButtonGroup = Object.assign(CheckboxButtonGroupRoot, {
+  Indicator: CheckboxButtonGroupIndicator,
+  Item: CheckboxButtonGroupItem,
+  ItemContent: CheckboxButtonGroupElement,
+});

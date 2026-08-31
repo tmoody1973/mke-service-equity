@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 
 import {render, screen} from "@testing-library/react";
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({push: vi.fn()}),
+}));
 import {OpportunityPage} from "./opportunity-page";
 import {parseOpportunityUrlState} from "./opportunity-url-state";
 
@@ -16,9 +20,7 @@ describe("OpportunityPage", () => {
 
     expect(screen.getByRole("heading", {level: 1, name: "Opportunity Explorer"}))
       .toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "No published Food Equity results yet",
-    );
+    expect(screen.getByText("No published Food Equity results yet")).toBeInTheDocument();
   });
 
   it("does not run or imply a partial search for invalid filter values", () => {

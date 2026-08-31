@@ -3,6 +3,7 @@ import type {OpportunityResponse} from "@mke/contracts";
 import Link from "next/link";
 
 import {AnalysisUnavailableState} from "../analyze/analysis-unavailable-state";
+import {OpportunityFilterWorkspace} from "./opportunity-filter-workspace";
 import {
   opportunityHref,
   type OpportunityUrlParseResult,
@@ -108,6 +109,15 @@ export function OpportunityPage({response, urlState}: OpportunityPageProps) {
             </p>
           </div>
         </header>
+        {urlState.state === "valid" ? (
+          <OpportunityFilterWorkspace
+            appliedFilters={urlState.filters}
+            currentSearchParams={urlState.canonicalSearchParams.toString()}
+            matchingTractCount={response?.state === "available"
+              ? response.summary.matchingTractCount
+              : null}
+          />
+        ) : null}
         {content}
       </div>
     </div>
