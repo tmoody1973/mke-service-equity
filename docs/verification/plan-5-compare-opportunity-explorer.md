@@ -3,9 +3,9 @@
 ## Status
 
 - Linear issue: `MOO-756`
-- Branch: `codex/moo-756-responsive-accessibility`
+- Branch: `codex/moo-756-preview-public-proof`
 - Verification date: 2026-08-31
-- Current checkpoint: Task 14 responsive and accessibility verification
+- Current checkpoint: Task 15 exact-preview and public fail-closed verification
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -217,3 +217,71 @@ npm run test:e2e -- --grep "Compare Areas|Opportunity Explorer" --workers=1
 Final Task 14 gates also passed: 179 web unit tests across 45 files, web lint, web
 typecheck, the Next.js production build, a 32-asset production client scan with no
 server-only or secret findings, and `git diff --check`.
+
+## Task 15 exact-preview and public fail-closed proof
+
+Task 15 first reconciled the exact validated development preview through the parameterized
+database repositories on the disposable Neon branch. The connection string was supplied only to
+the test and server processes and was neither printed nor written to an artifact. The immutable
+identities and result universe were:
+
+| Contract | Exact result |
+|---|---:|
+| Food Equity run | `97bd1cdf-bf96-573f-8fcf-92e8676925d4` |
+| Pinned Equity Baseline run | `502e2a04-b013-53cd-8b09-c9144862701a` |
+| Canonical 2020 tracts | 302 |
+| Complete / insufficient / zero-population | 299 / 1 / 2 |
+| Priority 1 / 2 / 3 / 4 / 5 | 18 / 96 / 136 / 40 / 9 |
+
+Golden comparison assertions preserved Priority 1, 3, and 5 examples in requested order. Census
+tract `55079008400` retained its 61.3% housing-cost-burden estimate, plus-or-minus 22.5 percentage
+point Census 90% margin of error, 97th county percentile, and `use_with_caution` reliability.
+Census tract `55079187200` remained `insufficient_data` with no inferred measures or Priority, and
+zero-population tract `55079990000` remained explicitly ineligible and unscored.
+
+Representative Opportunity calls used the production parameterized repository query and proved
+OR within Priority, AND across filter categories, explicit missing-data exclusions, population
+meaning, and canonical result order:
+
+| Applied conditions | Matches | Known population | Population missing | Missing filter data | First / last GEOID |
+|---|---:|---:|---:|---:|---|
+| Priority 1 | 18 | 58,869 | 0 | 3 | `55079000101` / `55079009600` |
+| Priority 1 or 2 | 114 | 365,125 | 0 | 3 | `55079000101` / `55079009800` |
+| Priority 1 or 2, and Equity High | 29 | 89,959 | 0 | 2 | `55079012300` / `55079009100` |
+
+The three focused live repository files passed 9 tests. The wider database integration command
+also passed all 12 tests across six files, including schema, health, and tract-profile lineage.
+No test changed a run status or wrote analytical rows.
+
+The isolated development server then received only the exact validated-preview configuration and
+ran the complete Compare and Opportunity suite on port 3011. All 10 route/width cases passed in
+4.7 minutes across 375×812, 430×932, 768×1024, 1024×900, and 1440×1000. Afterward that process was
+stopped before any production build or public-mode check began.
+
+For the separate public proof, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `MKE_ATLAS_DATA_MODE`,
+`MKE_ATLAS_PREVIEW_RUN_ID`, and `MKE_PIPELINE_ENV` were explicitly removed from the build, server,
+and browser-test environments. The clean Webpack production build passed and scanned 32 client
+assets with no preview identity, database secret, server-only module, or SQL finding. A separate
+production server ran on port 3012.
+
+At all five required widths, both `/analyze/compare` and `/analyze/opportunity` displayed “No
+published Food Equity results yet” and said that nothing from a private preview was shown. The
+strict production browser collector allowed no ignored console errors or page errors. All five
+combined route/width cases passed with zero browser errors, zero axe WCAG A/AA violations, no
+horizontal overflow, and no validated run UUID, `validated_preview` state, or representative
+validated value in rendered HTML. The production process was stopped after the proof.
+
+Task 15 did not publish, supersede, or mutate a run. Public mode remained fail-closed, and governed
+publication remains exclusively tracked by `MOO-768`.
+
+```text
+# Exact read-only repository proof, with approved local server-only environment supplied
+npm run test:integration --workspace @mke/database -- --reporter=verbose
+
+# Exact guarded preview on isolated port 3011
+npm run test:e2e -- --grep "Compare Areas|Opportunity Explorer" --workers=1
+
+# Clean production build and separate public server on port 3012
+npm run build --workspace @mke/web
+npm run test:e2e -- --grep "Analyze public fail-closed" --workers=1
+```

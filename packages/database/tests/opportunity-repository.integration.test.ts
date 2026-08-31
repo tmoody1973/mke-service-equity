@@ -49,7 +49,7 @@ describe.skipIf(!previewConfigured)("Opportunity repository integration", () => 
     expect(serialized).not.toContain('"coordinates"');
   });
 
-  it("uses OR within Priority and preserves the validated live counts", async () => {
+  it("uses OR within Priority, AND across categories, and preserves golden summaries", async () => {
     const selection = await selectAtlasRun();
     expect(selection.state).toBe("selected");
     if (selection.state !== "selected") {
@@ -58,14 +58,36 @@ describe.skipIf(!previewConfigured)("Opportunity repository integration", () => 
 
     const priorityOne = await loadOpportunity(selection, {priorities: [1]});
     const priorityOneOrTwo = await loadOpportunity(selection, {priorities: [1, 2]});
-    expect(priorityOne.summary).toMatchObject({
+    const priorityOneOrTwoAndHighEquity = await loadOpportunity(selection, {
+      priorities: [1, 2],
+      equityBands: ["high"],
+    });
+    expect(priorityOne.summary).toEqual({
       matchingTractCount: 18,
+      knownPopulationLivingInMatchingTracts: 58_869,
+      matchingTractsMissingPopulation: 0,
       excludedForMissingFilterData: 3,
     });
-    expect(priorityOneOrTwo.summary).toMatchObject({
+    expect(priorityOne.matchingAreas.at(0)?.tract.geoid).toBe("55079000101");
+    expect(priorityOne.matchingAreas.at(-1)?.tract.geoid).toBe("55079009600");
+    expect(priorityOneOrTwo.summary).toEqual({
       matchingTractCount: 114,
+      knownPopulationLivingInMatchingTracts: 365_125,
+      matchingTractsMissingPopulation: 0,
       excludedForMissingFilterData: 3,
     });
+    expect(priorityOneOrTwo.matchingAreas.at(0)?.tract.geoid).toBe("55079000101");
+    expect(priorityOneOrTwo.matchingAreas.at(-1)?.tract.geoid).toBe("55079009800");
+    expect(priorityOneOrTwoAndHighEquity.summary).toEqual({
+      matchingTractCount: 29,
+      knownPopulationLivingInMatchingTracts: 89_959,
+      matchingTractsMissingPopulation: 0,
+      excludedForMissingFilterData: 2,
+    });
+    expect(priorityOneOrTwoAndHighEquity.matchingAreas.at(0)?.tract.geoid)
+      .toBe("55079012300");
+    expect(priorityOneOrTwoAndHighEquity.matchingAreas.at(-1)?.tract.geoid)
+      .toBe("55079009100");
   });
 
   it("keeps observed grocery zero, unreachable, and missing as separate states", async () => {
