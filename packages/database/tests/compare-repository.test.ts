@@ -384,6 +384,24 @@ describe("buildComparisonResponse", () => {
       equities,
     )).toThrow(ComparisonDataIntegrityError);
   });
+
+  it("distinguishes an unavailable requested tract from duplicate stored headers", () => {
+    const rows = completeRows();
+    expect(() => buildComparisonResponse(
+      selectedRun,
+      [...requestedGeoids],
+      rows.headers.slice(0, 1),
+      rows.foods,
+      rows.equities,
+    )).toThrow("comparison_requested_tract_unavailable");
+    expect(() => buildComparisonResponse(
+      selectedRun,
+      [...requestedGeoids],
+      [...rows.headers, rows.headers[0]!],
+      rows.foods,
+      rows.equities,
+    )).toThrow("comparison_header_count_mismatch");
+  });
 });
 
 describe("loadComparison", () => {

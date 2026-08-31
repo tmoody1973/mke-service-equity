@@ -133,10 +133,10 @@ export function buildComparisonResponse(
   const headersByGeoid = groupRows(headerRows, requestedSet);
   const foodByGeoid = groupRows(foodRows, requestedSet);
   const equityByGeoid = groupRows(equityRows, requestedSet);
-  if (
-    headersByGeoid.size !== request.data.tracts.length
-    || [...headersByGeoid.values()].some((headers) => headers.length !== 1)
-  ) {
+  if (headersByGeoid.size !== request.data.tracts.length) {
+    return fail("comparison_requested_tract_unavailable");
+  }
+  if ([...headersByGeoid.values()].some((headers) => headers.length !== 1)) {
     return fail("comparison_header_count_mismatch");
   }
 
