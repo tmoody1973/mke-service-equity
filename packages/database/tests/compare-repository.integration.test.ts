@@ -1,6 +1,8 @@
 import {describe, expect, it} from "vitest";
 import {loadComparison, selectAtlasRun} from "../src/server";
 
+const COMPARE_RESPONSE_MAX_BYTES = 500_000;
+
 const previewConfigured = process.env.DATABASE_URL
   && process.env.MKE_ATLAS_DATA_MODE === "validated_preview"
   && process.env.MKE_ATLAS_PREVIEW_RUN_ID;
@@ -50,7 +52,8 @@ describe.skipIf(!previewConfigured)("Comparison repository integration", () => {
       foodAccessMeasures: [],
       equityIndicators: [],
     });
-    expect(Buffer.byteLength(JSON.stringify(response), "utf8")).toBeLessThanOrEqual(500_000);
+    const responseBytes = Buffer.byteLength(JSON.stringify(response), "utf8");
+    expect(responseBytes).toBeLessThanOrEqual(COMPARE_RESPONSE_MAX_BYTES);
   });
 
   it("keeps the approved zero-population tract explicitly unscored", async () => {

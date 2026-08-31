@@ -2,6 +2,8 @@ import type {OpportunityAvailableResponse} from "@mke/contracts";
 import {describe, expect, it} from "vitest";
 import {loadComparison, loadOpportunity, selectAtlasRun} from "../src/server";
 
+const OPPORTUNITY_RESPONSE_MAX_BYTES = 150_000;
+
 const previewConfigured = process.env.DATABASE_URL
   && process.env.MKE_ATLAS_DATA_MODE === "validated_preview"
   && process.env.MKE_ATLAS_PREVIEW_RUN_ID;
@@ -39,7 +41,12 @@ describe.skipIf(!previewConfigured)("Opportunity repository integration", () => 
     )).toHaveLength(2);
     expect(response.matchingAreas.filter((area) => area.tract.population === 0)).toHaveLength(2);
     expectCanonicalOrder(response);
-    expect(Buffer.byteLength(JSON.stringify(response), "utf8")).toBeLessThanOrEqual(150_000);
+    const serialized = JSON.stringify(response);
+    expect(Buffer.byteLength(serialized, "utf8")).toBeLessThanOrEqual(
+      OPPORTUNITY_RESPONSE_MAX_BYTES,
+    );
+    expect(serialized).not.toContain('"geometry"');
+    expect(serialized).not.toContain('"coordinates"');
   });
 
   it("uses OR within Priority and preserves the validated live counts", async () => {
