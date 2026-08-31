@@ -3,29 +3,10 @@ import type {
   ComparisonMetric,
   ComparisonTract,
 } from "@mke/contracts";
+import {COMPARISON_METRIC_PRESENTATION_ORDER} from "./comparison-metric-registry";
 
 const MINIMUM_PERCENTILE_GAP = 20;
 const MAXIMUM_DIFFERENCES = 5;
-
-const METRIC_PRESENTATION_ORDER = [
-  ["food_access", "sram_snap_low_access_share_1mi", "Residents beyond one driving mile from a SNAP-authorized retailer"],
-  ["food_access", "full_service_grocery_walk_access", "Walk to the nearest full-service grocery"],
-  ["food_access", "households_no_vehicle", "Households with no vehicle available"],
-  ["food_access", "scheduled_transit_service_intensity", "Scheduled transit service within a ten-minute walk"],
-  ["equity_baseline", "people_of_color", "People of color"],
-  ["equity_baseline", "limited_english_proficiency", "Speaks English less than ‘very well,’ age 5+"],
-  ["equity_baseline", "foreign_born", "Foreign born"],
-  ["equity_baseline", "below_200_percent_fpl", "Population below 200 percent of the federal poverty level"],
-  ["equity_baseline", "unemployment", "Unemployment"],
-  ["equity_baseline", "less_than_high_school", "Less than high school education"],
-  ["equity_baseline", "housing_cost_burden", "Housing cost burden"],
-  ["equity_baseline", "diagnosed_diabetes", "Diagnosed diabetes"],
-  ["equity_baseline", "obesity", "Obesity"],
-  ["equity_baseline", "current_asthma", "Current asthma"],
-  ["equity_baseline", "any_disability", "Any disability"],
-  ["equity_baseline", "frequent_mental_distress", "Frequent mental distress"],
-  ["equity_baseline", "no_leisure_time_physical_activity", "No leisure-time physical activity"],
-] as const;
 
 type DifferenceKind = "priority" | "equity_baseline_band" | "food_access_need_band" | "metric";
 
@@ -186,7 +167,7 @@ function buildMetricCandidates(
   const candidates: Array<NumericCandidate> = [];
   const insufficientComparisons: Array<InsufficientComparison> = [];
 
-  METRIC_PRESENTATION_ORDER.forEach(([category, slug, fallbackLabel], order) => {
+  COMPARISON_METRIC_PRESENTATION_ORDER.forEach(({category, label: fallbackLabel, slug}, order) => {
     const entries = tracts.map((tract) => ({
       metric: metricFor(tract, category, slug),
       name: tract.tract.name,

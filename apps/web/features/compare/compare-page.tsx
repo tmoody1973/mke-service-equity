@@ -5,6 +5,7 @@ import Link from "next/link";
 import type {AnalysisAvailability} from "../analyze/server/load-analysis-availability";
 import {AnalysisUnavailableState} from "../analyze/analysis-unavailable-state";
 import {ComparePicker, type ComparePickerTract} from "./compare-picker";
+import {ComparisonSummary} from "./comparison-summary";
 import {buildDifferences} from "./differences";
 import {DifferencesView} from "./differences-view";
 import {
@@ -116,22 +117,7 @@ export function ComparePage({availability, comparison, urlState}: ComparePagePro
   } else if (comparison?.state === "available") {
     content = (
       <div className="space-y-8">
-        <section aria-labelledby="loaded-comparison-heading" className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground" id="loaded-comparison-heading">
-            Areas in this comparison
-          </h2>
-          <ul className="grid gap-3 sm:grid-cols-2" role="list">
-            {comparison.tracts.map(({tract}) => (
-              <li
-                className="rounded-[var(--mke-radius-panel)] border border-divider bg-background p-4"
-                key={tract.geoid}
-              >
-                <p className="font-semibold text-foreground">{tract.name}</p>
-                <p className="mt-1 text-sm text-muted">Census tract ID {tract.geoid}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <ComparisonSummary comparison={comparison} />
         <DifferencesView summary={buildDifferences(comparison)} />
       </div>
     );
