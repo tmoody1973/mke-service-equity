@@ -16,6 +16,10 @@ import {
 import {useCallback, useEffect, useRef, useState} from "react";
 import {resetMilwaukeeExtent} from "./map-camera";
 import {
+  applyOpportunityLayerStyles,
+  synchronizeOpportunityMatchingStates,
+} from "./opportunity-layers";
+import {
   addFoodSiteLayers,
   FOOD_SITE_LAYER_ID,
   FOOD_SITE_SOURCE_ID,
@@ -29,6 +33,8 @@ import {
 } from "./tract-layers";
 
 type MapCanvasProps = {
+  errorMessage?: string;
+  matchingGeoids?: ReadonlyArray<string> | undefined;
   onSelectTract?: (geoid: string) => void;
   priorities?: Array<number>;
   selectedTract?: string | null;
@@ -53,6 +59,8 @@ function featureGeoid(event: MapLayerMouseEvent): string | null {
 }
 
 export function MapCanvas({
+  errorMessage = "The map couldn’t load. Select Browse census tracts to continue.",
+  matchingGeoids,
   onSelectTract,
   onSelectFoodSite,
   priorities = [],
@@ -67,6 +75,7 @@ export function MapCanvas({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
   const appliedSelectedTractRef = useRef<string | null>(null);
+  const appliedMatchingGeoidsRef = useRef<ReadonlyArray<string>>([]);
   const hoveredTractRef = useRef<string | null>(null);
   const selectedTractRef = useRef<string | null>(selectedTract);
   const appliedSelectedFoodSiteRef = useRef<string | null>(null);
@@ -74,6 +83,7 @@ export function MapCanvas({
   const tractsRef = useRef(tracts);
   const onSelectTractRef = useRef(onSelectTract);
   const prioritiesRef = useRef(priorities);
+  const matchingGeoidsRef = useRef(matchingGeoids);
   const foodSitesRef = useRef(foodSites);
   const onSelectFoodSiteRef = useRef(onSelectFoodSite);
   const showFoodSitesRef = useRef(showFoodSites);
@@ -169,6 +179,11 @@ export function MapCanvas({
     const handleLoad = () => {
       try {
         addTractLayers(map, tractsRef.current ?? emptyTracts);
+        if (matchingGeoidsRef.current !== undefined) {
+          applyOpportunityLayerStyles(map);
+          synchronizeOpportunityMatchingStates(map, [], matchingGeoidsRef.current);
+          appliedMatchingGeoidsRef.current = matchingGeoidsRef.current;
+        }
         if (foodSitesRef.current) {
           addFoodSiteLayers(map, foodSitesRef.current, showFoodSitesRef.current);
           map.on("mouseenter", FOOD_SITE_LAYER_ID, handleFoodSitePointerEnter);
@@ -234,6 +249,20 @@ export function MapCanvas({
       source.setData(foodSites as Parameters<GeoJSONSource["setData"]>[0]);
     }
   }, [foodSites]);
+
+  useEffect(() => {
+    matchingGeoidsRef.current = matchingGeoids;
+    const map = mapRef.current;
+    if (matchingGeoids !== undefined && map?.getSource(TRACT_SOURCE_ID)) {
+      applyOpportunityLayerStyles(map);
+      synchronizeOpportunityMatchingStates(
+        map,
+        appliedMatchingGeoidsRef.current,
+        matchingGeoids,
+      );
+      appliedMatchingGeoidsRef.current = matchingGeoids;
+    }
+  }, [matchingGeoids]);
 
   useEffect(() => {
     selectedTractRef.current = selectedTract;
@@ -322,7 +351,7 @@ export function MapCanvas({
           className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-divider bg-background px-4 py-3 text-sm"
           role="alert"
         >
-          The map couldn’t load. Select Browse census tracts to continue.
+          {errorMessage}
         </p>
       ) : null}
       {mapStatus === "loading" ? (

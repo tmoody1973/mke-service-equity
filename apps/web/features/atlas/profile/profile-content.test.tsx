@@ -125,6 +125,17 @@ describe("TractProfileContent", () => {
     expect(screen.getByText("American Community Survey 5-year estimates")).toBeInTheDocument();
   });
 
+  it("hands the selected tract to Compare without putting score values in the URL", () => {
+    render(<TractProfileContent idPrefix="test" profile={profile} />);
+
+    const compareLink = screen.getByRole("link", {name: "Compare this tract"});
+    expect(compareLink).toHaveAttribute(
+      "href",
+      "/analyze/compare?tract=55079000101",
+    );
+    expect(compareLink.getAttribute("href")).not.toMatch(/score|priority|percentile|run/i);
+  });
+
   it("explains reportable neighborhood overlaps as area context", () => {
     render(<TractProfileContent
       idPrefix="test"

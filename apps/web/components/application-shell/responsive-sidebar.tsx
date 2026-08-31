@@ -1,13 +1,15 @@
 "use client";
 
 import {Sidebar} from "@heroui-pro/react";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import type {ReactNode} from "react";
 
 import {primaryNavigation} from "./navigation";
 
 type ResponsiveSidebarProps = {
   children: ReactNode;
+  mainId: string;
+  pageTitle: string;
 };
 
 function Brand() {
@@ -21,29 +23,49 @@ function Brand() {
 }
 
 function PrimaryNavigation() {
+  const pathname = usePathname();
+
   return (
     <nav aria-label="Primary">
-      <Sidebar.Menu aria-label="Atlas">
-        {primaryNavigation.map((item) => (
-          <Sidebar.MenuItem
-            href={item.href}
-            id={item.id}
-            isCurrent={item.isCurrent}
-            key={item.id}
-            textValue={item.label}
-          >
-            <Sidebar.MenuLabel>
-              {item.label}
-              {item.isCurrent ? <span className="sr-only">Current page</span> : null}
-            </Sidebar.MenuLabel>
-          </Sidebar.MenuItem>
-        ))}
-      </Sidebar.Menu>
+      {primaryNavigation.map((group) => {
+        const labelId = `navigation-group-${group.id}`;
+        return (
+          <Sidebar.Group key={group.id}>
+            <Sidebar.GroupLabel
+              className="px-2 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted"
+              id={labelId}
+            >
+              {group.label}
+            </Sidebar.GroupLabel>
+            <Sidebar.Menu aria-labelledby={labelId}>
+              {group.items.map((item) => {
+                const isCurrent = pathname === item.href
+                  || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+                return (
+                  <Sidebar.MenuItem
+                    className="min-h-11"
+                    href={item.href}
+                    id={item.id}
+                    isCurrent={isCurrent}
+                    key={item.id}
+                    textValue={item.label}
+                  >
+                    <Sidebar.MenuLabel>
+                      {item.label}
+                      {isCurrent ? <span className="sr-only">Current page</span> : null}
+                    </Sidebar.MenuLabel>
+                  </Sidebar.MenuItem>
+                );
+              })}
+            </Sidebar.Menu>
+          </Sidebar.Group>
+        );
+      })}
     </nav>
   );
 }
 
-export function ResponsiveSidebar({children}: ResponsiveSidebarProps) {
+export function ResponsiveSidebar({children, mainId, pageTitle}: ResponsiveSidebarProps) {
   const router = useRouter();
 
   return (
@@ -58,9 +80,7 @@ export function ResponsiveSidebar({children}: ResponsiveSidebarProps) {
           <Brand />
         </Sidebar.Header>
         <Sidebar.Content>
-          <Sidebar.Group>
-            <PrimaryNavigation />
-          </Sidebar.Group>
+          <PrimaryNavigation />
         </Sidebar.Content>
       </Sidebar>
 
@@ -72,15 +92,13 @@ export function ResponsiveSidebar({children}: ResponsiveSidebarProps) {
           </div>
         </Sidebar.Header>
         <Sidebar.Content>
-          <Sidebar.Group>
-            <PrimaryNavigation />
-          </Sidebar.Group>
+          <PrimaryNavigation />
         </Sidebar.Content>
       </Sidebar.Mobile>
 
       <Sidebar.Main
         className="min-w-0 overflow-hidden bg-[var(--mke-canvas)]"
-        id="map-workspace"
+        id={mainId}
         tabIndex={-1}
       >
         <header className="flex h-14 shrink-0 items-center gap-3 px-3 min-[768px]:h-16 min-[769px]:hidden">
@@ -90,7 +108,7 @@ export function ResponsiveSidebar({children}: ResponsiveSidebarProps) {
           />
           <div className="min-w-0 min-[769px]:hidden">
             <p className="truncate text-xs font-medium text-foreground">MKE Service Equity</p>
-            <p className="truncate text-sm font-semibold text-foreground">Food Equity Atlas</p>
+            <p className="truncate text-sm font-semibold text-foreground">{pageTitle}</p>
           </div>
         </header>
         <div className="min-h-0 flex-1">{children}</div>

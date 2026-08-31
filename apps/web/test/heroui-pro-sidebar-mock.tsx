@@ -1,5 +1,9 @@
-import type {ComponentPropsWithoutRef, ReactElement, ReactNode} from "react";
-import {cloneElement, createContext, useContext, useState} from "react";
+import type {
+  ComponentPropsWithoutRef,
+  ReactElement,
+  ReactNode,
+} from "react";
+import {cloneElement, createContext, useContext, useEffect, useRef, useState} from "react";
 
 type ProviderProps = ComponentPropsWithoutRef<"div"> & {
   children: ReactNode;
@@ -137,6 +141,7 @@ function Main(props: ComponentPropsWithoutRef<"main">) {
 export const Sidebar = Object.assign(SidebarRoot, {
   Content: Element,
   Group: Element,
+  GroupLabel: Element,
   Header: Element,
   Main,
   Menu,
@@ -149,6 +154,7 @@ export const Sidebar = Object.assign(SidebarRoot, {
 
 type SheetContextValue = {
   isOpen: boolean;
+  rememberOpener: (opener: HTMLElement | null) => void;
   setOpen: (open: boolean) => void;
 };
 
@@ -172,9 +178,19 @@ function SheetRoot({
   onOpenChange?: (open: boolean) => void;
   [key: string]: unknown;
 }) {
+  const [opener, setOpener] = useState<HTMLElement | null>(null);
+  const wasOpenRef = useRef(isOpen);
+  useEffect(() => {
+    if (wasOpenRef.current && !isOpen) {
+      opener?.focus();
+    }
+    wasOpenRef.current = isOpen;
+  }, [isOpen, opener]);
+
   return (
     <SheetContext.Provider value={{
       isOpen,
+      rememberOpener: setOpener,
       setOpen: (open) => onOpenChange?.(open),
     }}>
       {children}
@@ -183,9 +199,10 @@ function SheetRoot({
 }
 
 function SheetTrigger({children}: {children: ReactElement<{onPress?: () => void}>}) {
-  const {setOpen} = useTestSheet();
+  const {rememberOpener, setOpen} = useTestSheet();
   return cloneElement(children, {
     onPress: () => {
+      rememberOpener(document.activeElement as HTMLElement | null);
       children.props.onPress?.();
       setOpen(true);
     },
@@ -203,7 +220,27 @@ function SheetCloseTrigger(props: ComponentPropsWithoutRef<"button">) {
 }
 
 function SheetDialog(props: ComponentPropsWithoutRef<"div">) {
-  return <div role="dialog" {...props} />;
+  const {isOpen, setOpen} = useTestSheet();
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (isOpen) {
+      ref.current?.focus();
+    }
+  }, [isOpen]);
+  return (
+    <div
+      role="dialog"
+      tabIndex={-1}
+      {...props}
+      ref={ref}
+      onKeyDown={(event) => {
+        props.onKeyDown?.(event);
+        if (event.key === "Escape") {
+          setOpen(false);
+        }
+      }}
+    />
+  );
 }
 
 function SheetHeading(props: ComponentPropsWithoutRef<"h2">) {
@@ -248,4 +285,76 @@ export const EmptyState = Object.assign(EmptyStateRoot, {
   Header: SheetElement,
   Media: SheetElement,
   Title: EmptyStateTitle,
+});
+
+type CheckboxButtonGroupContextValue = {
+  name: string | undefined;
+  onChange: ((value: Array<string>) => void) | undefined;
+  value: Array<string>;
+};
+
+const CheckboxButtonGroupContext = createContext<CheckboxButtonGroupContextValue | null>(null);
+
+function CheckboxButtonGroupRoot({
+  children,
+  name,
+  onChange,
+  value = [],
+  ...props
+}: ComponentPropsWithoutRef<"div"> & {
+  layout?: string;
+  name?: string;
+  onChange?: (value: Array<string>) => void;
+  value?: Array<string>;
+  variant?: string;
+}) {
+  const {layout, variant, ...elementProps} = props;
+  void layout;
+  void variant;
+  return (
+    <CheckboxButtonGroupContext.Provider value={{name, onChange, value}}>
+      <div role="group" {...elementProps}>{children}</div>
+    </CheckboxButtonGroupContext.Provider>
+  );
+}
+
+function CheckboxButtonGroupItem({
+  children,
+  value,
+  ...props
+}: ComponentPropsWithoutRef<"div"> & {value: string}) {
+  const context = useContext(CheckboxButtonGroupContext);
+  if (!context) throw new Error("CheckboxButtonGroup.Item must be inside CheckboxButtonGroup");
+  const checked = context.value.includes(value);
+  return (
+    <div {...props}>
+      <input
+        aria-label={props["aria-label"]}
+        checked={checked}
+        name={context.name}
+        type="checkbox"
+        value={value}
+        onChange={() => context.onChange?.(
+          checked
+            ? context.value.filter((selected) => selected !== value)
+            : [...context.value, value],
+        )}
+      />
+      {children}
+    </div>
+  );
+}
+
+function CheckboxButtonGroupElement(props: ComponentPropsWithoutRef<"div">) {
+  return <div {...props} />;
+}
+
+function CheckboxButtonGroupIndicator(props: ComponentPropsWithoutRef<"span">) {
+  return <span aria-hidden="true" {...props} />;
+}
+
+export const CheckboxButtonGroup = Object.assign(CheckboxButtonGroupRoot, {
+  Indicator: CheckboxButtonGroupIndicator,
+  Item: CheckboxButtonGroupItem,
+  ItemContent: CheckboxButtonGroupElement,
 });
