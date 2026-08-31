@@ -137,6 +137,7 @@ function Main(props: ComponentPropsWithoutRef<"main">) {
 export const Sidebar = Object.assign(SidebarRoot, {
   Content: Element,
   Group: Element,
+  GroupLabel: Element,
   Header: Element,
   Main,
   Menu,
