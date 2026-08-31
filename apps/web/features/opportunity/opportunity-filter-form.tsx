@@ -75,6 +75,7 @@ const NUMERIC_FIELDS: Array<NumericFieldDefinition> = [
 ];
 
 function CategoryGroup({
+  compact,
   description,
   label,
   name,
@@ -82,6 +83,7 @@ function CategoryGroup({
   options,
   value,
 }: {
+  compact: boolean;
   description: string;
   label: string;
   name: string;
@@ -92,7 +94,7 @@ function CategoryGroup({
   return (
     <CheckboxButtonGroup
       aria-label={label}
-      className="grid w-full grid-cols-2 gap-2"
+      className={compact ? "grid w-full grid-cols-1 gap-2" : "grid w-full grid-cols-2 gap-2"}
       layout="grid"
       name={name}
       value={value}
@@ -122,15 +124,17 @@ function CategoryGroup({
 function NumericFilterField({
   definition,
   error,
+  idPrefix,
   onChange,
   value,
 }: {
   definition: NumericFieldDefinition;
   error: string | undefined;
+  idPrefix: string;
   onChange: (value: string) => void;
   value: string;
 }) {
-  const inputId = `opportunity-filter-${definition.key}`;
+  const inputId = `${idPrefix}-${definition.key}`;
   return (
     <TextField
       aria-label={definition.label}
@@ -158,18 +162,24 @@ function NumericFilterField({
 }
 
 export function OpportunityFilterForm({
+  compact = false,
   draft,
   errors,
+  idPrefix = "opportunity-filter",
   onApply,
   onDraftChange,
   onReset,
 }: {
+  compact?: boolean;
   draft: OpportunityFilterDraft;
   errors: OpportunityFilterErrors;
+  idPrefix?: string;
   onApply: (event: FormEvent<HTMLFormElement>) => void;
   onDraftChange: (draft: OpportunityFilterDraft) => void;
   onReset: () => void;
 }) {
+  const headingId = `${idPrefix}-heading`;
+  const numericHeadingId = `${idPrefix}-numeric-heading`;
   const update = <Key extends keyof OpportunityFilterDraft>(
     key: Key,
     value: OpportunityFilterDraft[Key],
@@ -177,13 +187,13 @@ export function OpportunityFilterForm({
 
   return (
     <form
-      aria-labelledby="opportunity-filters-heading"
+      aria-labelledby={headingId}
       className="space-y-6"
       noValidate
       onSubmit={onApply}
     >
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold text-foreground" id="opportunity-filters-heading">
+        <h2 className="text-xl font-semibold text-foreground" id={headingId}>
           Choose conditions
         </h2>
         <p className="max-w-3xl text-sm leading-6 text-muted">
@@ -195,8 +205,9 @@ export function OpportunityFilterForm({
 
       {errors.form ? <p className="text-sm text-danger" role="alert">{errors.form}</p> : null}
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className={compact ? "grid gap-6" : "grid gap-6 xl:grid-cols-3"}>
         <CategoryGroup
+          compact={compact}
           description="Choose one or more. An area can match any selected Priority."
           label="Food Equity Priority"
           name="priorities"
@@ -209,6 +220,7 @@ export function OpportunityFilterForm({
           onChange={(value) => update("priorities", value)}
         />
         <CategoryGroup
+          compact={compact}
           description="Choose one or more Equity Baseline bands."
           label="Equity Baseline band"
           name="equity-bands"
@@ -217,6 +229,7 @@ export function OpportunityFilterForm({
           onChange={(value) => update("equityBands", value)}
         />
         <CategoryGroup
+          compact={compact}
           description="Choose one or more Food Access Need bands."
           label="Food Access Need band"
           name="food-need-bands"
@@ -226,9 +239,9 @@ export function OpportunityFilterForm({
         />
       </div>
 
-      <section aria-labelledby="numeric-conditions-heading" className="space-y-4">
+      <section aria-labelledby={numericHeadingId} className="space-y-4">
         <div className="space-y-1">
-          <h3 className="text-base font-semibold text-foreground" id="numeric-conditions-heading">
+          <h3 className="text-base font-semibold text-foreground" id={numericHeadingId}>
             Number-based conditions
           </h3>
           <p className="text-sm leading-6 text-muted">
@@ -236,11 +249,12 @@ export function OpportunityFilterForm({
             not a blank or missing value. Numbers may use up to two decimal places.
           </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className={compact ? "grid gap-4" : "grid gap-4 md:grid-cols-2 xl:grid-cols-3"}>
           {NUMERIC_FIELDS.map((definition) => (
             <NumericFilterField
               definition={definition}
               error={errors[definition.key]}
+              idPrefix={idPrefix}
               key={definition.key}
               value={draft[definition.key]}
               onChange={(value) => update(definition.key, value)}
@@ -267,7 +281,11 @@ export function OpportunityFilterForm({
       </section>
 
       <div className="flex flex-col gap-3 border-t border-divider pt-5 sm:flex-row">
-        <Button className="min-h-11" type="submit" variant="primary">
+        <Button
+          className="min-h-11 bg-foreground text-background"
+          type="submit"
+          variant="primary"
+        >
           Apply filters
         </Button>
         <Button className="min-h-11" type="button" variant="ghost" onPress={onReset}>

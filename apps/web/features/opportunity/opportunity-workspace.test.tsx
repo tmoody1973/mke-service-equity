@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import {render, screen} from "@testing-library/react";
+import {render, screen, within} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {describe, expect, it, vi} from "vitest";
 
@@ -70,16 +70,16 @@ describe("OpportunityWorkspace", () => {
       "data-selected-geoid",
       "55079000201",
     );
-    expect(screen.getByRole("complementary", {name: /Evidence for Census Tract 2.01/}))
-      .toBeInTheDocument();
+    expect(screen.getAllByRole("complementary", {name: /Evidence for Census Tract 2.01/}))
+      .toHaveLength(2);
 
     await user.click(screen.getByRole("button", {name: "Select first map tract"}));
-    expect(screen.getByRole("complementary", {name: /Evidence for Census Tract 1.01/}))
-      .toBeInTheDocument();
+    expect(screen.getAllByRole("complementary", {name: /Evidence for Census Tract 1.01/}))
+      .toHaveLength(2);
 
     await user.click(screen.getByRole("button", {name: "Select non-match map tract"}));
-    expect(screen.getByRole("complementary", {name: /Evidence for Census Tract 1.01/}))
-      .toBeInTheDocument();
+    expect(screen.getAllByRole("complementary", {name: /Evidence for Census Tract 1.01/}))
+      .toHaveLength(2);
   });
 
   it("does not revive a selection after filters remove it and history restores the result", async () => {
@@ -94,8 +94,8 @@ describe("OpportunityWorkspace", () => {
     );
 
     await user.click(screen.getByRole("button", {name: /Census Tract 2.01/}));
-    expect(screen.getByRole("complementary", {name: /Evidence for Census Tract 2.01/}))
-      .toBeInTheDocument();
+    expect(screen.getAllByRole("complementary", {name: /Evidence for Census Tract 2.01/}))
+      .toHaveLength(2);
 
     const oneMatch = {
       ...OPPORTUNITY_RESPONSE,
@@ -114,7 +114,7 @@ describe("OpportunityWorkspace", () => {
         tracts={OPPORTUNITY_TRACTS}
       />,
     );
-    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("complementary", {name: /Evidence for/})).toHaveLength(0);
 
     rerender(
       <OpportunityWorkspace
@@ -124,6 +124,105 @@ describe("OpportunityWorkspace", () => {
         tracts={OPPORTUNITY_TRACTS}
       />,
     );
-    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("complementary", {name: /Evidence for/})).toHaveLength(0);
+  });
+
+  it("keeps one map in a coordinated wide workspace and exposes mobile sheet triggers", () => {
+    render(
+      <OpportunityWorkspace
+        currentSearchParams=""
+        response={OPPORTUNITY_RESPONSE}
+        styleUrl="/map-style.json"
+        tracts={OPPORTUNITY_TRACTS}
+      />,
+    );
+
+    expect(screen.getAllByTestId("opportunity-map")).toHaveLength(1);
+    expect(screen.getByTestId("opportunity-wide-workspace").className)
+      .toContain("lg:grid-cols-");
+    expect(screen.getByRole("complementary", {name: "Opportunity filters"}))
+      .toBeInTheDocument();
+    expect(screen.getByRole("complementary", {
+      name: "Matching areas and selected-area evidence",
+    })).toBeInTheDocument();
+    expect(screen.getByRole("button", {name: "Open filters"})).toHaveClass("min-h-11");
+    expect(screen.getByRole("button", {name: "Open 2 matching areas"})).toHaveClass("min-h-11");
+  });
+
+  it("preserves a draft when the filter sheet closes and returns focus to its trigger", async () => {
+    const user = userEvent.setup();
+    render(
+      <OpportunityWorkspace
+        currentSearchParams=""
+        response={OPPORTUNITY_RESPONSE}
+        styleUrl="/map-style.json"
+        tracts={OPPORTUNITY_TRACTS}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {name: "Open filters"});
+    await user.click(trigger);
+    const dialog = screen.getByRole("dialog", {name: "Choose conditions"});
+    expect(dialog).toHaveFocus();
+
+    const field = within(dialog).getByRole("spinbutton", {
+      name: "Households with no vehicle available",
+    });
+    await user.type(field, "25");
+    await user.click(within(dialog).getByRole("button", {name: "Close filters"}));
+    expect(trigger).toHaveFocus();
+
+    await user.click(trigger);
+    expect(within(screen.getByRole("dialog", {name: "Choose conditions"})).getByRole(
+      "spinbutton",
+      {name: "Households with no vehicle available"},
+    )).toHaveValue(25);
+  });
+
+  it("closes a sheet with Escape and returns focus to the trigger", async () => {
+    const user = userEvent.setup();
+    render(
+      <OpportunityWorkspace
+        currentSearchParams=""
+        response={OPPORTUNITY_RESPONSE}
+        styleUrl="/map-style.json"
+        tracts={OPPORTUNITY_TRACTS}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {name: "Open filters"});
+    await user.click(trigger);
+    expect(screen.getByRole("dialog", {name: "Choose conditions"})).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog", {name: "Choose conditions"}))
+      .not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it("opens matching areas in a sheet and keeps row, map, and profile selection together", async () => {
+    const user = userEvent.setup();
+    render(
+      <OpportunityWorkspace
+        currentSearchParams=""
+        response={OPPORTUNITY_RESPONSE}
+        styleUrl="/map-style.json"
+        tracts={OPPORTUNITY_TRACTS}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {name: "Open 2 matching areas"});
+    await user.click(trigger);
+    const dialog = screen.getByRole("dialog", {name: "Matching areas"});
+    await user.click(within(dialog).getByRole("button", {name: /Census Tract 2.01/}));
+
+    expect(screen.queryByRole("dialog", {name: "Matching areas"})).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+    expect(screen.getByTestId("opportunity-map")).toHaveAttribute(
+      "data-selected-geoid",
+      "55079000201",
+    );
+    expect(screen.getAllByRole("complementary", {name: /Evidence for Census Tract 2.01/}))
+      .toHaveLength(2);
   });
 });

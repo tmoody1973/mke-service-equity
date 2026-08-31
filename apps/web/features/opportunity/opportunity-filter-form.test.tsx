@@ -30,6 +30,9 @@ describe("OpportunityFilterWorkspace", () => {
     expect(screen.getByRole("status", {name: "Applied filter update"})).toHaveTextContent(
       "No filters applied. 302 matching areas.",
     );
+    expect(screen.getByRole("button", {name: "Apply filters"})).toHaveClass("min-h-11");
+    expect(screen.getByRole("button", {name: "Reset draft to applied filters"}))
+      .toHaveClass("min-h-11");
 
     await user.click(screen.getByRole("checkbox", {name: /Priority 1/i}));
     await user.click(screen.getByRole("checkbox", {name: /Priority 2/i}));

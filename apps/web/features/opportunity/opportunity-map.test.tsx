@@ -4,8 +4,12 @@ import {render, screen} from "@testing-library/react";
 import {describe, expect, it, vi} from "vitest";
 
 vi.mock("../map/map-canvas", () => ({
-  MapCanvas: (props: {matchingGeoids: ReadonlyArray<string>}) => (
-    <div data-testid="map-canvas" data-matching-geoids={props.matchingGeoids.join(",")} />
+  MapCanvas: (props: {errorMessage: string; matchingGeoids: ReadonlyArray<string>}) => (
+    <div
+      data-error-message={props.errorMessage}
+      data-matching-geoids={props.matchingGeoids.join(",")}
+      data-testid="map-canvas"
+    />
   ),
 }));
 
@@ -28,5 +32,11 @@ describe("OpportunityMap", () => {
       "data-matching-geoids",
       "55079000101,55079000201",
     );
+    expect(screen.getByTestId("map-canvas")).toHaveAttribute(
+      "data-error-message",
+      "The map couldn’t load. Use Matching areas to review the same results.",
+    );
+    expect(screen.getByRole("region", {name: "Map of matching areas"}).className)
+      .toContain("min-h-[26rem]");
   });
 });

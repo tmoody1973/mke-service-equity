@@ -132,9 +132,11 @@ function appliedFilterItems(filters: OpportunityFilterState): Array<AppliedFilte
 export function AppliedFilterChips({
   currentSearchParams,
   filters,
+  idPrefix = "opportunity-filter",
 }: {
   currentSearchParams: string;
   filters: OpportunityFilterState;
+  idPrefix?: string;
 }) {
   const router = useRouter();
   const items = appliedFilterItems(filters);
@@ -147,10 +149,13 @@ export function AppliedFilterChips({
   };
 
   return (
-    <section aria-labelledby="applied-filters-heading" className="space-y-3">
+    <section aria-labelledby={`${idPrefix}-applied-heading`} className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-foreground" id="applied-filters-heading">
+          <h3
+            className="text-sm font-semibold text-foreground"
+            id={`${idPrefix}-applied-heading`}
+          >
             Applied filters
           </h3>
           <p className="text-xs leading-5 text-muted">

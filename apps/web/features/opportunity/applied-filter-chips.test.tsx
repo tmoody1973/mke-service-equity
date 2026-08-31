@@ -38,6 +38,10 @@ describe("AppliedFilterChips", () => {
     expect(screen.getByText("Equity Baseline: High")).toBeInTheDocument();
     expect(screen.getByText("Grocery walk: at least 15 minutes")).toBeInTheDocument();
     expect(screen.getByText("Grocery walk: no route found")).toBeInTheDocument();
+    expect(screen.getByRole("button", {name: "Remove applied filter Priority 1"}))
+      .toHaveClass("size-11");
+    expect(screen.getByRole("button", {name: "Clear all applied filters"}))
+      .toHaveClass("min-h-11");
 
     await user.click(screen.getByRole("button", {name: "Remove applied filter Priority 1"}));
 

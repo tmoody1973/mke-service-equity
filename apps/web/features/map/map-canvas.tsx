@@ -33,6 +33,7 @@ import {
 } from "./tract-layers";
 
 type MapCanvasProps = {
+  errorMessage?: string;
   matchingGeoids?: ReadonlyArray<string> | undefined;
   onSelectTract?: (geoid: string) => void;
   priorities?: Array<number>;
@@ -58,6 +59,7 @@ function featureGeoid(event: MapLayerMouseEvent): string | null {
 }
 
 export function MapCanvas({
+  errorMessage = "The map couldn’t load. Select Browse census tracts to continue.",
   matchingGeoids,
   onSelectTract,
   onSelectFoodSite,
@@ -349,7 +351,7 @@ export function MapCanvas({
           className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-divider bg-background px-4 py-3 text-sm"
           role="alert"
         >
-          The map couldn’t load. Select Browse census tracts to continue.
+          {errorMessage}
         </p>
       ) : null}
       {mapStatus === "loading" ? (

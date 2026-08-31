@@ -1,5 +1,9 @@
-import type {ComponentPropsWithoutRef, ReactElement, ReactNode} from "react";
-import {cloneElement, createContext, useContext, useState} from "react";
+import type {
+  ComponentPropsWithoutRef,
+  ReactElement,
+  ReactNode,
+} from "react";
+import {cloneElement, createContext, useContext, useEffect, useRef, useState} from "react";
 
 type ProviderProps = ComponentPropsWithoutRef<"div"> & {
   children: ReactNode;
@@ -150,6 +154,7 @@ export const Sidebar = Object.assign(SidebarRoot, {
 
 type SheetContextValue = {
   isOpen: boolean;
+  rememberOpener: (opener: HTMLElement | null) => void;
   setOpen: (open: boolean) => void;
 };
 
@@ -173,9 +178,19 @@ function SheetRoot({
   onOpenChange?: (open: boolean) => void;
   [key: string]: unknown;
 }) {
+  const [opener, setOpener] = useState<HTMLElement | null>(null);
+  const wasOpenRef = useRef(isOpen);
+  useEffect(() => {
+    if (wasOpenRef.current && !isOpen) {
+      opener?.focus();
+    }
+    wasOpenRef.current = isOpen;
+  }, [isOpen, opener]);
+
   return (
     <SheetContext.Provider value={{
       isOpen,
+      rememberOpener: setOpener,
       setOpen: (open) => onOpenChange?.(open),
     }}>
       {children}
@@ -184,9 +199,10 @@ function SheetRoot({
 }
 
 function SheetTrigger({children}: {children: ReactElement<{onPress?: () => void}>}) {
-  const {setOpen} = useTestSheet();
+  const {rememberOpener, setOpen} = useTestSheet();
   return cloneElement(children, {
     onPress: () => {
+      rememberOpener(document.activeElement as HTMLElement | null);
       children.props.onPress?.();
       setOpen(true);
     },
@@ -204,7 +220,27 @@ function SheetCloseTrigger(props: ComponentPropsWithoutRef<"button">) {
 }
 
 function SheetDialog(props: ComponentPropsWithoutRef<"div">) {
-  return <div role="dialog" {...props} />;
+  const {isOpen, setOpen} = useTestSheet();
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (isOpen) {
+      ref.current?.focus();
+    }
+  }, [isOpen]);
+  return (
+    <div
+      role="dialog"
+      tabIndex={-1}
+      {...props}
+      ref={ref}
+      onKeyDown={(event) => {
+        props.onKeyDown?.(event);
+        if (event.key === "Escape") {
+          setOpen(false);
+        }
+      }}
+    />
+  );
 }
 
 function SheetHeading(props: ComponentPropsWithoutRef<"h2">) {

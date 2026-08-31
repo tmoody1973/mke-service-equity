@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import {render, screen} from "@testing-library/react";
+import {act, render, screen} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
@@ -41,6 +41,10 @@ const {
   const on = vi.fn((event: string, layerOrHandler: string | ((event?: unknown) => void), handler?: (event?: unknown) => void) => {
     if (event === "load" && typeof layerOrHandler === "function") {
       layerOrHandler();
+      return;
+    }
+    if (typeof layerOrHandler === "function") {
+      handlers.set(event, layerOrHandler);
       return;
     }
     if (typeof layerOrHandler === "string" && handler) {
@@ -251,6 +255,26 @@ describe("MapShell", () => {
       {source: "atlas-tracts", id: "55079000301"},
       {matching: true},
     );
+  });
+
+  it("uses context-specific recovery copy when the map fails", () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(
+      <section>
+        <MapCanvas
+          errorMessage="The map couldn’t load. Use Matching areas to review the same results."
+          styleUrl="/fixtures/map-style.json"
+          tracts={tracts}
+        />
+      </section>,
+    );
+
+    act(() => layerHandlers.get("error")?.({error: new Error("style failed")}));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "The map couldn’t load. Use Matching areas to review the same results.",
+    );
+    consoleError.mockRestore();
   });
 
   it("renders, toggles, and selects a food site without changing tract scoring", () => {

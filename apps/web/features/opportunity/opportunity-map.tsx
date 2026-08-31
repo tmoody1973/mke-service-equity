@@ -20,9 +20,10 @@ export function OpportunityMap({
   return (
     <section
       aria-label="Map of matching areas"
-      className="relative h-[32rem] min-h-96 overflow-hidden rounded-[var(--mke-radius-panel)] border border-divider bg-default"
+      className="relative h-[min(62dvh,36rem)] min-h-[26rem] overflow-hidden rounded-[var(--mke-radius-panel)] border border-divider bg-default lg:h-[min(70dvh,48rem)] lg:min-h-[32rem]"
     >
       <MapCanvas
+        errorMessage="The map couldn’t load. Use Matching areas to review the same results."
         matchingGeoids={matchingGeoids}
         onSelectTract={onSelect}
         selectedTract={selectedGeoid}
