@@ -219,6 +219,10 @@ def test_resource_geometry_and_nullable_quality_states_are_consistent() -> None:
 
 def test_food_run_rows_obey_pinned_lineage_lifecycle_and_idempotency_contract() -> None:
     with psycopg.connect(integration_url()) as connection:
+        authoritative_run_exists = connection.execute(
+            "SELECT EXISTS (SELECT 1 FROM food_score_runs WHERE id=%s)",
+            (AUTHORITATIVE_FOOD_RUN_ID,),
+        ).fetchone()
         wrong_baseline = connection.execute(
             "SELECT count(*) FROM food_score_runs WHERE id=%s AND "
             "(equity_baseline_run_id<>%s OR equity_baseline_output_hash<>%s)",
@@ -247,6 +251,7 @@ def test_food_run_rows_obey_pinned_lineage_lifecycle_and_idempotency_contract() 
             "GROUP BY food_score_run_id,geography_id HAVING count(*)>1) duplicates"
         ).fetchone()
 
+    assert authoritative_run_exists == (True,)
     assert wrong_baseline == (0,)
     assert invalid_lifecycle == (0,)
     assert duplicate_fingerprints == (0,)
@@ -255,6 +260,10 @@ def test_food_run_rows_obey_pinned_lineage_lifecycle_and_idempotency_contract() 
 
 def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
     with psycopg.connect(integration_url()) as connection:
+        authoritative_run_exists = connection.execute(
+            "SELECT EXISTS (SELECT 1 FROM food_score_runs WHERE id=%s)",
+            (AUTHORITATIVE_FOOD_RUN_ID,),
+        ).fetchone()
         reconciliations = connection.execute(
             "SELECT runs.id,"
             "(SELECT count(*) FROM food_scores scores WHERE scores.food_score_run_id=runs.id),"
@@ -270,6 +279,8 @@ def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
             (AUTHORITATIVE_FOOD_RUN_ID,),
         ).fetchall()
 
+    assert authoritative_run_exists == (True,)
+    assert len(reconciliations) == 1
     for (
         _,
         score_count,
@@ -291,17 +302,15 @@ def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
             (AUTHORITATIVE_FOOD_RUN_ID,),
         ).fetchall()
 
-    assert all(
-        row
-        == (
+    assert insufficient == [
+        (
             "55079187200",
             [
                 "missing_metric:full_service_grocery_walk_access",
                 "missing_metric:scheduled_transit_service_intensity",
             ],
         )
-        for row in insufficient
-    )
+    ]
 
     with psycopg.connect(integration_url()) as connection:
         unsnapped_metrics = connection.execute(

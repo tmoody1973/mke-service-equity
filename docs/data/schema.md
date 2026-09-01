@@ -204,6 +204,11 @@ backward transitions are rejected. A validated, published, or superseded run req
 64-character lowercase output hash and validation result; a failed run requires completion and
 failure metadata but no output hash.
 
+Applied migration `0005` remains immutable. Forward migration
+`0006_publication_metadata_not_null.sql` hardens these lifecycle checks by explicitly requiring
+non-null failure metadata for failed runs and non-null supersession identity and reason for
+superseded publications.
+
 `run_fingerprint` identifies the methodology, registry, input manifests, implementation, and
 other deterministic inputs for one run. `output_hash` identifies the canonical scored output.
 An existing fingerprint is reused; `--verify-existing` also requires a matching independently

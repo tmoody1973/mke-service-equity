@@ -16,7 +16,7 @@ export const atlasAvailableResponseSchema = z.strictObject({
   contextLayers: z.strictObject({
     foodSites: atlasFoodSitesLayerResponseSchema,
   }),
-});
+}).superRefine(refineAtlasRunPublication);
 
 export const atlasUnavailableResponseSchema = z.strictObject({
   state: z.literal("unavailable"),
@@ -26,12 +26,7 @@ export const atlasUnavailableResponseSchema = z.strictObject({
 export const atlasResponseSchema = z.discriminatedUnion("state", [
   atlasAvailableResponseSchema,
   atlasUnavailableResponseSchema,
-]).superRefine((value, context) => {
-  if (value.state !== "available") {
-    return;
-  }
-  refineAtlasRunPublication(value, context);
-});
+]);
 
 export * from "./profile";
 export * from "./context-layers";

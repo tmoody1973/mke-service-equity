@@ -43,6 +43,13 @@
       "when": 1788272356546,
       "tag": "0005_governed_publication",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788297414822,
+      "tag": "0006_publication_metadata_not_null",
+      "breakpoints": true
     }
   ]
 }

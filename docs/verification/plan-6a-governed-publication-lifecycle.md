@@ -59,7 +59,7 @@ applied from a clean state.
 
 Independent checks proved:
 
-- Drizzle migrations `0000` through `0005` and PostGIS are present;
+- Drizzle migrations `0000` through `0006` and PostGIS are present;
 - both run enums have `draft`, `validated`, `published`, `superseded`, and `failed`;
 - all seven publication/member/audit tables, explicit foreign keys, checks, triggers, and the
   partial one-current unique index exist;
@@ -67,6 +67,27 @@ Independent checks proved:
 - controlled publish and withdraw functions exist;
 - zero current publications existed after migration; and
 - authoritative validated evidence remained unchanged.
+
+Migration `0005` remains immutable after application. Forward migration
+`0006_publication_metadata_not_null.sql` follows it and hardens the publication governance
+checks with explicit `IS NOT NULL` requirements for required failure and supersession metadata.
+
+## Review-hardening proof
+
+Review hardening used disposable Neon child `moo-768-review-hardening`
+(`br-old-butterfly-a5302z3w`). The live TypeScript publication repository checks passed with a
+30-second timeout, and the targeted publication-schema test passed after its query alias was
+corrected. The live Python Food Equity integration suite passed all 10 tests.
+
+Final read-only reconciliation returned:
+
+| Run | Status | Output hash | Shape | Publications |
+| --- | --- | --- | --- | --- |
+| Food `97bd1cdf-bf96-573f-8fcf-92e8676925d4` | `validated` | `dd53d60adf1755fff5d865f7ecfd4eba9459507b1c19c36a976b7152aa889096` | 302 scores; 1,196 components | 0 |
+| Equity `502e2a04-b013-53cd-8b09-c9144862701a` | `validated` | `19069c257e8f51fb4370b1ec8d04c6f823bd85e133846cf504866404c2c4e946` | 302 scores; 3,900 components | 0 |
+
+The disposable child was deleted, and source branch `br-floral-morning-a51g4fpt` had its exact
+expiration `2026-09-06T04:54:50Z` restored. Production was untouched.
 
 ## Controlled fixture lifecycle
 

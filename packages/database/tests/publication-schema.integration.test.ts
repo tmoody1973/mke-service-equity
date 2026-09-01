@@ -24,6 +24,26 @@ describe.skipIf(!process.env.DATABASE_URL)("publication schema integration", () 
       "atlas_publications",
     ]);
 
+    const metadataConstraints = await database.execute(sql`
+      select constraint_record.conname,
+        pg_get_constraintdef(constraint_record.oid) as definition
+      from pg_constraint constraint_record
+      where constraint_record.conname in (
+        'atlas_publications_state_metadata_check',
+        'atlas_publication_audit_events_error_check'
+      )
+      order by constraint_record.conname
+    `);
+    expect(metadataConstraints.rows).toHaveLength(2);
+    expect(metadataConstraints.rows.find(
+      (row) => row.conname === "atlas_publication_audit_events_error_check",
+    )?.definition).toMatch(/error_code IS NOT NULL/i);
+    const publicationMetadataDefinition = metadataConstraints.rows.find(
+      (row) => row.conname === "atlas_publications_state_metadata_check",
+    )?.definition;
+    expect(publicationMetadataDefinition).toMatch(/superseded_by IS NOT NULL/i);
+    expect(publicationMetadataDefinition).toMatch(/superseded_reason IS NOT NULL/i);
+
     const runStates = await database.execute(sql`
       select
         pg_type.typname,

@@ -25,13 +25,13 @@ const request = {
 describe("publication command environment", () => {
   it("accepts an exact development-only host guard", () => {
     expect(validatePublicationCommandEnvironment(request, {
-      DATABASE_URL_UNPOOLED: "postgresql://user:secret@ep-fixture.us-east-2.aws.neon.tech/neondb",
+      DATABASE_URL_UNPOOLED: "postgresql://user:secret@ep-fixture.example.test/neondb",
       MKE_PIPELINE_ENV: "development",
       MKE_PUBLICATION_ENV: "development",
-      MKE_PUBLICATION_EXPECTED_HOST: "ep-fixture.us-east-2.aws.neon.tech",
+      MKE_PUBLICATION_EXPECTED_HOST: "ep-fixture.example.test",
     })).toEqual({
-      databaseUrl: "postgresql://user:secret@ep-fixture.us-east-2.aws.neon.tech/neondb",
-      databaseHost: "ep-fixture.us-east-2.aws.neon.tech",
+      databaseUrl: "postgresql://user:secret@ep-fixture.example.test/neondb",
+      databaseHost: "ep-fixture.example.test",
       environment: "development",
     });
   });
@@ -42,10 +42,10 @@ describe("publication command environment", () => {
     ["database_host_mismatch", {MKE_PUBLICATION_EXPECTED_HOST: "production.example.test"}],
   ] as const)("fails closed with %s", (code, override) => {
     expect(() => validatePublicationCommandEnvironment(request, {
-      DATABASE_URL_UNPOOLED: "postgresql://user:secret@ep-fixture.us-east-2.aws.neon.tech/neondb",
+      DATABASE_URL_UNPOOLED: "postgresql://user:secret@ep-fixture.example.test/neondb",
       MKE_PIPELINE_ENV: "development",
       MKE_PUBLICATION_ENV: "development",
-      MKE_PUBLICATION_EXPECTED_HOST: "ep-fixture.us-east-2.aws.neon.tech",
+      MKE_PUBLICATION_EXPECTED_HOST: "ep-fixture.example.test",
       ...override,
     })).toThrowError(new PublicationCommandError(code));
   });

@@ -151,7 +151,9 @@ export const atlasPublications = pgTable(
       ) OR (
         ${table.state} = 'superseded'
         AND ${table.supersededAt} IS NOT NULL
+        AND ${table.supersededBy} IS NOT NULL
         AND btrim(${table.supersededBy}) <> ''
+        AND ${table.supersededReason} IS NOT NULL
         AND btrim(${table.supersededReason}) <> ''
       )`,
     ),
@@ -380,7 +382,9 @@ export const atlasPublicationAuditEvents = pgTable(
     ),
     check(
       "atlas_publication_audit_events_error_check",
-      sql`(${table.outcome} IN ('rejected', 'failed') AND btrim(${table.errorCode}) <> '')
+      sql`(${table.outcome} IN ('rejected', 'failed')
+        AND ${table.errorCode} IS NOT NULL
+        AND btrim(${table.errorCode}) <> '')
         OR (${table.outcome} IN ('attempted', 'succeeded') AND ${table.errorCode} IS NULL)`,
     ),
     index("atlas_publication_audit_events_idempotency_idx").on(table.idempotencyKey),

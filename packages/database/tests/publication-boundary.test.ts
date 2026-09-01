@@ -16,4 +16,14 @@ describe("publication capability boundary", () => {
     expect(serverSource).not.toMatch(/publishAtlasRelease|withdrawAtlasRelease|publication\/cli/);
     expect(packageManifest.exports).toEqual({"./server": "./src/server.ts"});
   });
+
+  it("scans client assets for both SQL and TypeScript publication mutation names", async () => {
+    const bundleVerificationSource = await readFile(
+      new URL("../../../apps/web/scripts/verify-analysis-client-bundle.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(bundleVerificationSource).toContain("_atlas_release|AtlasRelease");
+    expect(bundleVerificationSource).toContain("publish|withdraw");
+  });
 });

@@ -100,7 +100,9 @@ const sourceDecisions: Record<string, SourceDecision> = {
 
 export function decideSourcePublication(sourceKey: string): SourceDecision {
   const normalizedKey = sourceKey.startsWith("acs-") ? "acs" : sourceKey;
-  const decision = sourceDecisions[normalizedKey];
+  const decision = Object.hasOwn(sourceDecisions, normalizedKey)
+    ? sourceDecisions[normalizedKey]
+    : undefined;
   if (!decision) {
     throw new PublicationPolicyError("unreviewed_source");
   }

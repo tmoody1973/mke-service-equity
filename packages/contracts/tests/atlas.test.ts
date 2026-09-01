@@ -1,5 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {
+  atlasAvailableResponseSchema,
   atlasSearchResponseSchema,
   atlasResponseSchema,
   atlasNeighborhoodContextSchema,
@@ -195,6 +196,13 @@ describe("atlasResponseSchema", () => {
       contextLayers: {foodSites},
     }).success).toBe(true);
     expect(atlasResponseSchema.safeParse({
+      state: "available",
+      mode: "published",
+      run,
+      tracts: {type: "FeatureCollection", features: [feature]},
+      contextLayers: {foodSites},
+    }).success).toBe(false);
+    expect(atlasAvailableResponseSchema.safeParse({
       state: "available",
       mode: "published",
       run,

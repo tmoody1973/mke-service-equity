@@ -34,8 +34,8 @@ remains blocked behind Gate 3.
 
 1. Work only in .worktrees/moo-768 on codex/moo-768-publication-lifecycle.
 2. Preserve commit add20f4 as the separately approved contract checkpoint.
-3. Add only forward migration 0005 after the existing 0004 neighborhood migration. Never edit an
-   applied migration.
+3. Keep applied migrations immutable. Migration 0005 follows the existing 0004 neighborhood
+   migration; review hardening is added only through forward migration 0006.
 4. Keep the authoritative Equity and Food development runs validated and unchanged throughout
    implementation and fixture verification.
 5. Use controlled fixture runs for publish, replace, withdraw, retry, and failure tests.
@@ -94,6 +94,8 @@ remains blocked behind Gate 3.
   - schema exports.
 - packages/database/drizzle/0005_governed_publication.sql
   - forward-only SQL, lifecycle/immutability guards, grants, and controlled operation.
+- packages/database/drizzle/0006_publication_metadata_not_null.sql
+  - forward-only review hardening for supersession and failed-audit metadata checks.
 - packages/database/drizzle/meta files
   - generated Drizzle snapshot and journal update.
 - packages/database/tests/publication-schema.test.ts,
@@ -188,11 +190,11 @@ change.
 
 **Files:** This plan and Linear approval evidence only.
 
-- [ ] Review exact file boundaries, fixture strategy, migration sequence, CLI controls, live branch
+- [x] Review exact file boundaries, fixture strategy, migration sequence, CLI controls, live branch
   plan, verification gates, and production exclusion with Tarik.
 - [x] Obtain explicit response: **Approve MOO-768 implementation plan.**
 - [x] Change Plan status to Approved, record the approval date, and add Linear evidence.
-- [ ] Commit this approved plan before schema implementation.
+- [x] Commit this approved plan before schema implementation.
 
     git add docs/superpowers/plans/2026-09-01-governed-publication-lifecycle.md
     git commit -m "docs: approve MOO-768 implementation plan"
@@ -209,13 +211,13 @@ change.
 
 **Files:** Contract files and tests from the publication-contract file map.
 
-- [ ] Write failing tests first for strict release state, member roles, redistribution decisions,
+- [x] Write failing tests first for strict release state, member roles, redistribution decisions,
   UUID/hash/timestamp fields, idempotency, approval, and confirmation inputs.
-- [ ] Define canonical manifest collections with deterministic sort keys and duplicate rejection.
-- [ ] Keep operational metadata separate from the bundle-fingerprint input.
-- [ ] Model published run summaries with publication ID/timestamp while leaving validated-preview
+- [x] Define canonical manifest collections with deterministic sort keys and duplicate rejection.
+- [x] Keep operational metadata separate from the bundle-fingerprint input.
+- [x] Model published run summaries with publication ID/timestamp while leaving validated-preview
   contracts explicit and unchanged.
-- [ ] Reject unknown fields, empty approval/actor/reason values, malformed hashes, duplicate
+- [x] Reject unknown fields, empty approval/actor/reason values, malformed hashes, duplicate
   members, prohibited public-display decisions, and unbounded audit payloads.
 
     npm test --workspace @mke/contracts -- tests/atlas-publication.test.ts tests/atlas-run.test.ts
@@ -230,19 +232,19 @@ any migration or database connection.
 
 **Files:** Schema, migration, metadata, and schema tests from the file map.
 
-- [ ] Write static migration/schema tests before generating SQL.
-- [ ] Extend Food status with published and superseded and update only the reviewed completion,
+- [x] Write static migration/schema tests before generating SQL.
+- [x] Extend Food status with published and superseded and update only the reviewed completion,
   output-hash, and validation checks.
-- [ ] Replace Plan 2/3 transition guards with the approved forward-only state machines while
+- [x] Replace Plan 2/3 transition guards with the approved forward-only state machines while
   preserving draft-to-validated/failed behavior.
-- [ ] Add publication/member/audit tables, explicit FKs, checks, unique constraints, and one
+- [x] Add publication/member/audit tables, explicit FKs, checks, unique constraints, and one
   partial unique current-release index.
-- [ ] Add append-only release/audit protections and update/delete guards for every released
+- [x] Add append-only release/audit protections and update/delete guards for every released
   analytical, value, snapshot, resource, and membership row.
-- [ ] Add a controlled database operation and required grants without exposing table DML to the
+- [x] Add a controlled database operation and required grants without exposing table DML to the
   application reader or pipeline writer.
-- [ ] Prove invalid direct inserts/status changes and partial member sets cannot become current.
-- [ ] Confirm migration 0005 is additive/forward-only and does not edit 0000–0004.
+- [x] Prove invalid direct inserts/status changes and partial member sets cannot become current.
+- [x] Confirm migration 0005 is additive/forward-only and does not edit 0000–0004.
 
     npm test --workspace @mke/database -- tests/publication-schema.test.ts tests/migration-scope.test.ts
     npm run typecheck --workspace @mke/database
@@ -256,18 +258,18 @@ database has been touched.
 
 **Files:** Manifest/policy/reconciliation modules and unit tests.
 
-- [ ] Write failing golden tests for stable manifest bytes and bundle fingerprint regardless of
+- [x] Write failing golden tests for stable manifest bytes and bundle fingerprint regardless of
   storage query order.
-- [ ] Reject duplicate, missing, wrong-run, hash-mismatched, or ambiguous member IDs.
-- [ ] Require exact score pairs for every canonical geography and exact components/value rows for
+- [x] Reject duplicate, missing, wrong-run, hash-mismatched, or ambiguous member IDs.
+- [x] Require exact score pairs for every canonical geography and exact components/value rows for
   both run systems.
-- [ ] Require all contributing source snapshots and the explicit scoring resource inventory.
-- [ ] Require terms reference, attribution, warning, and one redistribution decision per
+- [x] Require all contributing source snapshots and the explicit scoring resource inventory.
+- [x] Require terms reference, attribution, warning, and one redistribution decision per
   source/resource membership.
-- [ ] Prove EmergencyFood_MKE_2024 can only be prohibited_public_use.
-- [ ] Prove no FNS direct-display decision appears automatically and Pantries 2026 is not inferred
+- [x] Prove EmergencyFood_MKE_2024 can only be prohibited_public_use.
+- [x] Prove no FNS direct-display decision appears automatically and Pantries 2026 is not inferred
   into the analytical bundle.
-- [ ] Keep missing and unavailable facts explicit; never turn them into zero or omit their
+- [x] Keep missing and unavailable facts explicit; never turn them into zero or omit their
   exclusion evidence.
 
     npm test --workspace @mke/database -- tests/publication-manifest.test.ts tests/publication-policy.test.ts
@@ -286,16 +288,16 @@ unapproved public resource fails closed.
 
 **Files:** Publication repository and database integration tests.
 
-- [ ] Write controlled fixture integration tests before repository implementation.
-- [ ] Acquire the single release-channel advisory lock and compare the expected current release.
-- [ ] Lock/revalidate candidate runs, hashes, validation evidence, and exact member rows.
-- [ ] Insert release/member rows and promote the candidate atomically.
-- [ ] Replace by superseding the current Food/release and only superseding its baseline when the
+- [x] Write controlled fixture integration tests before repository implementation.
+- [x] Acquire the single release-channel advisory lock and compare the expected current release.
+- [x] Lock/revalidate candidate runs, hashes, validation evidence, and exact member rows.
+- [x] Insert release/member rows and promote the candidate atomically.
+- [x] Replace by superseding the current Food/release and only superseding its baseline when the
   new release does not reuse it.
-- [ ] Withdraw only the exact current release under separate approval, leaving zero current.
-- [ ] Enforce one current release through transaction checks plus the partial unique index.
-- [ ] Prove a forced failure at every mutation stage rolls back all publication/status changes.
-- [ ] Prove published/superseded analytical content and audit history cannot update or delete.
+- [x] Withdraw only the exact current release under separate approval, leaving zero current.
+- [x] Enforce one current release through transaction checks plus the partial unique index.
+- [x] Prove a forced failure at every mutation stage rolls back all publication/status changes.
+- [x] Prove published/superseded analytical content and audit history cannot update or delete.
 
     npm exec --workspace @mke/database -- vitest run tests/publication-repository.integration.test.ts
     npm run typecheck --workspace @mke/database
@@ -309,17 +311,17 @@ withdrawal, concurrency defense, and zero partial state after failure.
 
 **Files:** Command/CLI/report files, scripts, dependency lock, and tests.
 
-- [ ] Write argument/environment/redaction/idempotency tests first.
-- [ ] Implement dry-run, publish, reconcile, and withdraw as separate explicit commands.
-- [ ] Require exact environment, candidate/current IDs, approval ID, idempotency key, dry-run
+- [x] Write argument/environment/redaction/idempotency tests first.
+- [x] Implement dry-run, publish, reconcile, and withdraw as separate explicit commands.
+- [x] Require exact environment, candidate/current IDs, approval ID, idempotency key, dry-run
   hash, actor, reason, and confirmation values.
-- [ ] Refuse production without the Gate 3 guard inputs; refuse any write when database identity
+- [x] Refuse production without the Gate 3 guard inputs; refuse any write when database identity
   cannot be safely checked.
-- [ ] Persist append-only attempted and outcome events where reachable and always emit a
+- [x] Persist append-only attempted and outcome events where reachable and always emit a
   secret-free local report.
-- [ ] Return prior success for an identical safe retry; reject an idempotency-key collision.
-- [ ] Ensure raw exceptions, URLs, credentials, and environment values are redacted.
-- [ ] Keep the CLI outside packages/database/src/server.ts and every web import graph.
+- [x] Return prior success for an identical safe retry; reject an idempotency-key collision.
+- [x] Ensure raw exceptions, URLs, credentials, and environment values are redacted.
+- [x] Keep the CLI outside packages/database/src/server.ts and every web import graph.
 
     npm test --workspace @mke/database -- tests/publication-command.test.ts tests/publication-report.test.ts
     npm run typecheck --workspace @mke/database
@@ -333,16 +335,16 @@ cannot publish without the exact dry run/approval, and emits no secrets.
 
 **Files:** Atlas run contract, run selector, database exports, downstream tests.
 
-- [ ] Write published-selector tests before changing the no_published_run branch.
-- [ ] Query the zero-or-one published release with exact Food/Baseline IDs, hashes, status,
+- [x] Write published-selector tests before changing the no_published_run branch.
+- [x] Query the zero-or-one published release with exact Food/Baseline IDs, hashes, status,
   publication ID/time, and member summary; do not order by date or query latest.
-- [ ] Reject missing, duplicate, superseded, hash-mismatched, incompletely manifested, or
+- [x] Reject missing, duplicate, superseded, hash-mismatched, incompletely manifested, or
   prohibited-public-member releases.
-- [ ] Preserve the exact guarded validated-preview query and its private/dynamic behavior.
-- [ ] Include immutable publication identity in public response/cache identity.
-- [ ] Prove Atlas, profile, Compare, and Opportunity receive the same SelectedAtlasRun and cannot
+- [x] Preserve the exact guarded validated-preview query and its private/dynamic behavior.
+- [x] Include immutable publication identity in public response/cache identity.
+- [x] Prove Atlas, profile, Compare, and Opportunity receive the same SelectedAtlasRun and cannot
   switch releases during one request.
-- [ ] Confirm packages/database/src/server.ts exports no publication mutation function.
+- [x] Confirm packages/database/src/server.ts exports no publication mutation function.
 
     npm test --workspace @mke/database -- tests/atlas-run-selector.test.ts
     npm test --workspace @mke/contracts -- tests/atlas-run.test.ts
@@ -362,13 +364,13 @@ remains unchanged and no web request can publish.
 
 **Human gate:** Ask Tarik to approve the exact branch before any creation or migration.
 
-- [ ] Resolve and record the existing Neon project, source branch containing the validated Plan 2
+- [x] Resolve and record the existing Neon project, source branch containing the validated Plan 2
   and Plan 3 runs, database, role, non-default status, and planned seven-day expiry without
   printing a connection string.
-- [ ] Propose child branch moo-768-publication-lifecycle with a seven-day TTL.
-- [ ] Obtain explicit approval for that exact development-only branch.
-- [ ] Create/checkout it, verify identity, and record sanitized IDs/expiry.
-- [ ] Confirm the authoritative run IDs, statuses, output hashes, fingerprints, counts, and zero
+- [x] Propose child branch moo-768-publication-lifecycle with a seven-day TTL.
+- [x] Obtain explicit approval for that exact development-only branch.
+- [x] Create/checkout it, verify identity, and record sanitized IDs/expiry.
+- [x] Confirm the authoritative run IDs, statuses, output hashes, fingerprints, counts, and zero
   current publications before migration.
 
 **Expected outcome:** A confirmed disposable branch contains untouched authoritative validated
@@ -376,12 +378,12 @@ runs and no published release.
 
 ### Task 10: Apply migration and independently verify schema/permissions
 
-- [ ] Apply only migrations 0000–0005 to the approved branch.
-- [ ] Verify PostGIS, journal scope, enums, tables, indexes, partial uniqueness, FKs, triggers,
+- [x] Apply only migrations 0000–0005 to the approved branch.
+- [x] Verify PostGIS, journal scope, enums, tables, indexes, partial uniqueness, FKs, triggers,
   controlled operation, grants, and application/pipeline denial paths with independent SQL.
-- [ ] Reconfirm authoritative run hashes, fingerprints, counts, and validated statuses are
+- [x] Reconfirm authoritative run hashes, fingerprints, counts, and validated statuses are
   unchanged.
-- [ ] Run database TypeScript integration and Python integration gates against this branch only.
+- [x] Run database TypeScript integration and Python integration gates against this branch only.
 
     npm run db:migrate --workspace @mke/database
     npm run test:integration --workspace @mke/database
@@ -392,18 +394,18 @@ development evidence.
 
 ### Task 11: Exercise controlled fixture lifecycle and reconcile reality
 
-- [ ] Insert controlled validated fixture pairs that cannot be mistaken for authoritative runs.
-- [ ] Dry-run and publish fixture A; independently reconcile every member/hash/count/decision.
-- [ ] Safely retry the identical request and prove no duplicate release/member/audit success.
-- [ ] Prove all invalid transitions: draft/failed publication, missing/mismatched baseline,
+- [x] Insert controlled validated fixture pairs that cannot be mistaken for authoritative runs.
+- [x] Dry-run and publish fixture A; independently reconcile every member/hash/count/decision.
+- [x] Safely retry the identical request and prove no duplicate release/member/audit success.
+- [x] Prove all invalid transitions: draft/failed publication, missing/mismatched baseline,
   incomplete validation, wrong hash, missing member, duplicate current, re-publication,
   published-content mutation/deletion, and superseded-as-current.
-- [ ] Publish fixture B, prove fixture A becomes superseded atomically, and prove exact selector
+- [x] Publish fixture B, prove fixture A becomes superseded atomically, and prove exact selector
   switch with no partial response.
-- [ ] Exercise rollback-by-forward-replacement logic and approved withdrawal on fixtures.
-- [ ] Force transaction failure and prove no partial release/status survives.
-- [ ] Prove prohibited emergency-food and unapproved resources never enter a public member set.
-- [ ] Confirm authoritative Plan 2/3 runs remain validated, unchanged, and unpublished.
+- [x] Exercise rollback-by-forward-replacement logic and approved withdrawal on fixtures.
+- [x] Force transaction failure and prove no partial release/status survives.
+- [x] Prove prohibited emergency-food and unapproved resources never enter a public member set.
+- [x] Confirm authoritative Plan 2/3 runs remain validated, unchanged, and unpublished.
 
 **Expected outcome:** Live evidence satisfies every MOO-768 verification item without publishing
 authoritative or production data.
@@ -412,17 +414,17 @@ authoritative or production data.
 
 **Files:** Operations/runbook plus core docs and verification record.
 
-- [ ] Document exact dry-run, publish, reconcile, replace, withdraw, safe retry, and report
+- [x] Document exact dry-run, publish, reconcile, replace, withdraw, safe retry, and report
   handling procedures without credentials.
-- [ ] Document Gate 3 approval evidence, role separation, expected-current compare-and-swap,
+- [x] Document Gate 3 approval evidence, role separation, expected-current compare-and-swap,
   monitoring checks, current selector, cache identity, and source licensing limitations.
-- [ ] Document incident responses for rejected dry run, failed transaction, no current release,
+- [x] Document incident responses for rejected dry run, failed transaction, no current release,
   selector inconsistency, post-release application fault, suspected credentials, and source-term
   change.
-- [ ] State that operators never hand-edit statuses, members, hashes, or pointers.
-- [ ] Update schema, ingestion, database, architecture, scoring governance, data quality, and
+- [x] State that operators never hand-edit statuses, members, hashes, or pointers.
+- [x] Update schema, ingestion, database, architecture, scoring governance, data quality, and
   README behavior only where the implementation now differs.
-- [ ] Record sanitized live commands, counts, hashes, test outcomes, branch TTL, and limitations.
+- [x] Record sanitized live commands, counts, hashes, test outcomes, branch TTL, and limitations.
 
     git add README.md docs
     git commit -m "docs: operate and verify MOO-768 publication"
@@ -436,15 +438,15 @@ stop conditions without seeing a secret or assuming production approval.
 
 ### Task 13: Prove permission, web-boundary, and secret controls
 
-- [ ] Test application reader SELECT boundary and denial of publication operation/table mutation.
-- [ ] Test pipeline writer cannot publish.
-- [ ] Test publication operator can execute only the controlled operation and required reads.
-- [ ] Prove browser/client bundles contain no database/publication credentials, mutation exports,
+- [x] Test application reader SELECT boundary and denial of publication operation/table mutation.
+- [x] Test pipeline writer cannot publish.
+- [x] Test publication operator can execute only the controlled operation and required reads.
+- [x] Prove browser/client bundles contain no database/publication credentials, mutation exports,
   approval IDs, or CLI code.
-- [ ] Prove Next.js build/start, Vercel deploy hooks, and ordinary public routes cannot invoke a
+- [x] Prove Next.js build/start, Vercel deploy hooks, and ordinary public routes cannot invoke a
   publication write.
-- [ ] Run GitGuardian or the repository's approved secret scanner on the complete branch diff.
-- [ ] Review SQL injection, identifier allowlists, parameterization, report path safety, and
+- [x] Run GitGuardian or the repository's approved secret scanner on the complete branch diff.
+- [x] Review SQL injection, identifier allowlists, parameterization, report path safety, and
   redaction behavior.
 
 **Expected outcome:** Publication is a server-only least-privilege capability with no web or
@@ -452,11 +454,11 @@ deployment path.
 
 ### Task 14: Run full offline and isolated live verification
 
-- [ ] Run focused contract/database/CLI/selector suites.
-- [ ] Run the entire repository gate.
-- [ ] Run migration/integration tests on the approved expiring Neon branch.
-- [ ] Re-run final read-only reconciliation after all tests.
-- [ ] Confirm no authoritative run status/hash/count changed and no production connection was
+- [x] Run focused contract/database/CLI/selector suites.
+- [x] Run the entire repository gate.
+- [x] Run migration/integration tests on the approved expiring Neon branch.
+- [x] Re-run final read-only reconciliation after all tests.
+- [x] Confirm no authoritative run status/hash/count changed and no production connection was
   used.
 
     npm run verify
@@ -469,13 +471,13 @@ documentation gates pass with exact recorded evidence.
 
 ### Task 15: Review, PR, and Gate 3 stop
 
-- [ ] Review every commit/diff against the approved contract and MOO-768 acceptance criteria.
-- [ ] Push codex/moo-768-publication-lifecycle and open a PR linked to MOO-768.
+- [x] Review every commit/diff against the approved contract and MOO-768 acceptance criteria.
+- [x] Push codex/moo-768-publication-lifecycle and open a PR linked to MOO-768.
 - [ ] Run CI, CodeRabbit, secret scanning, and resolve substantive review findings.
 - [ ] Obtain Tarik's approval to merge after evidence review.
 - [ ] Merge and record the merge commit/PR in Linear.
 - [ ] Mark MOO-768 Done only after merge and evidence.
-- [ ] Leave production publication unperformed. Create or advance the separate Gate 3 release
+- [x] Leave production publication unperformed. Create or advance the separate Gate 3 release
   decision with exact candidate/dry-run evidence only when Tarik explicitly requests it.
 
 **Expected outcome:** The governed mechanism is merged and proven, while public production data

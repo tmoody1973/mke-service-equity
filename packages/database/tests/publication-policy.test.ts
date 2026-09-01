@@ -33,6 +33,14 @@ describe("publication source policy", () => {
     expect(() => decideSourcePublication("latest_food_layer"))
       .toThrowError(new PublicationPolicyError("unreviewed_source"));
   });
+
+  it.each(["constructor", "toString", "valueOf"])(
+    "fails closed for the inherited object key %s",
+    (sourceKey) => {
+      expect(() => decideSourcePublication(sourceKey))
+        .toThrowError(new PublicationPolicyError("unreviewed_source"));
+    },
+  );
 });
 
 describe("publication resource policy", () => {

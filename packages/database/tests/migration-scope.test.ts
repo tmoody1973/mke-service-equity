@@ -166,6 +166,7 @@ describe("Plan 3 food-equity contract amendment", () => {
       {idx: 3, tag: "0003_food_equity_contract_amendment"},
       {idx: 4, tag: "0004_atlas_neighborhood_context"},
       {idx: 5, tag: "0005_governed_publication"},
+      {idx: 6, tag: "0006_publication_metadata_not_null"},
     ]);
   });
 });
@@ -217,6 +218,24 @@ describe("MOO-768 governed publication migration", () => {
     );
     expect(migration).toMatch(/REVOKE ALL ON FUNCTION publish_atlas_release/i);
     expect(migration).toMatch(/REVOKE ALL ON FUNCTION withdraw_atlas_release/i);
+  });
+
+  it("hardens nullable governance metadata through a forward repair migration", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0006_publication_metadata_not_null.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+
+    expect(migration).toContain(
+      'DROP CONSTRAINT "atlas_publications_state_metadata_check"',
+    );
+    expect(migration).toContain(
+      'DROP CONSTRAINT "atlas_publication_audit_events_error_check"',
+    );
+    expect(migration).toMatch(/"superseded_by" IS NOT NULL[\s\S]*btrim\("atlas_publications"\."superseded_by"\) <> ''/i);
+    expect(migration).toMatch(/"superseded_reason" IS NOT NULL[\s\S]*btrim\("atlas_publications"\."superseded_reason"\) <> ''/i);
+    expect(migration).toMatch(/"error_code" IS NOT NULL[\s\S]*btrim\("atlas_publication_audit_events"\."error_code"\) <> ''/i);
+    expect(migration).not.toMatch(/DROP TABLE|TRUNCATE|DELETE FROM/i);
   });
 });
 

@@ -42,6 +42,10 @@ publish/withdraw database functions. Public execution is revoked. Production rol
 provisioned separately so the application reader, pipeline writer, publication operator, and
 migration owner remain distinct.
 
+Applied migration `0005` remains immutable. Forward migration
+`0006_publication_metadata_not_null.sql` adds explicit `IS NOT NULL` requirements to the
+governance checks for required failure and supersession metadata.
+
 ## Local checks
 
 These checks do not require a database connection:
