@@ -94,3 +94,47 @@ polygon area within the portion covered by the City reference, not population, i
 membership, or service jurisdiction. Sub-1% boundary slivers may be grouped for display but remain
 auditable. Missing coverage is never converted into a nearest, centroid-selected, or ZIP-inferred
 neighborhood.
+
+## Analyze exact-run quality boundary
+
+Compare and Opportunity use the Atlas exact-run selector. Before a response is available, the
+server must bind canonical geography, the selected Food Equity run, its pinned Equity Baseline
+run, methodology labels, scores, required components and observations, and their quality/lineage
+checks. Compare additionally returns detailed uncertainty and source evidence. Unknown tracts,
+duplicate evidence, a mismatched baseline, wrong-run rows, or incomplete required joins make the
+complete response unavailable. Compare never returns a partly valid tract set.
+
+Public mode reads only a governed published bundle. Until `MOO-768` publishes one, both Analyze
+routes return `no_published_run` and show no validated data. A guarded local validated preview
+must name one exact run in server-only development configuration and display that it is not
+published. A deployment or verification run does not publish, supersede, or mutate data.
+
+## Opportunity missing-data and population rules
+
+Applied filters use three-valued evaluation: match, non-match, or missing. A tract is counted as
+excluded for missing filter data only when at least one active condition is unevaluable and every
+other evaluable condition matches. If any evaluable condition fails, the tract is an ordinary
+non-match. Missing never becomes zero, the lowest band, or unreachable.
+
+The population summary is the sum of known population values for matching canonical tracts. A
+matching tract with unavailable population remains in the matching count, is excluded from the
+known sum, and increments a separate missing-population count. An observed zero-population tract
+contributes zero and remains distinguishable from unavailable population. The UI says
+**population living in matching tracts**, never affected, served, or recommended population.
+
+Opportunity returns matching tract summaries without polygon geometry. The bounded Atlas
+collection supplies map shapes, and MapLibre highlights the server result without deciding which
+tracts match. Contextual food sites, public land, and public investment have no approved run-tied
+filter contract and cannot affect results.
+
+## Compare uncertainty and Differences
+
+Compare preserves the same observed/missing/suppressed/conflicting/unreachable states,
+reliability labels, margins of error, definitions, limitations, vintages, and sources as the Atlas
+profile. The deterministic Differences helper may include a numeric measure only when at least two
+valid county percentiles differ by 20 points or more. Missing values never create a gap. A stored
+ACS caution, high-uncertainty, or unclear-reliability state follows the statement and points to the
+estimate range; it does not alter the estimate, percentile, band, score, or eligibility.
+
+Neither workflow ranks tracts, infers a cause, recommends an intervention, or uses AI. Food sites,
+public land, and public investment remain contextual and cannot change an analytical result.

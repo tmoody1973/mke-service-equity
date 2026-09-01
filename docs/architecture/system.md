@@ -70,6 +70,39 @@ Owns:
 
 MapLibre does not own official GIS analysis or scoring.
 
+## Analyze request flow
+
+```text
+SHAREABLE URL
+        ↓
+STRICT REQUEST PARSER
+        ↓
+EXACT ATLAS RUN SELECTOR
+        ↓
+PARAMETERIZED COMPARE / OPPORTUNITY SQL
+        ↓
+STRICT BROWSER-SAFE RESPONSE CONTRACT
+        ↓
+SERVER COMPONENT + RESPONSIVE CLIENT INTERACTIONS
+        ↓
+MAPLIBRE VISUAL MIRROR + COMPLETE NON-MAP EVIDENCE
+```
+
+`/analyze/compare` accepts two to five unique repeated `tract` parameters and preserves their
+selection order for presentation. `/analyze/opportunity` accepts only the supported normalized
+applied-filter parameters. PostgreSQL applies OR within a filter category, AND across categories,
+inclusive numeric thresholds, the missing-filter tri-state rule, and canonical tract ordering.
+
+The Compare repository joins canonical geography to the exact Food run, its pinned Equity run,
+score components, indicator evidence, uncertainty, and source lineage. The separate authoritative
+search boundary supplies tract and neighborhood matches. The repository fails the whole response
+when a requested tract or required join is invalid; it never constructs a partial comparison.
+Opportunity returns concise tract summaries without geometry. The already bounded Atlas GeoJSON
+supplies shapes, and MapLibre highlights only the server-returned GEOIDs.
+
+Complete five-tract Compare responses are capped at 500 KB uncompressed. Geometry-free
+Opportunity responses are capped at 150 KB, while shared Atlas GeoJSON remains capped at 1.1 MB.
+
 ## Server-first rule
 
 Use Server Components by default.
@@ -83,6 +116,27 @@ The Atlas sends a bounded tract map payload first. When a person selects a tract
 loads the exact Food and Equity inputs, uncertainty, limitations, and source lineage for that same
 run and geography. If those joins cannot be proven, the route returns an explicit unavailable
 state instead of partial or inferred evidence.
+
+Compare's deterministic Differences helper consumes only the validated response and uses fixed
+rules; it does not query new data or use an LLM. Opportunity filtering and missing-data counts are
+computed by parameterized server SQL. Pending form edits, sheet state, accordions, and hover remain
+browser presentation state and do not become analytical authority.
+
+Contextual food sites, public land, and public investment do not participate in Opportunity
+filtering. No Analyze route recalculates a score, performs browser GIS, ranks tracts, recommends an
+intervention, or changes a score run.
+
+## Run selection and caching
+
+Public mode may select only one internally consistent published Food Equity bundle and its pinned
+Equity Baseline run. Until governed publication is completed by `MOO-768`, Analyze returns
+`no_published_run` and shows no validated data. Local validated preview is allowed only with the
+explicit development-only server configuration, remains visibly marked, and cannot run in
+production.
+
+Validated-preview responses are dynamic and excluded from shared public caches. A future
+published cache may key only on immutable publication identity plus normalized request identity.
+A deployment never publishes, supersedes, or mutates analytical data.
 
 ## Deployment
 

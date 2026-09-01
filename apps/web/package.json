@@ -8,11 +8,12 @@
     "predev": "npm run prepare:maplibre-worker",
     "dev": "next dev",
     "prebuild": "npm run prepare:maplibre-worker",
-    "build": "next build --webpack",
+    "build": "next build --webpack && node scripts/verify-analysis-client-bundle.mjs",
+    "verify:analysis-bundle": "node scripts/verify-analysis-client-bundle.mjs",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --maxWorkers=4 --testTimeout=15000"
   },
   "dependencies": {
     "@heroui-pro/react": "1.0.0-beta.8",

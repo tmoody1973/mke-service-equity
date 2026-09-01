@@ -2,12 +2,20 @@ import {expect, test, type Page} from "@playwright/test";
 import {mkdir} from "node:fs/promises";
 import path from "node:path";
 
+import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
+
+const validatedPreview = process.env.MKE_ATLAS_DATA_MODE === "validated_preview"
+  && Boolean(process.env.MKE_ATLAS_PREVIEW_RUN_ID);
+
 function observeBrowserErrors(page: Page) {
   const errors: string[] = [];
 
   page.on("console", (message) => {
-    if (message.type() === "error") {
-      errors.push(`console: ${message.text()}`);
+    const text = message.text();
+    // HeroUI Pro's React Aria IDs differ only under Next's development renderer.
+    // Public production-mode coverage continues to reject every console error.
+    if (message.type() === "error" && !isKnownHeroUiReactAriaDevHydrationWarning(text)) {
+      errors.push(`console: ${text}`);
     }
   });
   page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
@@ -42,9 +50,15 @@ test("renders and operates the shell at the configured width", async ({page}, te
   await expect(attribution).toBeVisible();
   await expect(attribution).toBeInViewport();
   await expect(attribution).toContainText("MapLibre GL JS");
-  await expect(
-    page.getByText("No published Food Equity results are available yet.", {exact: true}),
-  ).toBeVisible();
+  if (validatedPreview) {
+    await expect(
+      page.getByText("Preview only — checked, but not published.", {exact: true}),
+    ).toBeVisible();
+  } else {
+    await expect(
+      page.getByText("No published Food Equity results are available yet.", {exact: true}),
+    ).toBeVisible();
+  }
 
   const mapWorkspaceBox = await mapWorkspace.boundingBox();
   const mapContainerBox = await mapContainer.boundingBox();

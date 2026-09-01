@@ -7,8 +7,11 @@ mke-service-equity/
 │   ├── app/                  # App Router shell and server health route
 │   ├── components/           # HeroUI Pro application shell
 │   ├── data/context/         # Sanitized, release-pinned, browser-safe context display snapshots
+│   ├── features/analyze/     # Shared Analyze URL, availability, and unavailable-state boundaries
 │   ├── features/atlas/       # Atlas state, exact tract profile, and plain-language presentation
+│   ├── features/compare/     # Compare URL state, selection, Differences, matrix, and cards
 │   ├── features/map/         # Isolated MapLibre client lifecycle
+│   ├── features/opportunity/ # Applied filters, result list, sheets, and synchronized map state
 │   ├── public/map-style.json # Deterministic data-free style
 │   └── test/                 # Web-only test adapters
 ├── packages/
@@ -73,3 +76,23 @@ retrieval and edit dates, attribution, and limitations. The server validates it 
 only that context layer unavailable. MapLibre visualizes the points and selected state, while URL
 state stores only the layer toggle and stable source-derived site ID. The layer has no database or
 analytical-run join and is explicitly typed as `display_context_only_not_part_of_score_run`.
+
+Plan 5 adds strict Compare and Opportunity contracts in `packages/contracts`, parameterized
+repositories in `packages/database/src/analyze/`, and server loaders plus responsive presentation
+in the matching web feature folders. The database layer selects one exact Food run and pinned
+Equity run, validates canonical geography and evidence lineage, and returns only browser-safe
+presentation contracts. Compare preserves requested tract order; Opportunity performs set
+filtering and canonical ordering in SQL and returns no duplicate geometry.
+
+`apps/web/features/compare/differences.ts` applies the documented deterministic comparison rules
+to already validated evidence. It contains no network, database, LLM, or scoring path.
+`apps/web/features/opportunity/` keeps pending form state separate from applied canonical URL state;
+the server result remains authoritative for map highlights, matching counts, population summaries,
+missing-data exclusions, and the non-map list. Shared Atlas geometry is passed to MapLibre only for
+visualization. Contextual food sites, public land, and public investment do not enter these
+repositories or filter contracts.
+
+Worst-case contract tests enforce 500 KB for a complete five-tract Compare response, 150 KB for a
+geometry-free Opportunity response, and 1.1 MB for shared Atlas GeoJSON. Every production web
+build scans client assets for database variables, preview configuration, the validated run UUID,
+server-only imports, database packages, connection strings, and SQL-shaped text.

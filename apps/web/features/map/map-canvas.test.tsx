@@ -169,6 +169,7 @@ describe("MapShell", () => {
     const container = region.querySelector("[data-map-container]");
 
     expect(container).not.toBeNull();
+    expect(container).not.toHaveAttribute("aria-label");
     expect(mapConstructor).toHaveBeenCalledOnce();
     const options = mapConstructor.mock.calls[0]?.[0] as
       | {container?: Element; style?: string}

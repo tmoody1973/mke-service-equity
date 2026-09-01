@@ -1,12 +1,17 @@
 import AxeBuilder from "@axe-core/playwright";
 import {expect, test, type Locator, type Page} from "@playwright/test";
 
+import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
+
 function observeBrowserErrors(page: Page) {
   const errors: string[] = [];
 
   page.on("console", (message) => {
-    if (message.type() === "error") {
-      errors.push(`console: ${message.text()}`);
+    const text = message.text();
+    // HeroUI Pro's React Aria IDs differ only under Next's development renderer.
+    // Public production-mode coverage continues to reject every console error.
+    if (message.type() === "error" && !isKnownHeroUiReactAriaDevHydrationWarning(text)) {
+      errors.push(`console: ${text}`);
     }
   });
   page.on("pageerror", (error) => errors.push(`page: ${error.message}`));
@@ -27,12 +32,13 @@ async function hasVisibleFocusIndicator(locator: Locator) {
 async function hasNegligibleMotion(locator: Locator) {
   return locator.evaluate((element) => {
     const style = getComputedStyle(element);
-    const durations = `${style.animationDuration},${style.transitionDuration}`
+    const transitionDurations = style.transitionDuration
       .split(",")
       .map((value) => value.trim())
       .map((value) => (value.endsWith("ms") ? Number.parseFloat(value) : Number.parseFloat(value) * 1000));
 
-    return style.animationName === "none" || durations.every((duration) => duration <= 1);
+    return style.animationName === "none"
+      && transitionDurations.every((duration) => duration <= 1);
   });
 }
 
@@ -74,14 +80,14 @@ test("meets the accessibility contract at the configured width", async ({page}, 
     const sheet = page.locator(".sidebar__mobile-sheet");
     await expect(sheet).toBeVisible();
     await expect(page.locator('nav[aria-label="Primary"]:visible')).toHaveCount(1);
-    expect(await hasNegligibleMotion(sheet)).toBe(true);
+    await expect.poll(() => hasNegligibleMotion(sheet)).toBe(true);
     await page.keyboard.press("Escape");
     await expect(sheet).toBeHidden();
     await expect(openNavigation).toBeFocused();
   } else {
     const sidebar = page.getByRole("complementary", {name: "Application navigation"});
     await expect(page.locator('nav[aria-label="Primary"]:visible')).toHaveCount(1);
-    expect(await hasNegligibleMotion(sidebar)).toBe(true);
+    await expect.poll(() => hasNegligibleMotion(sidebar)).toBe(true);
   }
 
   expect(browserErrors).toEqual([]);

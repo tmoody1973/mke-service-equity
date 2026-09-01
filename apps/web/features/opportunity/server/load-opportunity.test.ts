@@ -133,6 +133,19 @@ describe("loadOpportunity", () => {
     expect(deps.loadImmutablePublished).not.toHaveBeenCalled();
   });
 
+  it("loads validated preview data again for every request", async () => {
+    const environment = {MKE_ATLAS_DATA_MODE: "validated_preview"};
+    const deps = dependencies();
+
+    await loadOpportunity(filters, environment, deps);
+    await loadOpportunity(filters, environment, deps);
+
+    expect(deps.markRequestTime).toHaveBeenCalledTimes(2);
+    expect(deps.selectRun).toHaveBeenCalledTimes(2);
+    expect(deps.loadValidatedPreview).toHaveBeenCalledTimes(2);
+    expect(deps.loadImmutablePublished).not.toHaveBeenCalled();
+  });
+
   it("keeps immutable published loading behind its own cache seam", async () => {
     const publishedResponse = {...availableResponse, mode: "published" as const};
     const deps = dependencies({

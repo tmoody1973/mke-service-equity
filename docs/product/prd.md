@@ -89,10 +89,12 @@ Produce subindex percentiles, overall percentile, and classification.
 ### FR-5 Food Access Need
 Measure independently from the Equity Baseline:
 
-- retail access
-- transportation constraint
-- emergency food availability
-- economic constraint
+- Retail Access: SNAP retailer low-access share and full-service-grocery walking access
+- Transportation Constraint: household vehicle access and reverse-ranked scheduled transit
+  service intensity
+
+Emergency food is contextual and does not reduce need. Economic conditions already represented
+in the Equity Baseline are not duplicated in Food Access Need.
 
 ### FR-6 Food Equity Priority
 Combine Equity Baseline and Food Access Need using the documented priority matrix.
@@ -121,33 +123,40 @@ Support:
 Every resource must carry source and verification metadata.
 
 ### FR-8 Compare Areas
-Allow 2–5 tracts.
+Allow 2–5 unique tracts in stable selection order.
 
 Desktop: comparison matrix.
-Mobile: comparison cards.
+Mobile and tablet: stacked comparison cards with the same evidence.
 
-Provide a deterministic rule-based differences summary.
+Provide summary-first Food Equity evidence, expandable Equity Baseline indicators, and a
+deterministic rule-based Differences summary. Differences may describe Priority or band changes
+and approved measure gaps of at least 20 county-percentile points, show no more than five items,
+and never rank tracts or recommend a choice.
 
 ### FR-9 Opportunity Explorer
 Support structured filters such as:
 
 - Food Equity Priority
-- Equity classification
-- Food Need classification
-- vehicle access
-- grocery access
-- walking access
-- food-resource availability
-- public land nearby when reliable
+- Equity Baseline band and percentile
+- Food Access Need band and percentile
+- household vehicle access
+- SNAP retailer low-access share (higher values mean worse access)
+- full-service grocery walking access and reachability
+- scheduled transit service intensity
 
 Output:
 
 - matching tract count
-- affected population
+- known population living in matching tracts
+- matching tracts with unavailable population, when present
+- tracts excluded because required filter data is missing, when present
 - synchronized map
-- tract result list
+- complete non-map tract result list
 
-Use the term **matching areas**, not recommendations.
+Choices within one category use OR; separate categories use AND; numeric thresholds are inclusive.
+Edits remain pending until applied, and only applied canonical URL state drives server results.
+Use the term **matching areas**, not recommendations. Food-site availability, public land, and
+public investment are context only and are not Opportunity filters in the first release.
 
 ### FR-10 Methodology and provenance
 For every substantive metric, the user must be able to determine:
@@ -176,6 +185,22 @@ MVP must support CSV export of published tract-level evidence including:
 
 ### FR-12 Shareable state
 Meaningful Atlas, tract, comparison, and opportunity states should use shareable URLs where technically practical.
+
+Compare uses repeated ordered `tract` parameters. Opportunity uses only the supported normalized
+applied-filter parameters. Run IDs, pending form edits, open sheets, hover, and other transient UI
+state do not belong in share URLs.
+
+### FR-13 Analyze data authority
+
+Both Analyze routes use the same exact-run selector as the Atlas. Public mode reads only a
+governed published Food Equity bundle and its pinned Equity Baseline run. A guarded local
+development preview may read only one explicitly configured validated run and must remain visibly
+marked as unpublished. There is no public fallback to a draft or validated run, and loading a web
+deployment does not publish data.
+
+The server owns run selection, joins, filtering, canonical ordering, missing-data classification,
+population summaries, and contract validation. The browser owns pending controls and presentation.
+MapLibre does not calculate matches, scores, percentiles, or spatial relationships.
 
 ## 5. Responsive requirements
 
