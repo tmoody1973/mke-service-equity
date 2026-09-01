@@ -104,8 +104,8 @@ checks. Compare additionally returns detailed uncertainty and source evidence. U
 duplicate evidence, a mismatched baseline, wrong-run rows, or incomplete required joins make the
 complete response unavailable. Compare never returns a partly valid tract set.
 
-Public mode reads only a governed published bundle. Until `MOO-768` publishes one, both Analyze
-routes return `no_published_run` and show no validated data. A guarded local validated preview
+Public mode reads only the zero-or-one current governed published bundle. When none exists, both
+Analyze routes return `no_published_run` and show no validated data. A guarded local validated preview
 must name one exact run in server-only development configuration and display that it is not
 published. A deployment or verification run does not publish, supersede, or mutate data.
 

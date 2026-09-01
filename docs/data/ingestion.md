@@ -13,8 +13,9 @@ External sources
 → published score run
 → application
 
-Plan 2 stops at a `validated` Equity Baseline run. Accessibility calculations, publication,
-and application consumption belong to later plans.
+Plan 2 stops at a `validated` Equity Baseline run and Plan 3 stops at a validated Food Equity run.
+The separate governed publication operation can later promote an exact reviewed pair; neither
+pipeline command publishes.
 
 ## Equity Baseline commands
 
