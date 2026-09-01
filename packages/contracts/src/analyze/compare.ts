@@ -6,6 +6,7 @@ import {
 } from "../atlas/profile";
 import {
   atlasModeSchema,
+  refineAtlasRunPublication,
   atlasRunSummarySchema,
   atlasUnavailableReasonSchema,
 } from "../atlas/run";
@@ -193,6 +194,7 @@ export const compareAvailableResponseSchema = z.strictObject({
   tracts: z.array(comparisonTractSchema).min(2).max(5),
   sources: z.array(comparisonSourceSchema).max(64),
 }).superRefine((value, context) => {
+  refineAtlasRunPublication(value, context);
   const requestedIds = value.request.tracts;
   const tractIds = value.tracts.map((tract) => tract.tract.geoid);
   if (

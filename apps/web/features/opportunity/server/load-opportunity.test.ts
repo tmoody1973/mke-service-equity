@@ -21,13 +21,25 @@ const previewRun = {
     equityBaselineMethodologyVersion: "equity-baseline-v1",
     completedAt: "2026-08-30T12:00:00.000Z",
     dataVintages: {acs: "2020-2024"},
+    publication: null,
   },
   equityBaselineRunId: "502e2a04-b013-53cd-8b09-c9144862701a",
   foodOutputHash: "a".repeat(64),
   equityBaselineOutputHash: "b".repeat(64),
 } satisfies AtlasRunSelection;
 
-const publishedRun = {...previewRun, mode: "published"} satisfies AtlasRunSelection;
+const publishedRun = {
+  ...previewRun,
+  mode: "published",
+  run: {
+    ...previewRun.run,
+    publication: {
+      id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      publishedAt: "2026-09-01T13:00:00.000Z",
+      bundleFingerprint: "c".repeat(64),
+    },
+  },
+} satisfies AtlasRunSelection;
 
 const filters: OpportunityFilterState = {
   priorities: [1, 2],
@@ -87,6 +99,7 @@ function dependencies(
     loadImmutablePublished: vi.fn(() => Promise.resolve({
       ...availableResponse,
       mode: "published" as const,
+      run: publishedRun.run,
     })),
     reportFailure: vi.fn(),
     ...overrides,
@@ -147,7 +160,11 @@ describe("loadOpportunity", () => {
   });
 
   it("keeps immutable published loading behind its own cache seam", async () => {
-    const publishedResponse = {...availableResponse, mode: "published" as const};
+    const publishedResponse = {
+      ...availableResponse,
+      mode: "published" as const,
+      run: publishedRun.run,
+    };
     const deps = dependencies({
       selectRun: vi.fn(() => Promise.resolve(publishedRun)),
       loadImmutablePublished: vi.fn(() => Promise.resolve(publishedResponse)),

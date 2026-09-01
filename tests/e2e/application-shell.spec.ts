@@ -6,6 +6,7 @@ import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
 
 const validatedPreview = process.env.MKE_ATLAS_DATA_MODE === "validated_preview"
   && Boolean(process.env.MKE_ATLAS_PREVIEW_RUN_ID);
+const runtimeDatabaseConfigured = Boolean(process.env.DATABASE_URL?.trim());
 
 function observeBrowserErrors(page: Page) {
   const errors: string[] = [];
@@ -53,6 +54,13 @@ test("renders and operates the shell at the configured width", async ({page}, te
   if (validatedPreview) {
     await expect(
       page.getByText("Preview only — checked, but not published.", {exact: true}),
+    ).toBeVisible();
+  } else if (!runtimeDatabaseConfigured) {
+    await expect(
+      page.getByText(
+        "The Food Equity Atlas is temporarily unavailable. Please try again later.",
+        {exact: true},
+      ),
     ).toBeVisible();
   } else {
     await expect(

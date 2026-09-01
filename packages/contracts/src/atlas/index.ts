@@ -2,6 +2,7 @@ import {z} from "zod";
 import {atlasFoodSitesLayerResponseSchema} from "./context-layers";
 import {
   atlasModeSchema,
+  refineAtlasRunPublication,
   atlasRunSummarySchema,
   atlasUnavailableReasonSchema,
 } from "./run";
@@ -15,7 +16,7 @@ export const atlasAvailableResponseSchema = z.strictObject({
   contextLayers: z.strictObject({
     foodSites: atlasFoodSitesLayerResponseSchema,
   }),
-});
+}).superRefine(refineAtlasRunPublication);
 
 export const atlasUnavailableResponseSchema = z.strictObject({
   state: z.literal("unavailable"),
@@ -29,6 +30,7 @@ export const atlasResponseSchema = z.discriminatedUnion("state", [
 
 export * from "./profile";
 export * from "./context-layers";
+export * from "./publication";
 export * from "./run";
 export * from "./search";
 export * from "./tract";

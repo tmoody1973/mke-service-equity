@@ -148,8 +148,8 @@ rows even though their analytical values are null.
 - status
 - failure_metadata
 
-Plan 2 may create `draft`, `validated`, or `failed` runs. It does not expose a transition to
-`published`.
+The Plan 2 pipeline may create `draft`, `validated`, or `failed` runs. Migration `0005` adds
+`published` and `superseded`, but only the controlled publication operation may enter them.
 
 ## score_components
 
@@ -190,17 +190,24 @@ Indicator value and score constraints preserve the distinction between a usable 
 missing-quality state. An incomplete or zero-population score row must have every numerical
 score and band set to null.
 
-The Plan 2 lifecycle trigger permits only:
+Before publication migration, the Plan 2 lifecycle trigger permitted only:
 
 ```text
 draft -> validated
 draft -> failed
 ```
 
-It rejects inserts or transitions to `published` and `superseded`, plus every other status
-transition. A validated run requires a 64-character lowercase output hash and validation result;
-a failed run requires completion and failure metadata but no output hash. Later publication work
-must introduce its own reviewed lifecycle migration rather than bypass this trigger.
+Migration `0005_governed_publication.sql` replaces that trigger with the reviewed forward-only
+state machine. Pipelines still own only `draft -> validated|failed`; the controlled release
+transaction alone may perform `validated -> published -> superseded`. Re-publication and
+backward transitions are rejected. A validated, published, or superseded run requires a
+64-character lowercase output hash and validation result; a failed run requires completion and
+failure metadata but no output hash.
+
+Applied migration `0005` remains immutable. Forward migration
+`0006_publication_metadata_not_null.sql` hardens these lifecycle checks by explicitly requiring
+non-null failure metadata for failed runs and non-null supersession identity and reason for
+superseded publications.
 
 `run_fingerprint` identifies the methodology, registry, input manifests, implementation, and
 other deterministic inputs for one run. `output_hash` identifies the canonical scored output.
@@ -225,11 +232,24 @@ grid, a 302-by-4 scoring grid, all metric/snapshot links, 1,196 components, and 
 validation. The exact Food score shape is 299 complete, one attributable `insufficient_data`, and
 two `ineligible_zero_population` rows.
 
-The separate Food lifecycle permits only `draft -> validated` and `draft -> failed`; it contains
-no `published` value. Each run pins the exact validated Equity Baseline ID and output hash. Base
+The Food pipeline permits only `draft -> validated` and `draft -> failed`. Migration `0005` adds
+controlled `validated -> published -> superseded` transitions tied to the exact baseline state;
+no pipeline or direct table update can use them. Each run pins the exact validated Equity
+Baseline ID and output hash. Base
 records are conflict-safe and reusable, while analytical rows and the lifecycle transition share
 one transaction. A failed transaction leaves no partial draft. A pre-existing draft may be
 marked failed only through the guarded, redacted repository path.
+
+## Governed Atlas publication
+
+`atlas_publications` holds the immutable release identity and exact Food/Equity hash pins. Six
+member/audit tables pin every score pair, component/value, source snapshot, resource version, and
+successful operation. A partial unique index permits zero or one current `published` row.
+Triggers make release history and released analytical content append-only/immutable. The
+security-definer publish and withdraw functions acquire one advisory lock, compare the expected
+current release, revalidate the candidate and complete membership, enforce redistribution
+decisions, change all states atomically, and write audit evidence. Public function execution is
+revoked; ordinary application code has no publication export.
 
 ## public_investments
 

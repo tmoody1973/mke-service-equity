@@ -12,6 +12,7 @@ pytestmark = pytest.mark.integration
 
 PINNED_BASELINE_RUN_ID = "502e2a04-b013-53cd-8b09-c9144862701a"
 PINNED_BASELINE_OUTPUT_HASH = "19069c257e8f51fb4370b1ec8d04c6f823bd85e133846cf504866404c2c4e946"
+AUTHORITATIVE_FOOD_RUN_ID = "97bd1cdf-bf96-573f-8fcf-92e8676925d4"
 PROBE_RUN_ID = UUID("9b5cbb10-9f69-5bbd-99ee-d5a5395ec9dc")
 CONTRACT_MIGRATION_TIMESTAMP = 1788051221521
 
@@ -119,7 +120,7 @@ def test_plan3_tables_exist_and_food_runs_cannot_publish() -> None:
         "food_score_components",
         "food_scores",
     } <= tables
-    assert statuses == {"draft", "validated", "failed"}
+    assert statuses == {"draft", "validated", "published", "superseded", "failed"}
 
 
 def test_plan3_foreign_keys_uniques_and_missing_quality_checks_exist() -> None:
@@ -218,16 +219,25 @@ def test_resource_geometry_and_nullable_quality_states_are_consistent() -> None:
 
 def test_food_run_rows_obey_pinned_lineage_lifecycle_and_idempotency_contract() -> None:
     with psycopg.connect(integration_url()) as connection:
+        authoritative_run_exists = connection.execute(
+            "SELECT EXISTS (SELECT 1 FROM food_score_runs WHERE id=%s)",
+            (AUTHORITATIVE_FOOD_RUN_ID,),
+        ).fetchone()
         wrong_baseline = connection.execute(
-            "SELECT count(*) FROM food_score_runs WHERE equity_baseline_run_id<>%s "
-            "OR equity_baseline_output_hash<>%s",
-            (PINNED_BASELINE_RUN_ID, PINNED_BASELINE_OUTPUT_HASH),
+            "SELECT count(*) FROM food_score_runs WHERE id=%s AND "
+            "(equity_baseline_run_id<>%s OR equity_baseline_output_hash<>%s)",
+            (
+                AUTHORITATIVE_FOOD_RUN_ID,
+                PINNED_BASELINE_RUN_ID,
+                PINNED_BASELINE_OUTPUT_HASH,
+            ),
         ).fetchone()
         invalid_lifecycle = connection.execute(
             "SELECT count(*) FROM food_score_runs WHERE NOT ("
             "status='draft' AND completed_at IS NULL AND validation_result IS NULL "
             "AND failure_metadata IS NULL AND output_hash IS NULL OR "
-            "status='validated' AND completed_at IS NOT NULL AND validation_result IS NOT NULL "
+            "status IN ('validated','published','superseded') "
+            "AND completed_at IS NOT NULL AND validation_result IS NOT NULL "
             "AND failure_metadata IS NULL AND output_hash~'^[0-9a-f]{64}$' OR "
             "status='failed' AND completed_at IS NOT NULL AND failure_metadata IS NOT NULL "
             "AND output_hash IS NULL)"
@@ -241,6 +251,7 @@ def test_food_run_rows_obey_pinned_lineage_lifecycle_and_idempotency_contract() 
             "GROUP BY food_score_run_id,geography_id HAVING count(*)>1) duplicates"
         ).fetchone()
 
+    assert authoritative_run_exists == (True,)
     assert wrong_baseline == (0,)
     assert invalid_lifecycle == (0,)
     assert duplicate_fingerprints == (0,)
@@ -249,6 +260,10 @@ def test_food_run_rows_obey_pinned_lineage_lifecycle_and_idempotency_contract() 
 
 def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
     with psycopg.connect(integration_url()) as connection:
+        authoritative_run_exists = connection.execute(
+            "SELECT EXISTS (SELECT 1 FROM food_score_runs WHERE id=%s)",
+            (AUTHORITATIVE_FOOD_RUN_ID,),
+        ).fetchone()
         reconciliations = connection.execute(
             "SELECT runs.id,"
             "(SELECT count(*) FROM food_scores scores WHERE scores.food_score_run_id=runs.id),"
@@ -260,9 +275,12 @@ def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
             "AND scores.quality_status='ineligible_zero_population'),"
             "(SELECT count(*) FROM food_scores scores WHERE scores.food_score_run_id=runs.id "
             "AND scores.quality_status='insufficient_data') "
-            "FROM food_score_runs runs WHERE runs.status='validated' ORDER BY runs.id"
+            "FROM food_score_runs runs WHERE runs.id=%s ORDER BY runs.id",
+            (AUTHORITATIVE_FOOD_RUN_ID,),
         ).fetchall()
 
+    assert authoritative_run_exists == (True,)
+    assert len(reconciliations) == 1
     for (
         _,
         score_count,
@@ -279,21 +297,20 @@ def test_validated_food_runs_reconcile_to_the_write_plan_output_shape() -> None:
             "SELECT geographies.geoid,scores.exclusion_reasons "
             "FROM food_scores scores JOIN geographies ON geographies.id=scores.geography_id "
             "JOIN food_score_runs runs ON runs.id=scores.food_score_run_id "
-            "WHERE runs.status='validated' AND scores.quality_status='insufficient_data' "
-            "ORDER BY runs.id,geographies.geoid"
+            "WHERE runs.id=%s AND scores.quality_status='insufficient_data' "
+            "ORDER BY runs.id,geographies.geoid",
+            (AUTHORITATIVE_FOOD_RUN_ID,),
         ).fetchall()
 
-    assert all(
-        row
-        == (
+    assert insufficient == [
+        (
             "55079187200",
             [
                 "missing_metric:full_service_grocery_walk_access",
                 "missing_metric:scheduled_transit_service_intensity",
             ],
         )
-        for row in insufficient
-    )
+    ]
 
     with psycopg.connect(integration_url()) as connection:
         unsnapped_metrics = connection.execute(
@@ -355,6 +372,12 @@ def test_draft_validates_only_against_the_exact_pinned_baseline_and_remains_unpu
             assert connection.execute(
                 "SELECT status,output_hash FROM food_score_runs WHERE id=%s", (PROBE_RUN_ID,)
             ).fetchone() == ("validated", "d" * 64)
+            with pytest.raises(psycopg.Error, match="Invalid governed Food score-run transition"):
+                with connection.transaction():
+                    connection.execute(
+                        "UPDATE food_score_runs SET status='published' WHERE id=%s",
+                        (PROBE_RUN_ID,),
+                    )
             with pytest.raises(psycopg.Error):
                 with connection.transaction():
                     connection.execute(

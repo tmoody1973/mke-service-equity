@@ -98,7 +98,13 @@ describe("food-equity schema contract", () => {
       "high",
       "very_high",
     ]);
-    expect(foodScoreRunStatusEnum.enumValues).toEqual(["draft", "validated", "failed"]);
+    expect(foodScoreRunStatusEnum.enumValues).toEqual([
+      "draft",
+      "validated",
+      "published",
+      "superseded",
+      "failed",
+    ]);
   });
 
   it("preserves stable resource identity and immutable snapshot versions", () => {

@@ -13,6 +13,15 @@ const run = {
   dataVintages: {acs: "2020-2024", foodRetail: "2025"},
 } as const;
 
+const publishedRun = {
+  ...run,
+  publication: {
+    id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    publishedAt: "2026-09-01T13:00:00.000Z",
+    bundleFingerprint: "c".repeat(64),
+  },
+} as const;
+
 function matchingArea(
   geoid: string,
   name: string,
@@ -274,7 +283,7 @@ describe("opportunityResponseSchema", () => {
     expect(opportunityResponseSchema.parse({
       state: "available",
       mode: "published",
-      run,
+      run: publishedRun,
       filters: {priorities: [1]},
       summary: {
         matchingTractCount: 0,

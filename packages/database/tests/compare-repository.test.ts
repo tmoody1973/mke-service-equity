@@ -18,6 +18,7 @@ const selectedRun = {
     equityBaselineMethodologyVersion: "equity-baseline-v1",
     completedAt: "2026-08-30T12:00:00.000Z",
     dataVintages: {acs: "2020-2024", foodRetail: "2025"},
+    publication: null,
   },
   equityBaselineRunId: baselineRunId,
   foodOutputHash: "a".repeat(64),

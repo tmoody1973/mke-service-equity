@@ -64,6 +64,13 @@ County midpoint—not causes or policy recommendations.
 The public app reads only a published score run. A guarded local development preview may read one
 exact validated run for review, but it cannot turn that run into published data.
 
+Publication is a separate, server-only data-release operation. It binds one validated Food run to
+its exact Equity Baseline, analytical members, sources, resources, licensing decisions, approval,
+and audit record in one transaction. It never runs from the website or a Vercel deployment. With
+zero current releases, the public app fails closed instead of showing validated preview data. See
+the [publication runbook](docs/operations/publication-runbook.md) and
+[Plan 6A verification](docs/verification/plan-6a-governed-publication-lifecycle.md).
+
 ## Analyze workflows
 
 Plan 5 adds two focused, responsive routes under **Analyze**:

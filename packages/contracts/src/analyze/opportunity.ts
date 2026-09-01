@@ -2,6 +2,7 @@ import {z} from "zod";
 import {atlasProfileScoreSummarySchema} from "../atlas/profile";
 import {
   atlasModeSchema,
+  refineAtlasRunPublication,
   atlasRunSummarySchema,
   atlasUnavailableReasonSchema,
 } from "../atlas/run";
@@ -138,6 +139,7 @@ export const opportunityAvailableResponseSchema = z.strictObject({
   summary: opportunitySummarySchema,
   matchingAreas: z.array(opportunityMatchingAreaSchema).max(302),
 }).superRefine((value, context) => {
+  refineAtlasRunPublication(value, context);
   value.matchingAreas.forEach((area, index) => {
     if (area.runId !== value.run.id) {
       context.addIssue({

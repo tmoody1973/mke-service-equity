@@ -9,6 +9,7 @@ export const OPPORTUNITY_RUN = {
   equityBaselineMethodologyVersion: "equity-baseline-v1",
   completedAt: "2026-08-30T12:00:00.000Z",
   dataVintages: {acs: "2020-2024"},
+  publication: null,
 };
 
 const tractOne = {

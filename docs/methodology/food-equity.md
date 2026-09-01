@@ -180,8 +180,9 @@ weight, band, matrix cell, or missing-data rule.
 
 Development pins validated, verified, unpublished Equity Baseline run
 `502e2a04-b013-53cd-8b09-c9144862701a`, including its stored output hash and methodology/source
-lineage. A Food run based on that baseline may be validated for development, but is not
-publishable.
+lineage. A Food run based on that baseline may be validated for development. Validation alone
+never makes it public; publication requires the separate approved manifest, licensing policy,
+dry run, expected-current comparison, and controlled transaction.
 
 A web deployment does not publish a score. The public application reads only `published` runs.
 Publication is a separate governed action.

@@ -13,6 +13,7 @@
     "build": "npm run build --workspace @mke/web",
     "dev": "npm run dev --workspace @mke/web",
     "lint": "eslint .",
+    "publication": "npm run publication --workspace @mke/database --",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:e2e": "playwright test",

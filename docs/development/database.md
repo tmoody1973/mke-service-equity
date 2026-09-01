@@ -35,6 +35,17 @@ amendment `0003_food_equity_contract_amendment.sql` add the reviewed Food resour
 provenance, score, and development lifecycle contract. They deliberately exclude publication and
 application read models.
 
+Migration `0004_atlas_neighborhood_context.sql` adds the reviewed tract/neighborhood crosswalk.
+Migration `0005_governed_publication.sql` adds the forward-only governed publication tables,
+closed run transitions, immutable member/audit protections, one-current index, and controlled
+publish/withdraw database functions. Public execution is revoked. Production role grants are
+provisioned separately so the application reader, pipeline writer, publication operator, and
+migration owner remain distinct.
+
+Applied migration `0005` remains immutable. Forward migration
+`0006_publication_metadata_not_null.sql` adds explicit `IS NOT NULL` requirements to the
+governance checks for required failure and supersession metadata.
+
 ## Local checks
 
 These checks do not require a database connection:
@@ -124,3 +135,22 @@ published Food runs. Database pipeline commands additionally require
 facts; `validate-run` replays them and writes the analytical run in one transaction. Repeating
 `run --through validated --verify-existing` must return the same run ID and output hash without
 increasing natural-key or analytical counts.
+
+## Plan 6A isolated publication verification
+
+Publication verification uses an explicitly approved disposable child of the Plan 3 branch. It
+may publish and withdraw controlled fixtures only. Never publish the authoritative Plan 2/3 runs
+or use production credentials without the separate Gate 3 approval.
+
+Apply the migration and run both database stacks:
+
+```bash
+npm run db:migrate --workspace @mke/database
+npm run test:integration --workspace @mke/database
+uv run pytest tests/data -q -m integration
+```
+
+Use the [publication runbook](../operations/publication-runbook.md) for dry-run, publish,
+reconcile, safe retry, replacement, and withdrawal. The branch owner is allowed only for isolated
+development proof. Production must grant a dedicated operator the controlled function boundary
+without general table DML and must keep application-reader credentials read-only.

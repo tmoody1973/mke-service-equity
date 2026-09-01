@@ -128,14 +128,14 @@ intervention, or changes a score run.
 
 ## Run selection and caching
 
-Public mode may select only one internally consistent published Food Equity bundle and its pinned
-Equity Baseline run. Until governed publication is completed by `MOO-768`, Analyze returns
+Public mode may select only the zero-or-one internally consistent governed Food Equity
+publication and its pinned Equity Baseline run. If no current publication exists, Analyze returns
 `no_published_run` and shows no validated data. Local validated preview is allowed only with the
 explicit development-only server configuration, remains visibly marked, and cannot run in
 production.
 
-Validated-preview responses are dynamic and excluded from shared public caches. A future
-published cache may key only on immutable publication identity plus normalized request identity.
+Validated-preview responses are dynamic and excluded from shared public caches. A published
+cache may key only on immutable publication identity plus normalized request identity.
 A deployment never publishes, supersedes, or mutates analytical data.
 
 ## Deployment

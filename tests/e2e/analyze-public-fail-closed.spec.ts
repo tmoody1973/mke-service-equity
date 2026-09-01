@@ -6,6 +6,7 @@ import {
 } from "./analyze-helpers";
 
 const VALIDATED_PREVIEW_RUN_ID = "97bd1cdf-bf96-573f-8fcf-92e8676925d4";
+const runtimeDatabaseConfigured = Boolean(process.env.DATABASE_URL?.trim());
 
 function observeProductionBrowserErrors(page: Page) {
   const errors: string[] = [];
@@ -20,13 +21,23 @@ function observeProductionBrowserErrors(page: Page) {
 
 async function expectPublicUnavailable(page: Page, pageTitle: string) {
   await expect(page.getByRole("heading", {level: 1, name: pageTitle})).toBeVisible();
-  await expect(page.getByRole("heading", {
-    level: 2,
-    name: "No published Food Equity results yet",
-  })).toBeVisible();
-  await expect(page.getByText(
-    "A reviewed Food Equity data release has not been published yet. Nothing from a private preview is shown here.",
-  )).toBeVisible();
+  if (runtimeDatabaseConfigured) {
+    await expect(page.getByRole("heading", {
+      level: 2,
+      name: "No published Food Equity results yet",
+    })).toBeVisible();
+    await expect(page.getByText(
+      "A reviewed Food Equity data release has not been published yet. Nothing from a private preview is shown here.",
+    )).toBeVisible();
+  } else {
+    await expect(page.getByRole("heading", {
+      level: 2,
+      name: "Analysis temporarily unavailable",
+    })).toBeVisible();
+    await expect(page.getByText(
+      "We could not load complete, verified information for this analysis. Please try again later.",
+    )).toBeVisible();
+  }
   await expect(page.getByRole("link", {name: "Start over"})).toBeVisible();
   await expect(page.getByText(/Validated preview — not published/i)).toHaveCount(0);
   await expect(page.getByText(/matching census tracts/i)).toHaveCount(0);
