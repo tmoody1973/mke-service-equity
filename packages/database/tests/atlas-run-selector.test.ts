@@ -60,6 +60,7 @@ describe("selectAtlasRun", () => {
         equityBaselineMethodologyVersion: "equity-baseline-v1",
         completedAt: "2026-08-30T12:00:00.000Z",
         dataVintages: {acs: "2020-2024", foodRetail: "2025"},
+        publication: null,
       },
       equityBaselineRunId: "502e2a04-b013-53cd-8b09-c9144862701a",
       foodOutputHash: hash,

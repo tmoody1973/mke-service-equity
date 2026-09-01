@@ -86,6 +86,8 @@ export const foodAccessNeedBandEnum = pgEnum("food_access_need_band", [
 export const foodScoreRunStatusEnum = pgEnum("food_score_run_status", [
   "draft",
   "validated",
+  "published",
+  "superseded",
   "failed",
 ]);
 
@@ -345,7 +347,7 @@ export const foodScoreRuns = pgTable(
     check(
       "food_score_runs_output_hash_check",
       sql`(
-        ${table.status} = 'validated'
+        ${table.status} IN ('validated', 'published', 'superseded')
         AND ${table.outputHash} IS NOT NULL
         AND ${table.outputHash} ~ '^[0-9a-f]{64}$'
       ) OR (
@@ -355,7 +357,7 @@ export const foodScoreRuns = pgTable(
     ),
     check(
       "food_score_runs_completion_check",
-      sql`(${table.status} = 'draft' AND ${table.completedAt} IS NULL) OR (${table.status} IN ('validated', 'failed') AND ${table.completedAt} IS NOT NULL)`,
+      sql`(${table.status} = 'draft' AND ${table.completedAt} IS NULL) OR (${table.status} IN ('validated', 'published', 'superseded', 'failed') AND ${table.completedAt} IS NOT NULL)`,
     ),
     check(
       "food_score_runs_failure_metadata_check",
@@ -363,7 +365,7 @@ export const foodScoreRuns = pgTable(
     ),
     check(
       "food_score_runs_validation_result_check",
-      sql`${table.status} <> 'validated' OR ${table.validationResult} IS NOT NULL`,
+      sql`${table.status} NOT IN ('validated', 'published', 'superseded') OR ${table.validationResult} IS NOT NULL`,
     ),
     index("food_score_runs_status_idx").on(table.status),
     index("food_score_runs_equity_baseline_idx").on(table.equityBaselineRunId),

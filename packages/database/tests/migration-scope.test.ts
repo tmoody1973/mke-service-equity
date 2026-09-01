@@ -165,7 +165,52 @@ describe("Plan 3 food-equity contract amendment", () => {
       {idx: 2, tag: "0002_food_equity"},
       {idx: 3, tag: "0003_food_equity_contract_amendment"},
       {idx: 4, tag: "0004_atlas_neighborhood_context"},
+      {idx: 5, tag: "0005_governed_publication"},
     ]);
+  });
+});
+
+describe("MOO-768 governed publication migration", () => {
+  it("adds only the reviewed publication tables through a forward migration", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0005_governed_publication.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+    const tableNames = [...migration.matchAll(/CREATE TABLE "([a-z_]+)"/g)].map(
+      ([, tableName]) => tableName,
+    );
+
+    expect(tableNames.sort()).toEqual([
+      "atlas_publication_audit_events",
+      "atlas_publication_equity_component_members",
+      "atlas_publication_food_component_members",
+      "atlas_publication_resource_version_members",
+      "atlas_publication_score_members",
+      "atlas_publication_source_snapshot_members",
+      "atlas_publications",
+    ]);
+    expect(migration).not.toMatch(/DROP TABLE|TRUNCATE|DELETE FROM/i);
+    expect(migration.match(/DROP TYPE/g)).toHaveLength(1);
+    expect(migration).toContain('DROP TYPE "public"."food_score_run_status_plan3"');
+    expect(migration).not.toMatch(/INSERT INTO "(?:score_runs|food_score_runs|scores|food_scores)"/i);
+  });
+
+  it("enforces current uniqueness, controlled transitions, immutability, and operation grants", async () => {
+    const migrationPath = fileURLToPath(
+      new URL("../drizzle/0005_governed_publication.sql", import.meta.url),
+    );
+    const migration = await readFile(migrationPath, "utf8");
+
+    expect(migration).toContain("atlas_publications_one_current_idx");
+    expect(migration).toMatch(/WHERE [^;]*"state" = 'published'/i);
+    expect(migration).toContain("enforce_governed_score_run_transition");
+    expect(migration).toContain("enforce_governed_food_score_run_transition");
+    expect(migration).toContain("reject_released_content_mutation");
+    expect(migration).toContain("enforce_atlas_publication_transition");
+    expect(migration).toContain("publish_atlas_release");
+    expect(migration).toContain("withdraw_atlas_release");
+    expect(migration).toMatch(/REVOKE ALL ON FUNCTION publish_atlas_release/i);
+    expect(migration).toMatch(/REVOKE ALL ON FUNCTION withdraw_atlas_release/i);
   });
 });
 
