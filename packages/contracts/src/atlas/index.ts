@@ -2,6 +2,7 @@ import {z} from "zod";
 import {atlasFoodSitesLayerResponseSchema} from "./context-layers";
 import {
   atlasModeSchema,
+  refineAtlasRunPublication,
   atlasRunSummarySchema,
   atlasUnavailableReasonSchema,
 } from "./run";
@@ -29,20 +30,7 @@ export const atlasResponseSchema = z.discriminatedUnion("state", [
   if (value.state !== "available") {
     return;
   }
-  if (value.mode === "published" && value.run.publication === null) {
-    context.addIssue({
-      code: "custom",
-      message: "Published Atlas data requires immutable publication identity.",
-      path: ["run", "publication"],
-    });
-  }
-  if (value.mode === "validated_preview" && value.run.publication !== null) {
-    context.addIssue({
-      code: "custom",
-      message: "Validated preview cannot claim publication identity.",
-      path: ["run", "publication"],
-    });
-  }
+  refineAtlasRunPublication(value, context);
 });
 
 export * from "./profile";

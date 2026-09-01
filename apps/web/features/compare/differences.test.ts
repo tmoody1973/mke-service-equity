@@ -179,6 +179,7 @@ function comparison(tracts: Array<ComparisonTract>): CompareAvailableResponse {
       equityBaselineMethodologyVersion: "equity-baseline-v1",
       completedAt: "2026-08-30T12:00:00.000Z",
       dataVintages: {acs: "2024 ACS 5-year"},
+      publication: null,
     },
     request: {tracts: tracts.map((tract) => tract.tract.geoid)},
     tracts,
