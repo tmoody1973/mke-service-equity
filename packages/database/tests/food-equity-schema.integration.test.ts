@@ -31,7 +31,13 @@ describe.skipIf(!process.env.DATABASE_URL)("food-equity schema integration", () 
       where pg_type.typname = 'food_score_run_status'
       order by enumsortorder
     `);
-    expect(lifecycle.rows.map((row) => row.enumlabel)).toEqual(["draft", "validated", "failed"]);
+    expect(lifecycle.rows.map((row) => row.enumlabel)).toEqual([
+      "draft",
+      "validated",
+      "published",
+      "superseded",
+      "failed",
+    ]);
 
     const safeguards = await database.execute(sql`
       select conname
@@ -103,7 +109,7 @@ describe.skipIf(!process.env.DATABASE_URL)("food-equity schema integration", () 
     const trigger = await database.execute(sql`
       select tgname
       from pg_trigger
-      where tgname = 'food_score_runs_plan3_transition_trigger'
+      where tgname = 'food_score_runs_governed_transition_trigger'
         and not tgisinternal
     `);
     expect(trigger.rows).toHaveLength(1);

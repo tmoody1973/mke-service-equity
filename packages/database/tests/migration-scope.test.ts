@@ -209,6 +209,9 @@ describe("MOO-768 governed publication migration", () => {
     expect(migration).toContain("enforce_atlas_publication_transition");
     expect(migration).toContain("publish_atlas_release");
     expect(migration).toContain("withdraw_atlas_release");
+    expect(migration).toContain(
+      "Prohibited source or resource cannot enter a public release",
+    );
     expect(migration).toMatch(/REVOKE ALL ON FUNCTION publish_atlas_release/i);
     expect(migration).toMatch(/REVOKE ALL ON FUNCTION withdraw_atlas_release/i);
   });

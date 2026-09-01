@@ -8,6 +8,9 @@ const staticDirectory = path.resolve(scriptDirectory, "../.next/static");
 const forbiddenPatterns = [
   ["DATABASE_URL", /\bDATABASE_URL\b/],
   ["DATABASE_URL_UNPOOLED", /\bDATABASE_URL_UNPOOLED\b/],
+  ["publication environment variable", /\bMKE_PUBLICATION_[A-Z0-9_]+\b/],
+  ["publication mutation function", /\b(?:publish|withdraw)_atlas_release\b/],
+  ["publication CLI implementation", /mke-publication-cli|publication\/cli/],
   [
     "preview environment variable",
     /MKE_ATLAS_DATA_MODE|MKE_ATLAS_PREVIEW_RUN_ID|MKE_PIPELINE_ENV/,

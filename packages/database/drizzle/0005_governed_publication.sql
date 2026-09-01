@@ -5,6 +5,11 @@ CREATE TYPE "public"."publication_environment" AS ENUM('development', 'productio
 CREATE TYPE "public"."publication_redistribution_decision" AS ENUM('public_derived_results', 'public_direct_display', 'internal_reproduction_only', 'prohibited_public_use');--> statement-breakpoint
 CREATE TYPE "public"."publication_resource_role" AS ENUM('scoring_inventory', 'public_display');--> statement-breakpoint
 CREATE TYPE "public"."publication_source_role" AS ENUM('canonical_geography', 'equity_input', 'food_scoring_input', 'food_context_input');--> statement-breakpoint
+DROP TRIGGER "food_score_runs_plan3_transition_trigger" ON "food_score_runs";--> statement-breakpoint
+ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_output_hash_check";--> statement-breakpoint
+ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_completion_check";--> statement-breakpoint
+ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_failure_metadata_check";--> statement-breakpoint
+ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_validation_result_check";--> statement-breakpoint
 ALTER TYPE "public"."food_score_run_status" RENAME TO "food_score_run_status_plan3";--> statement-breakpoint
 CREATE TYPE "public"."food_score_run_status" AS ENUM('draft', 'validated', 'published', 'superseded', 'failed');--> statement-breakpoint
 ALTER TABLE "food_score_runs" ALTER COLUMN "status" TYPE "public"."food_score_run_status"
@@ -138,9 +143,6 @@ CREATE TABLE "atlas_publications" (
       ))
 );
 --> statement-breakpoint
-ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_output_hash_check";--> statement-breakpoint
-ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_completion_check";--> statement-breakpoint
-ALTER TABLE "food_score_runs" DROP CONSTRAINT "food_score_runs_validation_result_check";--> statement-breakpoint
 ALTER TABLE "atlas_publication_audit_events" ADD CONSTRAINT "atlas_publication_audit_events_publication_fk" FOREIGN KEY ("publication_id") REFERENCES "public"."atlas_publications"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "atlas_publication_equity_component_members" ADD CONSTRAINT "atlas_publication_equity_component_members_publication_fk" FOREIGN KEY ("publication_id") REFERENCES "public"."atlas_publications"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "atlas_publication_equity_component_members" ADD CONSTRAINT "atlas_publication_equity_component_members_component_fk" FOREIGN KEY ("component_id") REFERENCES "public"."score_components"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
@@ -173,11 +175,11 @@ ALTER TABLE "food_score_runs" ADD CONSTRAINT "food_score_runs_output_hash_check"
         AND "food_score_runs"."output_hash" IS NULL
       ));--> statement-breakpoint
 ALTER TABLE "food_score_runs" ADD CONSTRAINT "food_score_runs_completion_check" CHECK (("food_score_runs"."status" = 'draft' AND "food_score_runs"."completed_at" IS NULL) OR ("food_score_runs"."status" IN ('validated', 'published', 'superseded', 'failed') AND "food_score_runs"."completed_at" IS NOT NULL));--> statement-breakpoint
+ALTER TABLE "food_score_runs" ADD CONSTRAINT "food_score_runs_failure_metadata_check" CHECK (("food_score_runs"."status" = 'failed' AND "food_score_runs"."failure_metadata" IS NOT NULL) OR ("food_score_runs"."status" <> 'failed' AND "food_score_runs"."failure_metadata" IS NULL));--> statement-breakpoint
 ALTER TABLE "food_score_runs" ADD CONSTRAINT "food_score_runs_validation_result_check" CHECK ("food_score_runs"."status" NOT IN ('validated', 'published', 'superseded') OR "food_score_runs"."validation_result" IS NOT NULL);
 --> statement-breakpoint
 
 DROP TRIGGER "score_runs_plan2_transition_trigger" ON "score_runs";--> statement-breakpoint
-DROP TRIGGER "food_score_runs_plan3_transition_trigger" ON "food_score_runs";--> statement-breakpoint
 
 CREATE OR REPLACE FUNCTION publication_operation_is_enabled()
 RETURNS boolean
@@ -547,6 +549,22 @@ BEGIN
      OR candidate_baseline.validation_result IS NULL
      OR candidate_baseline.output_hash <> candidate_food.equity_baseline_output_hash THEN
     RAISE EXCEPTION 'Candidate Food run baseline pin is invalid';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM jsonb_to_recordset(p_source_snapshot_members) AS member(
+      redistribution_decision text
+    )
+    WHERE member.redistribution_decision = 'prohibited_public_use'
+  ) OR EXISTS (
+    SELECT 1
+    FROM jsonb_to_recordset(p_resource_version_members) AS member(
+      redistribution_decision text
+    )
+    WHERE member.redistribution_decision = 'prohibited_public_use'
+  ) THEN
+    RAISE EXCEPTION 'Prohibited source or resource cannot enter a public release';
   END IF;
 
   PERFORM set_config('mke.publication_operation', 'enabled', true);
