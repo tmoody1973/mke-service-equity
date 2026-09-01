@@ -25,10 +25,29 @@ export const atlasUnavailableResponseSchema = z.strictObject({
 export const atlasResponseSchema = z.discriminatedUnion("state", [
   atlasAvailableResponseSchema,
   atlasUnavailableResponseSchema,
-]);
+]).superRefine((value, context) => {
+  if (value.state !== "available") {
+    return;
+  }
+  if (value.mode === "published" && value.run.publication === null) {
+    context.addIssue({
+      code: "custom",
+      message: "Published Atlas data requires immutable publication identity.",
+      path: ["run", "publication"],
+    });
+  }
+  if (value.mode === "validated_preview" && value.run.publication !== null) {
+    context.addIssue({
+      code: "custom",
+      message: "Validated preview cannot claim publication identity.",
+      path: ["run", "publication"],
+    });
+  }
+});
 
 export * from "./profile";
 export * from "./context-layers";
+export * from "./publication";
 export * from "./run";
 export * from "./search";
 export * from "./tract";

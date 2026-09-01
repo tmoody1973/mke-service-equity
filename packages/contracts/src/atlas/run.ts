@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {currentAtlasPublicationSchema} from "./publication";
 
 export const atlasModeSchema = z.enum(["published", "validated_preview"]);
 
@@ -16,6 +17,7 @@ export const atlasRunSummarySchema = z.strictObject({
   equityBaselineMethodologyVersion: z.string().trim().min(1),
   completedAt: z.iso.datetime({offset: true}),
   dataVintages: z.record(z.string().trim().min(1), z.string().trim().min(1)),
+  publication: currentAtlasPublicationSchema.nullable().default(null),
 });
 
 export type AtlasMode = z.infer<typeof atlasModeSchema>;

@@ -36,6 +36,7 @@ const run = {
   equityBaselineMethodologyVersion: "equity-baseline-v1",
   completedAt: "2026-08-30T12:00:00.000Z",
   dataVintages: {acs: "2020-2024", foodRetail: "2025"},
+  publication: null,
 } as const;
 
 const foodSites = {
@@ -175,6 +176,31 @@ describe("atlasResponseSchema", () => {
     if (response.state === "available") {
       expect(response.tracts.features[0]?.id).toBe("55079000101");
     }
+  });
+
+  it("requires immutable publication identity for published mode", () => {
+    const publishedRun = {
+      ...run,
+      publication: {
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        publishedAt: "2026-09-01T12:00:00.000Z",
+        bundleFingerprint: "f".repeat(64),
+      },
+    };
+    expect(atlasResponseSchema.safeParse({
+      state: "available",
+      mode: "published",
+      run: publishedRun,
+      tracts: {type: "FeatureCollection", features: [feature]},
+      contextLayers: {foodSites},
+    }).success).toBe(true);
+    expect(atlasResponseSchema.safeParse({
+      state: "available",
+      mode: "published",
+      run,
+      tracts: {type: "FeatureCollection", features: [feature]},
+      contextLayers: {foodSites},
+    }).success).toBe(false);
   });
 
   it.each([
