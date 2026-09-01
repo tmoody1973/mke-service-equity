@@ -5,7 +5,7 @@
 - Linear issue: `MOO-756`
 - Branch: `codex/moo-756-completion-gate`
 - Verification date: 2026-09-01
-- Current checkpoint: Task 17 completion gate passed; Task 18 product review remains
+- Current checkpoint: Task 18 product experience approved; PR pending
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -400,3 +400,10 @@ git status --short
 
 Task 17 did not publish, supersede, or mutate a run. MOO-756 now stops at the required Task 18
 product-review gate.
+
+## Task 18 product review
+
+On 2026-09-01, Tarik reviewed the exact validated local preview after receiving the required
+Compare Areas and Opportunity Explorer task prompt and explicitly approved the MOO-756 product
+experience. No review finding or requested amendment was reported. This approval authorizes the
+verified branch to proceed to pull-request review; it is not merge authorization.
