@@ -22,6 +22,7 @@ import {
   publishAtlasRelease,
   readCurrentPublicationIdentity,
   readPublicationReconciliationEvidence,
+  readSuccessfulPublicationRetry,
   type PublicationOperationClient,
   withdrawAtlasRelease,
 } from "./repository";
@@ -55,6 +56,7 @@ type CliDependencies = {
     client: PublicationOperationClient,
     manifest: AtlasPublicationManifest,
   ): Promise<ReconciliationEvidence>;
+  readRetry: typeof readSuccessfulPublicationRetry;
   publish: typeof publishAtlasRelease;
   withdraw: typeof withdrawAtlasRelease;
   writeReport: typeof writePublicationReport;
@@ -73,6 +75,7 @@ const defaultDependencies: CliDependencies = {
   },
   readCurrent: readCurrentPublicationIdentity,
   readEvidence: readPublicationReconciliationEvidence,
+  readRetry: readSuccessfulPublicationRetry,
   publish: publishAtlasRelease,
   withdraw: withdrawAtlasRelease,
   writeReport: writePublicationReport,
@@ -238,6 +241,46 @@ export async function runPublicationCli(
     const gitCommit = readGitCommit(dependencies.environment);
     const client = dependencies.createClient(environmentGuard.databaseUrl);
     const current = await dependencies.readCurrent(client);
+    const requestHash = buildPublicationDryRunHash({request});
+    if (!isReadOnly) {
+      const retry = await dependencies.readRetry(client, {
+        action: request.action,
+        idempotencyKey: request.idempotencyKey,
+        requestHash,
+      });
+      if (retry) {
+        const report = {
+          action: safeAction,
+          intendedAction: request.action,
+          status: "succeeded",
+          environment: request.environment,
+          databaseHost: environmentGuard.databaseHost,
+          candidateFoodRunId: request.candidateFoodRunId,
+          expectedCurrentPublicationId: request.expectedCurrentPublicationId,
+          currentPublicationId: current?.id ?? null,
+          bundleFingerprint: retry.bundleFingerprint,
+          dryRunHash: request.dryRunHash,
+          approvalId: request.approvalId,
+          idempotencyKey: request.idempotencyKey,
+          actor: request.actor,
+          reason: request.reason,
+          publicationProcess: "mke-publication-cli",
+          commandVersion,
+          gitCommit,
+          validation: {},
+          result: {publicationId: retry.publicationId, reused: true},
+          completedAt: dependencies.now().toISOString(),
+        };
+        const reportPath = await dependencies.writeReport(
+          report,
+          parsed.reportRoot ?? defaultReportRoot,
+          dependencies.now(),
+        );
+        const output = {...report, reportPath};
+        dependencies.writeOutput(JSON.stringify(output));
+        return output;
+      }
+    }
     assertCurrentMatches(request, current);
     const rawManifest = parsed.manifestPath
       ? await dependencies.readJson(parsed.manifestPath)
@@ -276,7 +319,7 @@ export async function runPublicationCli(
         commandVersion,
         gitCommit,
         validationSummary: validation,
-        requestHash: buildPublicationDryRunHash({request}),
+        requestHash,
       });
     } else if (parsed.command === "withdraw") {
       if (request.action !== "withdraw") {
@@ -285,7 +328,7 @@ export async function runPublicationCli(
       verifyPublicationDryRunHash(request, dryRunHash);
       result = await dependencies.withdraw(client, request, {
         auditEventId: dependencies.randomUuid(),
-        requestHash: buildPublicationDryRunHash({request}),
+        requestHash,
       });
     }
 

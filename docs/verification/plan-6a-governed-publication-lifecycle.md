@@ -17,11 +17,13 @@ a separate decision requiring exact candidate and dry-run evidence.
 
 - Neon project: `wispy-glitter-41930798`
 - Source branch: `moo-753-food-equity` (`br-floral-morning-a51g4fpt`)
-- Disposable child: `moo-768-publication-lifecycle` (`br-dry-term-a599a485`), deleted after proof
+- Disposable children: `moo-768-publication-lifecycle` (`br-dry-term-a599a485`, then corrective
+  proofs `br-sweet-term-a5iba562` and `br-muddy-recipe-a5c8xj16`), all deleted after proof
 - Database: `neondb`
 - Migration role: `neondb_owner`
 - Child classification: non-default, non-primary, development-only
-- Child TTL after final reset: 2026-09-08T17:50:32Z
+- Child TTLs: 2026-09-08T17:50:32Z, 2026-09-08T18:50:00Z, and
+  2026-09-08T19:00:00Z
 
 Neon cannot expire a parent while it has a child. With explicit approval, the source expiration
 was temporarily removed for this verification. After the child was deleted, the source branch's
@@ -83,6 +85,9 @@ The live repository integration proved:
 - released scores and publication membership cannot be updated or deleted;
 - direct published-to-validated status changes are rejected;
 - approved withdrawal leaves zero current releases and supersedes the released fixture runs;
+- an identical withdrawal retry returns the recorded result without a duplicate audit event;
+- the CLI resolves an exact successful publish/withdraw retry from immutable audit identity before
+  changed-current or candidate-state checks, and issues no second write;
 - rejected fixture C remains validated; and
 - authoritative Plan 2/3 runs stay validated with their exact hashes.
 
@@ -109,11 +114,16 @@ npm run test:integration --workspace @mke/database -- --reporter verbose
   PASS — publication repository, publication schema, Food schema, and health (4 tests)
   SKIP — 10 preview repository cases requiring their separate exact-preview environment
 
+npm exec --workspace @mke/database -- vitest run \
+  tests/publication-repository.integration.test.ts \
+  tests/publication-schema.integration.test.ts --reporter verbose
+  PASS — 2 focused live tests after the database and CLI safe-retry corrections
+
 uv run pytest tests/data -q -m integration
   PASS — 12 tests; 590 non-integration tests deselected
 
 npm run verify
-  PASS — lint; all workspace type checks; 453 tests; production Next.js build
+  PASS — lint; all workspace type checks; 455 tests; production Next.js build
   PASS — 32 client assets scanned with no database/publication secret or mutation code
 
 uv run pytest -q

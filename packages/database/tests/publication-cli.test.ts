@@ -132,6 +132,7 @@ describe("publication CLI", () => {
       createClient: () => ({execute: vi.fn()}),
       readCurrent: async () => null,
       readEvidence: async () => evidence,
+      readRetry: async () => null,
       publish,
       withdraw,
       writeReport,
@@ -148,5 +149,51 @@ describe("publication CLI", () => {
     expect(withdraw).not.toHaveBeenCalled();
     expect(writeReport).toHaveBeenCalledOnce();
     expect(JSON.stringify(writeReport.mock.calls[0]?.[0])).not.toContain("postgresql://");
+  });
+
+  it("returns an exact recorded write retry without revalidating changed current state", async () => {
+    const publish = vi.fn();
+    const withdraw = vi.fn();
+    const readEvidence = vi.fn();
+    const writeReport = vi.fn().mockResolvedValue("/tmp/publication-retry.json");
+    const result = await runPublicationCli([
+      "publish",
+      "--request",
+      "request.json",
+      "--manifest",
+      "manifest.json",
+    ], {
+      environment: {
+        DATABASE_URL_UNPOOLED: "postgresql://user:secret@ep-fixture.example.test/neondb",
+        MKE_PIPELINE_ENV: "development",
+        MKE_PUBLICATION_ENV: "development",
+        MKE_PUBLICATION_EXPECTED_HOST: "ep-fixture.example.test",
+        MKE_PUBLICATION_GIT_COMMIT: "abc1234",
+      },
+      readJson: async () => ({...dryRequest, dryRunHash: hash("e")}),
+      createClient: () => ({execute: vi.fn()}),
+      readCurrent: async () => null,
+      readEvidence,
+      readRetry: async () => ({
+        publicationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        bundleFingerprint: hash("f"),
+      }),
+      publish,
+      withdraw,
+      writeReport,
+      now: () => new Date("2026-09-01T12:00:00.000Z"),
+      writeOutput: vi.fn(),
+    });
+    expect(result).toMatchObject({
+      status: "succeeded",
+      result: {
+        publicationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        reused: true,
+      },
+      bundleFingerprint: hash("f"),
+    });
+    expect(readEvidence).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+    expect(withdraw).not.toHaveBeenCalled();
   });
 });

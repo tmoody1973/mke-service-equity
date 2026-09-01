@@ -777,8 +777,27 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
   current_publication "atlas_publications"%ROWTYPE;
+  existing_withdrawal_id uuid;
 BEGIN
   PERFORM pg_advisory_xact_lock(hashtextextended('mke-atlas-publication', 0));
+
+  SELECT "publication_id" INTO existing_withdrawal_id
+  FROM "atlas_publication_audit_events"
+  WHERE "idempotency_key" = p_idempotency_key
+    AND "action" = 'withdraw'
+    AND "outcome" = 'succeeded'
+    AND "request_hash" = p_request_hash;
+
+  IF existing_withdrawal_id = p_publication_id THEN
+    RETURN existing_withdrawal_id;
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM "atlas_publication_audit_events"
+    WHERE "idempotency_key" = p_idempotency_key
+  ) THEN
+    RAISE EXCEPTION 'Withdrawal idempotency key was reused with different inputs';
+  END IF;
+
   SELECT * INTO current_publication
   FROM "atlas_publications"
   WHERE "state" = 'published'

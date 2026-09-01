@@ -32,6 +32,50 @@ type PublishMetadata = {
   requestHash: string;
 };
 
+export async function readSuccessfulPublicationRetry(
+  client: PublicationOperationClient,
+  input: {
+    action: "publish" | "withdraw";
+    idempotencyKey: string;
+    requestHash: string;
+  },
+): Promise<{publicationId: string; bundleFingerprint: string} | null> {
+  try {
+    const result = await client.execute(sql`
+      select
+        audit.action::text,
+        audit.outcome::text,
+        audit.request_hash,
+        audit.publication_id,
+        publication.bundle_fingerprint
+      from atlas_publication_audit_events audit
+      join atlas_publications publication on publication.id = audit.publication_id
+      where audit.idempotency_key = ${input.idempotencyKey}::uuid
+    `);
+    if (result.rows.length === 0) {
+      return null;
+    }
+    const row = result.rows[0]!;
+    if (
+      result.rows.length !== 1
+      || row.action !== input.action
+      || row.outcome !== "succeeded"
+      || row.request_hash !== input.requestHash
+    ) {
+      throw new PublicationOperationError("idempotency_key_reused");
+    }
+    return {
+      publicationId: requiredString(row, "publication_id"),
+      bundleFingerprint: requiredString(row, "bundle_fingerprint"),
+    };
+  } catch (error) {
+    if (error instanceof PublicationOperationError) {
+      throw error;
+    }
+    throw new PublicationOperationError("publication_retry_read_failed");
+  }
+}
+
 function asDatabaseMembers(manifest: AtlasPublicationManifest) {
   return {
     scores: manifest.scoreMembers.map((member) => ({

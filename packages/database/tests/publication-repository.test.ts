@@ -4,6 +4,7 @@ import {
   publishAtlasRelease,
   PublicationOperationError,
   readPublicationReconciliationEvidence,
+  readSuccessfulPublicationRetry,
   withdrawAtlasRelease,
 } from "../src/publication/repository";
 
@@ -67,6 +68,27 @@ const request = {
 } as const;
 
 describe("publication repository", () => {
+  it("returns only an exact successful idempotent retry", async () => {
+    const execute = vi.fn().mockResolvedValue({rows: [{
+      action: "withdraw",
+      outcome: "succeeded",
+      request_hash: hash("1"),
+      publication_id: publicationId,
+      bundle_fingerprint: hash("f"),
+    }]});
+    await expect(readSuccessfulPublicationRetry({execute}, {
+      action: "withdraw",
+      idempotencyKey: request.idempotencyKey,
+      requestHash: hash("1"),
+    })).resolves.toEqual({publicationId, bundleFingerprint: hash("f")});
+
+    await expect(readSuccessfulPublicationRetry({execute}, {
+      action: "publish",
+      idempotencyKey: request.idempotencyKey,
+      requestHash: hash("1"),
+    })).rejects.toThrowError(new PublicationOperationError("idempotency_key_reused"));
+  });
+
   it("reads candidate reconciliation evidence through parameterized queries", async () => {
     const execute = vi.fn()
       .mockResolvedValueOnce({rows: [{

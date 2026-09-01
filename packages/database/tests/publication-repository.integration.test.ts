@@ -3,6 +3,7 @@ import {sql, type SQL} from "drizzle-orm";
 import {describe, expect, it} from "vitest";
 import {createDatabaseClient} from "../src/client";
 import {readRuntimeDatabaseUrl} from "../src/env";
+import {readSuccessfulPublicationRetry} from "../src/publication/repository";
 
 type Database = ReturnType<typeof createDatabaseClient>;
 
@@ -488,19 +489,48 @@ describe.skipIf(!process.env.DATABASE_URL)("publication repository integration",
       `),
     ).rejects.toThrow();
 
+    const withdrawalIdempotencyKey = randomUUID();
+    const withdrawalRequestHash = hash();
     const withdrawal = await database.execute(sql`
       select withdraw_atlas_release(
         ${publicationB}::uuid,
         'MOO-768-integration',
-        ${randomUUID()}::uuid,
+        ${withdrawalIdempotencyKey}::uuid,
         'integration-test',
         'Verify zero-current withdrawal behavior',
         ${randomUUID()}::uuid,
         'development'::publication_environment,
-        ${hash()}::char(64)
+        ${withdrawalRequestHash}::char(64)
       ) as publication_id
     `);
     expect(withdrawal.rows).toEqual([{publication_id: publicationB}]);
+
+    const withdrawalRetry = await database.execute(sql`
+      select withdraw_atlas_release(
+        ${publicationB}::uuid,
+        'MOO-768-integration',
+        ${withdrawalIdempotencyKey}::uuid,
+        'integration-test',
+        'Verify zero-current withdrawal behavior',
+        ${randomUUID()}::uuid,
+        'development'::publication_environment,
+        ${withdrawalRequestHash}::char(64)
+      ) as publication_id
+    `);
+    expect(withdrawalRetry.rows).toEqual([{publication_id: publicationB}]);
+    const withdrawalAudit = await database.execute(sql`
+      select count(*)::integer as event_count
+      from atlas_publication_audit_events
+      where idempotency_key = ${withdrawalIdempotencyKey}::uuid
+        and action = 'withdraw'
+        and outcome = 'succeeded'
+    `);
+    expect(withdrawalAudit.rows).toEqual([{event_count: 1}]);
+    await expect(readSuccessfulPublicationRetry(database, {
+      action: "withdraw",
+      idempotencyKey: withdrawalIdempotencyKey,
+      requestHash: withdrawalRequestHash,
+    })).resolves.toEqual({publicationId: publicationB, bundleFingerprint: expect.any(String)});
 
     const finalState = await database.execute(sql`
       select
