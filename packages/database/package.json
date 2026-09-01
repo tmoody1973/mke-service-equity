@@ -3,11 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": {"./server": "./src/server.ts"},
+  "exports": {
+    "./server": "./src/server.ts"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run --exclude '**/*.integration.test.ts'",
     "test:integration": "vitest run tests/*.integration.test.ts",
+    "publication": "node --import tsx src/publication/cli.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
   },
@@ -17,5 +20,11 @@
     "drizzle-orm": "0.45.2",
     "server-only": "0.0.1"
   },
-  "devDependencies": {"@types/node": "26.4.0", "drizzle-kit": "0.31.10", "typescript": "6.0.3", "vitest": "4.1.11"}
+  "devDependencies": {
+    "@types/node": "26.4.0",
+    "drizzle-kit": "0.31.10",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
+  }
 }
