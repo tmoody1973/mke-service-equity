@@ -151,6 +151,21 @@ describe("publication CLI", () => {
     expect(JSON.stringify(writeReport.mock.calls[0]?.[0])).not.toContain("postgresql://");
   });
 
+  it("reports a missing manifest before a publish dry run", async () => {
+    const writeReport = vi.fn().mockResolvedValue("/tmp/publication-failure.json");
+
+    await expect(runPublicationCli([
+      "dry-run",
+      "--request",
+      "request.json",
+    ], {
+      readJson: async () => dryRequest,
+      writeReport,
+      writeOutput: vi.fn(),
+    })).rejects.toThrowError(new PublicationCommandError("manifest_path_missing"));
+    expect(writeReport).toHaveBeenCalledOnce();
+  });
+
   it("returns an exact recorded write retry without revalidating changed current state", async () => {
     const publish = vi.fn();
     const withdraw = vi.fn();

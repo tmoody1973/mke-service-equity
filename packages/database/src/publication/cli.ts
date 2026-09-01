@@ -234,6 +234,9 @@ export async function runPublicationCli(
     const request = isReadOnly
       ? commandRequestFromDryRun(dryRequest)
       : publicationCommandRequestSchema.parse(rawRequest);
+    if (parsed.command === "dry-run" && request.action === "publish" && !parsed.manifestPath) {
+      throw new PublicationCommandError("manifest_path_missing");
+    }
     const environmentGuard = validatePublicationCommandEnvironment(
       request,
       dependencies.environment,

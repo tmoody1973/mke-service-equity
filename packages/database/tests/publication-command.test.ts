@@ -6,6 +6,7 @@ import {
   verifyPublicationDryRunHash,
   validatePublicationCommandEnvironment,
 } from "../src/publication/command";
+import {createHash} from "node:crypto";
 
 const hash = "a".repeat(64);
 const request = {
@@ -89,6 +90,14 @@ describe("publication dry-run binding", () => {
     });
     expect(left).toMatch(/^[0-9a-f]{64}$/);
     expect(right).toBe(left);
+  });
+
+  it("uses raw code-point ordering for canonical evidence", () => {
+    const expected = createHash("sha256")
+      .update('{"a":3,"z":2,"ä":1}', "utf8")
+      .digest("hex");
+
+    expect(buildPublicationDryRunHash({"ä": 1, z: 2, a: 3})).toBe(expected);
   });
 
   it("rejects a write whose request does not match the dry-run evidence", () => {

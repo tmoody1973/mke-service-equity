@@ -29,7 +29,11 @@ type ManifestInput = Omit<
 };
 
 function sorted<T>(values: ReadonlyArray<T>, key: (value: T) => string): T[] {
-  return [...values].sort((left, right) => key(left).localeCompare(key(right), "en"));
+  return [...values].sort((left, right) => {
+    const leftKey = key(left);
+    const rightKey = key(right);
+    return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+  });
 }
 
 export function buildPublicationManifest(input: ManifestInput): AtlasPublicationManifest {
