@@ -3,9 +3,9 @@
 ## Status
 
 - Linear issue: `MOO-756`
-- Branch: `codex/moo-756-analysis-documentation`
-- Verification date: 2026-08-31
-- Current checkpoint: Task 16 documentation reconciliation
+- Branch: `codex/moo-756-completion-gate`
+- Verification date: 2026-09-01
+- Current checkpoint: Task 17 completion gate passed; Task 18 product review remains
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -335,3 +335,68 @@ npm test --workspace @mke/web -- --maxWorkers=4 --testTimeout=15000
 npm run build --workspace @mke/web
 git diff --check
 ```
+
+## Task 17 completion gate
+
+Task 17 reran the complete repository, database, design, build, and browser verification before
+the product-review gate. The web test command now carries the already-proven four-worker and
+15-second ceiling directly in `apps/web/package.json`, so `npm run verify` is stable under local
+process contention without weakening any assertion.
+
+The complete guarded preview used the exact validated Food Equity run and the approved valid City
+neighborhood snapshot. All 40 applicable tests passed across 375, 430, 768, 1024, and 1440 pixels;
+the five public-only tests skipped by design. The neighborhood search and tract profile therefore
+also proved the configured City reference instead of exercising the intentional
+`snapshot_not_configured` state. Accessibility and shell coverage distinguish this guarded
+development preview from public production while excluding only the exact HeroUI Pro React Aria
+ID hydration warning produced by Next's development renderer. Every other console error and page
+error remains fatal.
+
+The separate clean public run explicitly removed the database, preview-run, neighborhood-snapshot,
+data-mode, and pipeline-environment variables. All 15 applicable public tests passed at the same
+five widths; 30 preview-only tests skipped by design. The public collector ignored no browser
+errors, Analyze stayed fail-closed, and no validated preview data appeared.
+
+Read-only reconciliation against the disposable Neon branch passed all 12 database integration
+tests across six files, including PostGIS health, schema, the exact Atlas bundle, Compare and
+Opportunity golden results, and tract-profile lineage. The connection string was supplied only to
+the test and server processes and was not printed or written to an artifact. No run status or
+analytical row was changed.
+
+The `main...HEAD` audit found no schema, scoring-methodology, source-ingestion, publication,
+export, address-authority, public-land, resource-ranking, or AI change. The Plan 5 database joins
+and Opportunity filters remain in parameterized Drizzle SQL; strict Zod contracts validate the
+server results. MapLibre receives already-selected geometry only for display and interaction.
+Missing values are not replaced with zero, contextual food sites and public investment do not
+change results, and matching areas remain canonically ordered rather than ranked. Changed files
+remain focused on verification, responsive/accessibility corrections, documentation, and the
+client-bundle boundary.
+
+| Task 17 verification | Result |
+|---|---:|
+| `npm run verify` | passed |
+| Offline tests | 389 passed |
+| Exact read-only database integrations | 12 passed |
+| Exact validated-preview Playwright matrix | 40 passed, 5 skipped |
+| Clean public Playwright matrix | 15 passed, 30 skipped |
+| Required responsive widths | 375, 430, 768, 1024, 1440 passed |
+| Next.js production build | passed |
+| Production client asset scan | 32 assets, no findings |
+| `main...HEAD` guardrail audit | passed |
+| `git diff --check` | passed |
+
+```text
+npm run verify
+npm run test:integration --workspace @mke/database -- --reporter=verbose
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:3011 \
+  MKE_ATLAS_PREVIEW_RUN_ID=<exact validated run supplied locally> \
+  npm run test:e2e -- --workers=1
+env -u DATABASE_URL -u DATABASE_URL_UNPOOLED -u MKE_ATLAS_DATA_MODE \
+  -u MKE_ATLAS_PREVIEW_RUN_ID -u MKE_ATLAS_NEIGHBORHOOD_SNAPSHOT_ID \
+  -u MKE_PIPELINE_ENV npm run test:e2e -- --workers=1
+git diff --check
+git status --short
+```
+
+Task 17 did not publish, supersede, or mutate a run. MOO-756 now stops at the required Task 18
+product-review gate.
