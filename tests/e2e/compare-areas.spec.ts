@@ -2,6 +2,7 @@ import {expect, test} from "@playwright/test";
 
 import {
   captureAnalyzeScreenshot,
+  configuredViewportWidth,
   expectForcedColors,
   expectNoAxeViolations,
   expectNoHorizontalOverflow,
@@ -34,7 +35,7 @@ test("Compare Areas supports accessible two-to-five-area work at the configured 
   test.setTimeout(120_000);
 
   const browserErrors = observeAnalyzeBrowserErrors(page);
-  const width = testInfo.project.use.viewport?.width ?? 0;
+  const width = configuredViewportWidth(testInfo);
   await page.emulateMedia({reducedMotion: "reduce"});
   await page.goto(comparePath(TWO_TRACTS));
 

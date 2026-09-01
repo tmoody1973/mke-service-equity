@@ -5,7 +5,7 @@
 - Linear issue: `MOO-756`
 - Branch: `codex/moo-756-completion-gate`
 - Verification date: 2026-09-01
-- Current checkpoint: Task 18 product experience approved; PR pending
+- Current checkpoint: Task 18 product experience and PR #6 merge approved
 - Publication state: no Food Equity run is published; governed publication remains tracked by
   `MOO-768`
 
@@ -210,6 +210,7 @@ The Task 14 browser command was:
 
 ```text
 PLAYWRIGHT_BASE_URL=http://localhost:3011 \
+MKE_ATLAS_DATA_MODE=validated_preview \
 MKE_ATLAS_PREVIEW_RUN_ID=<exact validated run supplied locally> \
 npm run test:e2e -- --grep "Compare Areas|Opportunity Explorer" --workers=1
 ```
@@ -239,7 +240,7 @@ point Census 90% margin of error, 97th county percentile, and `use_with_caution`
 Census tract `55079187200` remained `insufficient_data` with no inferred measures or Priority, and
 zero-population tract `55079990000` remained explicitly ineligible and unscored.
 
-Representative Opportunity calls used the production parameterized repository query and proved
+Representative Opportunity calls used the production-parameterized repository query and proved
 OR within Priority, AND across filter categories, explicit missing-data exclusions, population
 meaning, and canonical result order:
 
@@ -389,6 +390,7 @@ client-bundle boundary.
 npm run verify
 npm run test:integration --workspace @mke/database -- --reporter=verbose
 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3011 \
+  MKE_ATLAS_DATA_MODE=validated_preview \
   MKE_ATLAS_PREVIEW_RUN_ID=<exact validated run supplied locally> \
   npm run test:e2e -- --workers=1
 env -u DATABASE_URL -u DATABASE_URL_UNPOOLED -u MKE_ATLAS_DATA_MODE \
@@ -407,3 +409,17 @@ On 2026-09-01, Tarik reviewed the exact validated local preview after receiving 
 Compare Areas and Opportunity Explorer task prompt and explicitly approved the MOO-756 product
 experience. No review finding or requested amendment was reported. This approval authorizes the
 verified branch to proceed to pull-request review; it is not merge authorization.
+
+Before merge, CodeRabbit completed its review and posted seven bounded findings. The branch now
+uses the canonical SNAP retailer low-access label, identifies higher values as worse access,
+requires both validated-preview mode and an exact HeroUI/React Aria signature before excluding the
+known development-only hydration warning, checks both animation names and transition durations,
+waits for negligible-motion state to settle, requires configured Playwright viewports, and uses a
+retrying URL assertion after keyboard filter edits. The preview verification commands now provide
+the explicit data mode to the test process.
+
+After those corrections, `npm run verify` passed all 389 offline tests and the production build
+scanned 32 client assets with no finding. The complete exact-preview browser matrix passed 40
+applicable tests with five public-only skips. A fresh isolated production server on port 3012 then
+passed all 15 applicable public tests with 30 preview-only skips. Tarik separately authorized
+merging PR #6 on 2026-09-01 after the review completed.

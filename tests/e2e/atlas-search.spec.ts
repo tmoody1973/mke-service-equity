@@ -1,13 +1,16 @@
 import AxeBuilder from "@axe-core/playwright";
 import {expect, test, type Page} from "@playwright/test";
 
+import {configuredViewportWidth} from "./analyze-helpers";
+import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
+
 const previewRunId = process.env.MKE_ATLAS_PREVIEW_RUN_ID;
 
 function observeBrowserErrors(page: Page) {
   const errors: string[] = [];
   page.on("console", (message) => {
     const text = message.text();
-    if (message.type() === "error" && !text.startsWith("A tree hydrated")) {
+    if (message.type() === "error" && !isKnownHeroUiReactAriaDevHydrationWarning(text)) {
       errors.push(`console: ${text}`);
     }
   });
@@ -19,7 +22,7 @@ test("finds a tract from the approved City neighborhood reference", async ({page
   test.skip(!previewRunId, "Requires the explicit local validated-preview run.");
 
   const browserErrors = observeBrowserErrors(page);
-  const width = testInfo.project.use.viewport?.width ?? 0;
+  const width = configuredViewportWidth(testInfo);
   await page.emulateMedia({reducedMotion: "reduce"});
   await page.goto("/");
 

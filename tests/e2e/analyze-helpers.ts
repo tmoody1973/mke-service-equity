@@ -3,6 +3,8 @@ import {expect, type Locator, type Page, type TestInfo} from "@playwright/test";
 import {mkdir} from "node:fs/promises";
 import path from "node:path";
 
+import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
+
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"];
 
 export function observeAnalyzeBrowserErrors(page: Page) {
@@ -12,7 +14,7 @@ export function observeAnalyzeBrowserErrors(page: Page) {
     const text = message.text();
     // HeroUI Pro Sidebar's React Aria collection IDs differ only under Next's dev renderer.
     // Task 15 separately owns the production-mode browser proof, where no error is ignored.
-    if (message.type() === "error" && !text.startsWith("A tree hydrated")) {
+    if (message.type() === "error" && !isKnownHeroUiReactAriaDevHydrationWarning(text)) {
       errors.push(`console: ${message.text()}`);
     }
   });
@@ -64,16 +66,26 @@ export async function expectReducedMotion(page: Page) {
 }
 
 export async function expectNegligibleMotion(locator: Locator) {
-  expect(await locator.evaluate((element) => {
+  await expect.poll(() => locator.evaluate((element) => {
     const style = getComputedStyle(element);
-    const milliseconds = `${style.animationDuration},${style.transitionDuration}`
+    const transitionMilliseconds = style.transitionDuration
       .split(",")
       .map((value) => value.trim())
       .map((value) => (value.endsWith("ms")
         ? Number.parseFloat(value)
         : Number.parseFloat(value) * 1000));
-    return style.animationName === "none" || milliseconds.every((duration) => duration <= 1);
+    return style.animationName === "none"
+      && transitionMilliseconds.every((duration) => duration <= 1);
   })).toBe(true);
+}
+
+export function configuredViewportWidth(testInfo: TestInfo): number {
+  const viewport = testInfo.project.use.viewport;
+  expect(viewport, "Playwright project must define a viewport").toBeDefined();
+  if (!viewport) {
+    throw new Error("playwright_viewport_not_configured");
+  }
+  return viewport.width;
 }
 
 export async function expectForcedColors(page: Page) {

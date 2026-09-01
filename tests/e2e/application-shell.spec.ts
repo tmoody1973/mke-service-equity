@@ -2,7 +2,10 @@ import {expect, test, type Page} from "@playwright/test";
 import {mkdir} from "node:fs/promises";
 import path from "node:path";
 
-const previewRunId = process.env.MKE_ATLAS_PREVIEW_RUN_ID;
+import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
+
+const validatedPreview = process.env.MKE_ATLAS_DATA_MODE === "validated_preview"
+  && Boolean(process.env.MKE_ATLAS_PREVIEW_RUN_ID);
 
 function observeBrowserErrors(page: Page) {
   const errors: string[] = [];
@@ -11,7 +14,7 @@ function observeBrowserErrors(page: Page) {
     const text = message.text();
     // HeroUI Pro's React Aria IDs differ only under Next's development renderer.
     // Public production-mode coverage continues to reject every console error.
-    if (message.type() === "error" && !(previewRunId && text.startsWith("A tree hydrated"))) {
+    if (message.type() === "error" && !isKnownHeroUiReactAriaDevHydrationWarning(text)) {
       errors.push(`console: ${text}`);
     }
   });
@@ -47,7 +50,7 @@ test("renders and operates the shell at the configured width", async ({page}, te
   await expect(attribution).toBeVisible();
   await expect(attribution).toBeInViewport();
   await expect(attribution).toContainText("MapLibre GL JS");
-  if (previewRunId) {
+  if (validatedPreview) {
     await expect(
       page.getByText("Preview only — checked, but not published.", {exact: true}),
     ).toBeVisible();

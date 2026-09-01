@@ -3,6 +3,9 @@ import {expect, test, type Page} from "@playwright/test";
 import {mkdir} from "node:fs/promises";
 import path from "node:path";
 
+import {configuredViewportWidth} from "./analyze-helpers";
+import {isKnownHeroUiReactAriaDevHydrationWarning} from "./browser-errors";
+
 const previewRunId = process.env.MKE_ATLAS_PREVIEW_RUN_ID;
 
 function observeBrowserErrors(page: Page) {
@@ -12,7 +15,7 @@ function observeBrowserErrors(page: Page) {
     const text = message.text();
     // The HeroUI Pro Sidebar emits this React Aria ID warning only under Next's dev renderer.
     // The production five-width suite still rejects every console error.
-    if (message.type() === "error" && !text.startsWith("A tree hydrated")) {
+    if (message.type() === "error" && !isKnownHeroUiReactAriaDevHydrationWarning(text)) {
       errors.push(`console: ${text}`);
     }
   });
@@ -25,7 +28,7 @@ test("renders the plain-language tract profile at the configured width", async (
   test.skip(!previewRunId, "Requires the explicit local validated-preview run.");
 
   const browserErrors = observeBrowserErrors(page);
-  const width = testInfo.project.use.viewport?.width ?? 0;
+  const width = configuredViewportWidth(testInfo);
 
   await page.emulateMedia({reducedMotion: "reduce"});
   await page.goto("/?tract=55079000101");
@@ -102,7 +105,7 @@ test("explains a wide Census margin of error before planning", async ({page}, te
   test.skip(!previewRunId, "Requires the explicit local validated-preview run.");
 
   const browserErrors = observeBrowserErrors(page);
-  const width = testInfo.project.use.viewport?.width ?? 0;
+  const width = configuredViewportWidth(testInfo);
 
   await page.goto("/?tract=55079008400");
   if (width < 1280) {

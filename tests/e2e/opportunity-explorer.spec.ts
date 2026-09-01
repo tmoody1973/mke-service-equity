@@ -2,6 +2,7 @@ import {expect, test, type Locator, type Page} from "@playwright/test";
 
 import {
   captureAnalyzeScreenshot,
+  configuredViewportWidth,
   expectForcedColors,
   expectNegligibleMotion,
   expectNoAxeViolations,
@@ -37,7 +38,7 @@ test("Opportunity Explorer supports accessible planning filters at the configure
   test.setTimeout(150_000);
 
   const browserErrors = observeAnalyzeBrowserErrors(page);
-  const width = testInfo.project.use.viewport?.width ?? 0;
+  const width = configuredViewportWidth(testInfo);
   const isNarrow = width <= 768;
   await page.emulateMedia({reducedMotion: "reduce"});
   await page.goto("/analyze/opportunity?priorities=1");
@@ -88,7 +89,7 @@ test("Opportunity Explorer supports accessible planning filters at the configure
   const highEquity = filters.getByRole("checkbox", {name: "Equity Baseline band: High"});
   await highEquity.focus();
   await page.keyboard.press("Space");
-  expect(page.url()).toMatch(/priorities=1$/);
+  await expect(page).toHaveURL(/priorities=1$/);
   if (!isNarrow) {
     await expect(page.getByText(/18 matching census tracts/i)).toBeVisible();
   }

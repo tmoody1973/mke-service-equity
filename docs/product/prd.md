@@ -140,7 +140,7 @@ Support structured filters such as:
 - Equity Baseline band and percentile
 - Food Access Need band and percentile
 - household vehicle access
-- SNAP retailer access
+- SNAP retailer low-access share (higher values mean worse access)
 - full-service grocery walking access and reachability
 - scheduled transit service intensity
 

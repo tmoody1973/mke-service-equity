@@ -599,6 +599,8 @@ npm run dev --workspace @mke/web -- --hostname 127.0.0.1 --port 3011
 
 # Terminal 2: run only against that isolated preview process.
 PLAYWRIGHT_BASE_URL=http://127.0.0.1:3011 \
+MKE_ATLAS_DATA_MODE=validated_preview \
+MKE_ATLAS_PREVIEW_RUN_ID=97bd1cdf-bf96-573f-8fcf-92e8676925d4 \
 npm run test:e2e -- --grep "Compare Areas|Opportunity Explorer"
 
 # Stop Terminal 1 before continuing. In a clean shell with preview variables absent, build and
