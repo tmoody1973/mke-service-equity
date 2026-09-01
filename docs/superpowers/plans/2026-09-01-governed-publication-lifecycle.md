@@ -473,7 +473,7 @@ documentation gates pass with exact recorded evidence.
 
 - [x] Review every commit/diff against the approved contract and MOO-768 acceptance criteria.
 - [x] Push codex/moo-768-publication-lifecycle and open a PR linked to MOO-768.
-- [ ] Run CI, CodeRabbit, secret scanning, and resolve substantive review findings.
+- [x] Run CI, CodeRabbit, secret scanning, and resolve substantive review findings.
 - [ ] Obtain Tarik's approval to merge after evidence review.
 - [ ] Merge and record the merge commit/PR in Linear.
 - [ ] Mark MOO-768 Done only after merge and evidence.
