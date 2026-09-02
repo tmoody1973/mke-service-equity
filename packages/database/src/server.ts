@@ -22,6 +22,12 @@ export {
   MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE,
 } from "./atlas/atlas-repository";
 export type {AtlasRepositoryClient} from "./atlas/atlas-repository";
+export {
+  AtlasExportDataIntegrityError,
+  buildTractEvidenceExport,
+  loadTractEvidenceExport,
+} from "./atlas/export-repository";
+export type {AtlasExportRepositoryClient} from "./atlas/export-repository";
 export {parseAtlasMultiPolygon, serializedGeoJsonBytes} from "./atlas/geometry";
 export {
   buildNeighborhoodContext,
