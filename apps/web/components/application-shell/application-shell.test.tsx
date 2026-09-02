@@ -56,6 +56,8 @@ describe("ApplicationShell", () => {
     );
     expect(within(navigation).getByRole("treeitem", {name: "Opportunity Explorer"}))
       .toHaveAttribute("href", "/analyze/opportunity");
+    expect(within(navigation).getByRole("treeitem", {name: "Download data"}))
+      .toHaveAttribute("href", "/data");
   });
 
   it("derives the current item and route-specific shell labels from the pathname", () => {

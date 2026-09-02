@@ -36,4 +36,13 @@ export const primaryNavigation = [
       },
     ],
   },
+  {
+    id: "data",
+    label: "Data",
+    items: [{
+      href: "/data",
+      id: "download-data",
+      label: "Download data",
+    }],
+  },
 ] as const satisfies readonly PrimaryNavigationGroup[];
