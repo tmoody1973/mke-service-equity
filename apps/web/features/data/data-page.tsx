@@ -1,3 +1,5 @@
+"use client";
+
 import {Accordion, Card} from "@heroui/react";
 import {
   tractEvidenceColumnRegistry,
