@@ -89,6 +89,13 @@ const sourceDecisions: Record<string, SourceDecision> = {
     attribution: "OpenStreetMap contributors and Geofabrik",
     warning: "Derived from OpenStreetMap data under ODbL 1.0.",
   },
+  milwaukee_dcd_neighborhoods: {
+    role: "food_context_input",
+    redistributionDecision: "public_derived_results",
+    termsUrl: "https://city.milwaukee.gov/mapmilwaukee/DownloadMapData3497",
+    attribution: "City of Milwaukee Department of City Development and ITMD-GIS",
+    warning: "City-published reference, not an official City or neighborhood-association boundary; City of Milwaukee coverage only.",
+  },
   emergency_food_context: {
     role: "food_context_input",
     redistributionDecision: "prohibited_public_use",

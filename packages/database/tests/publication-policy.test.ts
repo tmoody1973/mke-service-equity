@@ -12,6 +12,7 @@ describe("publication source policy", () => {
     ["sram", "USDA Economic Research Service"],
     ["walking_network", "OpenStreetMap contributors and Geofabrik"],
     ["mcts_gtfs", "Milwaukee County Transit System"],
+    ["milwaukee_dcd_neighborhoods", "City of Milwaukee Department of City Development and ITMD-GIS"],
   ] as const)("permits attributed derived results for %s", (sourceKey, attribution) => {
     expect(decideSourcePublication(sourceKey)).toMatchObject({
       redistributionDecision: "public_derived_results",

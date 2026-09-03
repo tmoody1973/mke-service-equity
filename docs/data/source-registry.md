@@ -221,6 +221,12 @@ The approved snapshot retrieved on 2026-08-30 has SHA-256
 preserved within a relative tolerance of `1e-9`; any other invalid geometry or a changed repair
 result fails validation.
 
+For a governed public Atlas release, the exact validated snapshot may be a
+`food_context_input` member with `public_derived_results`, City download-data terms attribution,
+and the City-reference limitation preserved. That permits the approved overlap/search context;
+it does not permit a different boundary source, a claim that these are official boundaries, or a
+change to any score or priority.
+
 The City says these boundaries were developed using subdivisions, major streets, physical
 barriers, community participation, housing characteristics, historic areas, and residents'
 opinions. The City also says they are not official City boundaries, do not necessarily match
