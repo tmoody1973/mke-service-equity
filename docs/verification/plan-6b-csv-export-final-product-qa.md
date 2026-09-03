@@ -25,10 +25,12 @@ coordinates, resource-level records, public investment, or partial rows.
 | Contract tests | 98 passed |
 | Database tests | 198 passed |
 | Web tests | 194 passed |
+| Python data tests | 590 passed; 12 integration tests deselected by the repository default |
 | Project lint and workspace typechecks | passed |
 | Production web build and client-bundle scan | passed; 37 client assets scanned with no analysis secret or server-only code |
 | Data-page responsive check | 5 passed at 375, 430, 768, 1024, and 1440 px |
 | Final public-route/browser and accessibility checks | 15 passed at those five widths |
+| Complete browser suite | 30 passed and 30 intentionally skipped because no private preview or live fixture was configured |
 
 The final browser checks cover Atlas, selected-tract URL handling, Compare Areas, Opportunity
 Explorer, and Download data. They verify a visible main region and page title, horizontal-overflow
