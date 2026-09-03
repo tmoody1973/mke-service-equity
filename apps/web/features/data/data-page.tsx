@@ -52,7 +52,7 @@ export function DataPage({availability}: DataPageProps) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold text-accent">MKE Service Equity</p>
+        <p className="text-sm font-semibold text-foreground">MKE Service Equity</p>
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Download data
         </h1>
