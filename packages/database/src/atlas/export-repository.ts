@@ -314,17 +314,24 @@ function contribution(row: Record<string, unknown>, code: string): number {
 }
 
 function buildEquityMetric(row: Record<string, unknown>, selectedRun: SelectedAtlasRun): TractEvidenceMetric {
-  if (
-    string(row.component_score_run_id, "missing_equity_component_run") !== selectedRun.equityBaselineRunId
-    || string(row.component_geography_id, "missing_equity_component_geography")
-      !== string(row.value_geography_id, "missing_equity_value_geography")
-  ) {
-    return fail("equity_component_run_or_geography_mismatch");
+  const hasComponent = row.component_id !== null;
+  if (hasComponent) {
+    if (
+      string(row.component_score_run_id, "missing_equity_component_run") !== selectedRun.equityBaselineRunId
+      || string(row.component_geography_id, "missing_equity_component_geography")
+        !== string(row.value_geography_id, "missing_equity_value_geography")
+    ) {
+      return fail("equity_component_run_or_geography_mismatch");
+    }
   }
   const slug = string(row.indicator_slug, "invalid_equity_slug");
   const englishAccess = slug === "limited_english_proficiency";
-  const percentile = number(row.indicator_percentile, "invalid_equity_percentile");
-  const weight = number(row.effective_weight, "invalid_equity_weight");
+  const percentile = hasComponent
+    ? number(row.indicator_percentile, "invalid_equity_percentile")
+    : null;
+  const weight = hasComponent
+    ? number(row.effective_weight, "invalid_equity_weight")
+    : null;
   return {
     slug: slug as TractEvidenceMetric["slug"],
     name: englishAccess
@@ -333,11 +340,11 @@ function buildEquityMetric(row: Record<string, unknown>, selectedRun: SelectedAt
     definition: englishAccess
       ? "Share of people age 5 and older who speak a language other than English at home and report speaking English less than ‘very well.’ This measures English-language access, not literacy."
       : string(row.indicator_description, "invalid_equity_definition"),
-    dataYear: string(row.data_year, "invalid_equity_data_year"),
+    dataYear: nullableString(row.data_year, "invalid_equity_data_year"),
     measurement: equityMeasurement(row),
     countyPercentile: percentile,
     effectiveWeight: weight,
-    contribution: contribution(row, "equity_contribution"),
+    contribution: hasComponent ? contribution(row, "equity_contribution") : null,
     higherIsWorse: row.higher_is_worse === true,
     limitation: englishAccess
       ? "This Census estimate measures reported English-speaking ability. It does not measure reading or writing literacy."
@@ -346,20 +353,27 @@ function buildEquityMetric(row: Record<string, unknown>, selectedRun: SelectedAt
 }
 
 function buildFoodMetric(row: Record<string, unknown>, selectedRun: SelectedAtlasRun): TractEvidenceMetric {
-  if (
-    string(row.component_food_score_run_id, "missing_food_component_run") !== selectedRun.run.id
-    || string(row.component_geography_id, "missing_food_component_geography")
-      !== string(row.value_geography_id, "missing_food_value_geography")
-  ) {
-    return fail("food_component_run_or_geography_mismatch");
+  const hasComponent = row.component_id !== null;
+  if (hasComponent) {
+    if (
+      string(row.component_food_score_run_id, "missing_food_component_run") !== selectedRun.run.id
+      || string(row.component_geography_id, "missing_food_component_geography")
+        !== string(row.value_geography_id, "missing_food_value_geography")
+    ) {
+      return fail("food_component_run_or_geography_mismatch");
+    }
   }
   const slug = string(row.metric_slug, "invalid_food_slug");
   const details = FOOD_METRIC_DETAILS[slug];
   if (!details) {
     return fail("unexpected_food_metric");
   }
-  const percentile = number(row.indicator_percentile, "invalid_food_percentile");
-  const weight = number(row.effective_weight, "invalid_food_weight");
+  const percentile = hasComponent
+    ? number(row.indicator_percentile, "invalid_food_percentile")
+    : null;
+  const weight = hasComponent
+    ? number(row.effective_weight, "invalid_food_weight")
+    : null;
   return {
     slug: slug as TractEvidenceMetric["slug"],
     ...details,
@@ -369,7 +383,7 @@ function buildFoodMetric(row: Record<string, unknown>, selectedRun: SelectedAtla
     measurement: foodMeasurement(row),
     countyPercentile: percentile,
     effectiveWeight: weight,
-    contribution: contribution(row, "food_contribution"),
+    contribution: hasComponent ? contribution(row, "food_contribution") : null,
   };
 }
 
@@ -432,6 +446,21 @@ function buildRow(
     (row) => buildFoodMetric(row, selectedRun),
     "food_metric",
   );
+
+  if (
+    baselineQualityStatus === "complete"
+    && equityIndicators.some((metric) => metric.countyPercentile === null
+      || metric.effectiveWeight === null || metric.contribution === null)
+  ) {
+    return fail("complete_equity_score_missing_component");
+  }
+  if (
+    foodQualityStatus === "complete"
+    && foodMetrics.some((metric) => metric.countyPercentile === null
+      || metric.effectiveWeight === null || metric.contribution === null)
+  ) {
+    return fail("complete_food_score_missing_component");
+  }
 
   return {
     geoid,
@@ -522,6 +551,9 @@ export async function loadTractEvidenceExport(
   }
   const publicationId = selectedRun.run.publication.id;
   const client = createClient(readRuntimeDatabaseUrl(environment));
+  // The two evidence queries enumerate every approved metric definition for each released score.
+  // A non-complete score can therefore retain its fixed CSV family as explicit missing slots without
+  // reading an unpinned raw value or inventing a score component.
   const [headers, equity, food, sources, neighborhoodContexts, neighborhoodOverlaps] = await Promise.all([
     client.execute(sql`
       select
@@ -574,82 +606,146 @@ export async function loadTractEvidenceExport(
       order by geography.geoid
     `),
     client.execute(sql`
+      with published_scores as (
+        select publication_score.publication_id, publication_score.geography_id,
+          geography.geoid, baseline_run.methodology_version
+        from atlas_publication_score_members as publication_score
+        join atlas_publications as publication
+          on publication.id = publication_score.publication_id
+          and publication.id = ${publicationId}::uuid
+          and publication.state = 'published'
+        join geographies as geography on geography.id = publication_score.geography_id
+        join scores as baseline_score
+          on baseline_score.id = publication_score.equity_score_id
+          and baseline_score.score_run_id = ${selectedRun.equityBaselineRunId}::uuid
+          and baseline_score.geography_id = geography.id
+        join score_runs as baseline_run on baseline_run.id = baseline_score.score_run_id
+        where geography.geography_type = 'tract'
+          and geography.state_fips = '55'
+          and geography.county_fips = '079'
+          and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
+      ), component_evidence as (
+        select publication_component.publication_id, component.geography_id,
+          definition.slug, component.id::text as component_id,
+          component.score_run_id::text as component_score_run_id,
+          component.geography_id::text as component_geography_id,
+          indicator_value.id::text as indicator_value_id,
+          indicator_value.geography_id::text as value_geography_id,
+          indicator_value.value as indicator_value,
+          indicator_value.margin_of_error as margin_of_error,
+          indicator_value.confidence_low as confidence_low,
+          indicator_value.confidence_high as confidence_high,
+          indicator_value.data_year, indicator_value.quality_status::text as value_quality_status,
+          indicator_value.quality_metadata as value_quality_metadata,
+          component.indicator_percentile, component.effective_weight
+        from atlas_publication_equity_component_members as publication_component
+        join score_components as component
+          on component.id = publication_component.component_id
+          and component.score_run_id = ${selectedRun.equityBaselineRunId}::uuid
+        join indicator_values as indicator_value
+          on indicator_value.id = publication_component.indicator_value_id
+          and indicator_value.id = component.indicator_value_id
+          and indicator_value.geography_id = component.geography_id
+        join indicator_definitions as definition on definition.id = indicator_value.indicator_id
+        where publication_component.publication_id = ${publicationId}::uuid
+      )
       select
-        geography.geoid as geoid,
-        component.id::text as component_id,
-        component.score_run_id::text as component_score_run_id,
-        component.geography_id::text as component_geography_id,
-        indicator_value.id::text as indicator_value_id,
-        indicator_value.geography_id::text as value_geography_id,
+        published_scores.geoid,
+        component_evidence.component_id,
+        component_evidence.component_score_run_id,
+        component_evidence.component_geography_id,
+        component_evidence.indicator_value_id,
+        component_evidence.value_geography_id,
         definition.slug as indicator_slug,
         definition.name as indicator_name,
         definition.description as indicator_description,
-        indicator_value.value as indicator_value,
-        indicator_value.margin_of_error as margin_of_error,
-        indicator_value.confidence_low as confidence_low,
-        indicator_value.confidence_high as confidence_high,
-        indicator_value.data_year as data_year,
+        component_evidence.indicator_value,
+        component_evidence.margin_of_error,
+        component_evidence.confidence_low,
+        component_evidence.confidence_high,
+        component_evidence.data_year,
         definition.unit as indicator_unit,
         definition.higher_is_worse as higher_is_worse,
-        indicator_value.quality_status::text as value_quality_status,
-        indicator_value.quality_metadata as value_quality_metadata,
-        component.indicator_percentile as indicator_percentile,
-        component.effective_weight as effective_weight,
+        coalesce(component_evidence.value_quality_status, 'missing') as value_quality_status,
+        coalesce(component_evidence.value_quality_metadata, '{}'::jsonb) as value_quality_metadata,
+        component_evidence.indicator_percentile,
+        component_evidence.effective_weight,
         definition.methodology_notes as limitation
-      from atlas_publication_equity_component_members as publication_component
-      join atlas_publication_score_members as publication_score
-        on publication_score.publication_id = publication_component.publication_id
-      join score_components as component
-        on component.id = publication_component.component_id
-        and component.geography_id = publication_score.geography_id
-        and component.score_run_id = ${selectedRun.equityBaselineRunId}::uuid
-      join indicator_values as indicator_value
-        on indicator_value.id = publication_component.indicator_value_id
-        and indicator_value.id = component.indicator_value_id
-        and indicator_value.geography_id = component.geography_id
-      join indicator_definitions as definition on definition.id = indicator_value.indicator_id
-      join geographies as geography on geography.id = component.geography_id
-      where publication_component.publication_id = ${publicationId}::uuid
-        and geography.geography_type = 'tract'
-        and geography.state_fips = '55'
-        and geography.county_fips = '079'
-        and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
-      order by geography.geoid, definition.slug
+      from published_scores
+      join indicator_definitions as definition
+        on definition.methodology_version = published_scores.methodology_version
+      left join component_evidence
+        on component_evidence.publication_id = published_scores.publication_id
+        and component_evidence.geography_id = published_scores.geography_id
+        and component_evidence.slug = definition.slug
+      order by published_scores.geoid, definition.slug
     `),
     client.execute(sql`
+      with published_scores as (
+        select publication_score.publication_id, publication_score.geography_id, geography.geoid
+        from atlas_publication_score_members as publication_score
+        join atlas_publications as publication
+          on publication.id = publication_score.publication_id
+          and publication.id = ${publicationId}::uuid
+          and publication.state = 'published'
+        join geographies as geography on geography.id = publication_score.geography_id
+        join food_scores as food_score
+          on food_score.id = publication_score.food_score_id
+          and food_score.food_score_run_id = ${selectedRun.run.id}::uuid
+          and food_score.geography_id = geography.id
+        where geography.geography_type = 'tract'
+          and geography.state_fips = '55'
+          and geography.county_fips = '079'
+          and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
+      ), component_evidence as (
+        select publication_component.publication_id, component.geography_id,
+          metric.metric_slug, component.id::text as component_id,
+          component.food_score_run_id::text as component_food_score_run_id,
+          component.geography_id::text as component_geography_id,
+          metric.id::text as access_metric_value_id,
+          metric.geography_id::text as value_geography_id,
+          metric.value as metric_value, metric.state::text as metric_state,
+          metric.unit as metric_unit, metric.quality_status::text as metric_quality_status,
+          metric.quality_metadata as metric_quality_metadata,
+          component.indicator_percentile, component.effective_weight
+        from atlas_publication_food_component_members as publication_component
+        join food_score_components as component
+          on component.id = publication_component.component_id
+          and component.food_score_run_id = ${selectedRun.run.id}::uuid
+        join food_access_metric_values as metric
+          on metric.id = publication_component.access_metric_value_id
+          and metric.id = component.access_metric_value_id
+          and metric.geography_id = component.geography_id
+        where publication_component.publication_id = ${publicationId}::uuid
+      ), expected_metrics(slug, unit) as (
+        values
+          ('sram_snap_low_access_share_1mi', 'percent'),
+          ('full_service_grocery_walk_access', 'minutes'),
+          ('households_no_vehicle', 'percent'),
+          ('scheduled_transit_service_intensity', 'trips_per_hour')
+      )
       select
-        geography.geoid as geoid,
-        component.id::text as component_id,
-        component.food_score_run_id::text as component_food_score_run_id,
-        component.geography_id::text as component_geography_id,
-        metric.id::text as access_metric_value_id,
-        metric.geography_id::text as value_geography_id,
-        metric.metric_slug as metric_slug,
-        metric.value as metric_value,
-        metric.state::text as metric_state,
-        metric.unit as metric_unit,
-        metric.quality_status::text as metric_quality_status,
-        metric.quality_metadata as metric_quality_metadata,
-        component.indicator_percentile as indicator_percentile,
-        component.effective_weight as effective_weight
-      from atlas_publication_food_component_members as publication_component
-      join atlas_publication_score_members as publication_score
-        on publication_score.publication_id = publication_component.publication_id
-      join food_score_components as component
-        on component.id = publication_component.component_id
-        and component.geography_id = publication_score.geography_id
-        and component.food_score_run_id = ${selectedRun.run.id}::uuid
-      join food_access_metric_values as metric
-        on metric.id = publication_component.access_metric_value_id
-        and metric.id = component.access_metric_value_id
-        and metric.geography_id = component.geography_id
-      join geographies as geography on geography.id = component.geography_id
-      where publication_component.publication_id = ${publicationId}::uuid
-        and geography.geography_type = 'tract'
-        and geography.state_fips = '55'
-        and geography.county_fips = '079'
-        and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
-      order by geography.geoid, metric.metric_slug
+        published_scores.geoid,
+        component_evidence.component_id,
+        component_evidence.component_food_score_run_id,
+        component_evidence.component_geography_id,
+        component_evidence.access_metric_value_id,
+        component_evidence.value_geography_id,
+        expected_metrics.slug as metric_slug,
+        component_evidence.metric_value,
+        coalesce(component_evidence.metric_state, 'missing') as metric_state,
+        coalesce(component_evidence.metric_unit, expected_metrics.unit) as metric_unit,
+        coalesce(component_evidence.metric_quality_status, 'missing') as metric_quality_status,
+        coalesce(component_evidence.metric_quality_metadata, '{}'::jsonb) as metric_quality_metadata,
+        component_evidence.indicator_percentile,
+        component_evidence.effective_weight
+      from published_scores
+      cross join expected_metrics
+      left join component_evidence
+        on component_evidence.publication_id = published_scores.publication_id
+        and component_evidence.geography_id = published_scores.geography_id
+        and component_evidence.metric_slug = expected_metrics.slug
+      order by published_scores.geoid, expected_metrics.slug
     `),
     client.execute(sql`
       select source.publisher as source_publisher, source.name as source_name,

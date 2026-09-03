@@ -51,7 +51,18 @@ function fixture(): TractEvidenceExport {
         },
         limitation: "Area overlap only.",
       },
-      equityIndicators: [],
+      equityIndicators: [{
+        slug: "people_of_color",
+        name: "People of color",
+        definition: "Synthetic unavailable measurement for serializer coverage.",
+        dataYear: null,
+        measurement: {state: "missing", value: null, unit: "percent", qualityStatus: "missing"},
+        countyPercentile: null,
+        effectiveWeight: null,
+        contribution: null,
+        higherIsWorse: true,
+        limitation: "No published score component exists for this unavailable score.",
+      }],
       equityResults: {
         demographicSubindex: null,
         socioeconomicSubindex: null,
@@ -86,6 +97,7 @@ describe("serializeTractEvidenceCsv", () => {
     expect(row).toContain("'=Not a formula");
     expect(row).toContain('"\'=Not a formula, ""quoted"""');
     expect(row).toContain(',0,observed,');
+    expect(row).toContain(',missing,percent,,,,,missing,');
     expect(row).toContain('"[{""coveredAreaShare"":0.6,""name"":""North, Side"",""sourceNeighborhoodId"":2}]"');
     expect(trailing).toBe("");
   });
