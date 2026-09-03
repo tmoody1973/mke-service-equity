@@ -157,6 +157,17 @@ describe("reconcilePublicationManifest", () => {
     });
   });
 
+  it("reconciles a candidate after the controlled publication transition", () => {
+    expect(reconcilePublicationManifest(
+      buildPublicationManifest(input()),
+      {
+        ...evidence(),
+        foodRun: {...evidence().foodRun, status: "published"},
+        equityBaselineRun: {...evidence().equityBaselineRun, status: "published"},
+      },
+    )).toMatchObject({scoreCount: 2});
+  });
+
   it.each([
     ["food_output_hash_mismatch", {foodRun: {...evidence().foodRun, outputHash: hash("f")}}],
     ["baseline_pin_mismatch", {

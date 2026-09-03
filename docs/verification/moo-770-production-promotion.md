@@ -1,4 +1,4 @@
-# MOO-770 — Production schema and validated-data promotion
+# MOO-770 — Production schema, validated-data promotion, and governed publication
 
 ## Scope
 
@@ -7,11 +7,11 @@
 - Neon project: `wispy-glitter-41930798`
 - Source: `moo-753-food-equity` (`br-floral-morning-a51g4fpt`)
 - Target: `production` (`br-raspy-voice-a5443cft`)
-- Result: production contains the exact validated candidate and governed-publication schema;
-  zero current publications remain.
+- Result: production contains the exact validated candidate and governed-publication schema; the
+  approved candidate was published as the current governed data release.
 
-This was preparation for MOO-758 Gate 3, not a public release. No Vercel variable, Vercel
-deployment, publication row, run-status transition, or publication audit event was created.
+This work prepared and then completed MOO-758 Gate 3 for the data release. No Vercel variable or
+Vercel deployment has been created, so the website has not yet been pointed at production.
 
 ## Controlled operation
 
@@ -107,12 +107,47 @@ from the database package directory. It created no database write. The corrected
 invocation succeeded using the same exact request and manifest. This dry run does not publish a
 run, create a publication row, or deploy the web application.
 
-## Remaining release gates
+## Final Gate 3 dry run and publication
 
-1. Create separate least-privilege production application-reader and publication-operator
-   credentials; keep the operator credential out of Vercel.
-2. Build and independently review the exact production manifest and dry-run report.
-3. Obtain the separate MOO-758 Gate 3 approval naming the candidate, fingerprint, dry-run hash,
-   expected-current value, and approval ID.
-4. Only then publish through the controlled function, configure the reader-only Vercel variable,
-   deploy, and verify the public site.
+The earlier dry run used a distinct dry-run approval identity. Because the dry-run hash binds
+the approval ID and idempotency key as well as the data bundle, it could not be reused for the
+final approval identity. A final read-only dry run was therefore performed with the precise
+approval identity below. Tarik then explicitly confirmed that exact hash before publication.
+
+| Evidence | Result |
+| --- | --- |
+| Approval ID | `MOO-758-GATE3-PUBLISH-2026-09-03` |
+| Candidate Food / Equity runs | `97bd1cdf-bf96-573f-8fcf-92e8676925d4` / `502e2a04-b013-53cd-8b09-c9144862701a` |
+| Expected/current before publish | `null` / `null` |
+| Manifest fingerprint | `5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a` |
+| Confirmed final dry-run hash | `6e7009940e165e3ae9382c8bc0ac4a479bba0e9dd257b974bd1c3a5c595077a2` |
+| Publication ID | `7d1f3565-97b3-43d1-9be4-2c1c476bf4ee` |
+
+The first publish attempt was rejected before any write because it used the earlier dry-run
+identity. The controlled function required the exact final dry-run hash, so the mismatch was a
+safe stop rather than a partial publication. The second attempt used the approved final identity
+and created the publication above. It set the selected Food and Equity runs to `published` and
+made this the one current publication through the governed database function.
+
+## Post-publication reconciliation
+
+A read-only reconciliation then compared the live publication with the approved bundle. It
+completed successfully with current publication
+`7d1f3565-97b3-43d1-9be4-2c1c476bf4ee`, manifest fingerprint
+`5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a`, and reconciliation
+dry hash `02d8dc039da9a781a1dceaaf6c8586f443997d1260ef2f247b347e69af1961ae`.
+
+It verified 302 score pairs, 3,900 Equity components, 1,196 Food components, 16 source
+snapshots, and 51 resource versions. An initial reconciliation check correctly stopped when it
+assumed Food must still be `validated`; publication intentionally changes that run to
+`published`. The check was corrected to accept either governed status and covered with focused
+tests before this successful read-only verification. No analytical value, source, score, or
+publication record was altered by reconciliation.
+
+## Remaining website-release gates
+
+1. Merge the reconciliation fix and this production evidence into `main`.
+2. Configure Vercel production with only the `mke_atlas_app_reader` database credential; the
+   publication-operator credential remains outside Vercel.
+3. Deploy the web application and verify that public pages read this published release, including
+   unavailable-data states, mobile layouts, and attribution links.
