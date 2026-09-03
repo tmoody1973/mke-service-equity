@@ -62,6 +62,30 @@ privilege. The reader has schema usage, database connect, and table-select grant
 operator has those required reads plus explicit execute grants on the two security-definer
 functions; it has no general analytical table write grant.
 
+## Gate 3 manifest preparation
+
+A canonical local-only manifest was generated directly from the validated production candidate
+and checked by the strict contract serializer. Its fingerprint is
+`5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a`.
+
+| Manifest member family | Count |
+| --- | ---: |
+| Food/Equity score pairs | 302 |
+| Equity components | 3,900 |
+| Food components | 1,196 |
+| Approved source snapshots | 16 |
+| Directly referenced FNS resource versions | 51 |
+
+The source set contains the canonical Census tract snapshot, the seven exact ACS snapshots and
+CDC PLACES snapshot used by the baseline, the six Food scoring snapshots, and the approved City
+neighborhood reference. It intentionally excludes the stale, non-public emergency-food context
+and one ACS snapshot not referenced by the validated candidate. All resource members are the
+exact FNS versions named by validated Food components and remain `internal_reproduction_only`.
+
+The expected current publication remains `null`. A production dry run and any later publication
+remain blocked until MOO-758 Gate 3 approval names this fingerprint, the exact candidate, a
+reviewer-approved approval ID, and the resulting dry-run hash.
+
 ## Remaining release gates
 
 1. Create separate least-privilege production application-reader and publication-operator
