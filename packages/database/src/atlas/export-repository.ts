@@ -15,6 +15,10 @@ import {
   MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE,
   MILWAUKEE_CANONICAL_TRACT_COUNT,
 } from "./atlas-repository";
+import {
+  buildNeighborhoodContext,
+  NeighborhoodContextIntegrityError,
+} from "./neighborhood-context";
 import type {SelectedAtlasRun} from "./run-selector";
 
 type AtlasEnvironment = Record<string, string | undefined>;
@@ -36,6 +40,9 @@ type ExportInput = {
   headers: ReadonlyArray<Record<string, unknown>>;
   equity: ReadonlyArray<Record<string, unknown>>;
   food: ReadonlyArray<Record<string, unknown>>;
+  sources?: ReadonlyArray<Record<string, unknown>>;
+  neighborhoodContexts?: ReadonlyArray<Record<string, unknown>>;
+  neighborhoodOverlaps?: ReadonlyArray<Record<string, unknown>>;
 };
 
 type BuildOptions = {
@@ -125,6 +132,63 @@ function dataVintages(value: unknown, code: string): Record<string, string> {
     return fail(code);
   }
   return Object.fromEntries(entries.map(([key, entry]) => [key.trim(), (entry as string).trim()]));
+}
+
+function sourceVersions(rows: ReadonlyArray<Record<string, unknown>>): Record<string, string> {
+  const versions = new Map<string, string>();
+  for (const row of rows) {
+    const key = `${string(row.source_publisher, "invalid_source_publisher")} — ${string(row.source_name, "invalid_source_name")}`;
+    const version = string(row.dataset_version, "invalid_source_version");
+    const existing = versions.get(key);
+    if (existing !== undefined && existing !== version) {
+      return fail("conflicting_public_source_version");
+    }
+    versions.set(key, version);
+  }
+  return Object.fromEntries([...versions.entries()].sort(([left], [right]) => left.localeCompare(right)));
+}
+
+function neighborhoodsForExport(
+  headers: ReadonlyArray<Record<string, unknown>>,
+  input: ExportInput,
+): Map<string, TractEvidenceRow["neighborhood"]> {
+  const contexts = input.neighborhoodContexts ?? [];
+  const overlaps = input.neighborhoodOverlaps ?? [];
+  if (contexts.length === 0) {
+    return new Map(headers.map((header) => [
+      string(header.geoid, "invalid_export_geoid"),
+      {state: "unavailable", reason: "not_pinned_to_publication"} as const,
+    ]));
+  }
+
+  const byGeoid = new Map<string, Array<Record<string, unknown>>>();
+  for (const row of contexts) {
+    const geoid = string(row.geoid, "invalid_neighborhood_context_geoid");
+    byGeoid.set(geoid, [...(byGeoid.get(geoid) ?? []), row]);
+  }
+  const overlapsByGeoid = new Map<string, Array<Record<string, unknown>>>();
+  for (const row of overlaps) {
+    const geoid = string(row.geoid, "invalid_neighborhood_overlap_geoid");
+    overlapsByGeoid.set(geoid, [...(overlapsByGeoid.get(geoid) ?? []), row]);
+  }
+
+  const neighborhoods = new Map<string, TractEvidenceRow["neighborhood"]>();
+  for (const header of headers) {
+    const geoid = string(header.geoid, "invalid_export_geoid");
+    const rows = byGeoid.get(geoid) ?? [];
+    try {
+      neighborhoods.set(geoid, buildNeighborhoodContext(rows, overlapsByGeoid.get(geoid) ?? []));
+    } catch (error) {
+      if (error instanceof NeighborhoodContextIntegrityError) {
+        return fail(`invalid_published_neighborhood_context:${error.message}`);
+      }
+      throw error;
+    }
+  }
+  if (neighborhoods.size !== byGeoid.size) {
+    return fail("unexpected_published_neighborhood_context");
+  }
+  return neighborhoods;
 }
 
 function reliability(value: unknown, code: string): "reliable" | "use_with_caution" | "high_uncertainty" | "cv_not_computable" | null {
@@ -338,6 +402,7 @@ function buildRow(
   header: Record<string, unknown>,
   selectedRun: SelectedAtlasRun,
   input: ExportInput,
+  neighborhood: TractEvidenceRow["neighborhood"],
 ): TractEvidenceRow {
   const geographyId = string(header.canonical_geography_id, "missing_canonical_geography");
   const geoid = string(header.geoid, "invalid_export_geoid");
@@ -374,7 +439,7 @@ function buildRow(
     population,
     populationState: population === null ? "missing" : "observed",
     geographyVintage: string(header.geography_vintage, "invalid_export_geography_vintage"),
-    neighborhood: {state: "unavailable", reason: "not_pinned_to_publication"},
+    neighborhood,
     equityIndicators,
     equityResults: {
       demographicSubindex: nullableNumber(header.demographic_score, "invalid_demographic_score"),
@@ -412,7 +477,11 @@ export function buildTractEvidenceExport(
     return fail("export_tract_count_mismatch");
   }
 
-  const rows = input.headers.map((header) => buildRow(header, selectedRun, input))
+  const neighborhoods = neighborhoodsForExport(input.headers, input);
+  const rows = input.headers.map((header) => {
+    const geoid = string(header.geoid, "invalid_export_geoid");
+    return buildRow(header, selectedRun, input, neighborhoods.get(geoid) ?? fail("missing_export_neighborhood"));
+  })
     .sort((left, right) => left.geoid.localeCompare(right.geoid));
   if (new Set(rows.map((row) => row.geoid)).size !== rows.length) {
     return fail("export_duplicate_geoid");
@@ -433,6 +502,7 @@ export function buildTractEvidenceExport(
       outputHash: selectedRun.equityBaselineOutputHash,
       dataVintages: dataVintages(input.headers[0]?.baseline_data_vintages, "invalid_baseline_data_vintages"),
     },
+    sourceVersions: sourceVersions(input.sources ?? []),
     rows,
   };
   const parsed = tractEvidenceExportSchema.safeParse(candidate);
@@ -452,7 +522,7 @@ export async function loadTractEvidenceExport(
   }
   const publicationId = selectedRun.run.publication.id;
   const client = createClient(readRuntimeDatabaseUrl(environment));
-  const [headers, equity, food] = await Promise.all([
+  const [headers, equity, food, sources, neighborhoodContexts, neighborhoodOverlaps] = await Promise.all([
     client.execute(sql`
       select
         geography.id::text as canonical_geography_id,
@@ -581,11 +651,86 @@ export async function loadTractEvidenceExport(
         and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
       order by geography.geoid, metric.metric_slug
     `),
+    client.execute(sql`
+      select source.publisher as source_publisher, source.name as source_name,
+        snapshot.dataset_version
+      from atlas_publication_source_snapshot_members as publication_source
+      join atlas_publications as publication
+        on publication.id = publication_source.publication_id
+        and publication.id = ${publicationId}::uuid
+        and publication.state = 'published'
+      join source_snapshots as snapshot on snapshot.id = publication_source.snapshot_id
+        and snapshot.validation_status = 'valid'
+      join data_sources as source on source.id = snapshot.source_id
+      where publication_source.redistribution_decision in (
+        'public_derived_results',
+        'public_direct_display'
+      )
+      order by lower(source.publisher), lower(source.name), snapshot.dataset_version
+    `),
+    client.execute(sql`
+      select geography.geoid as geoid, context.city_reference_coverage,
+        snapshot.validation_status::text as validation_status,
+        source.name as source_name, source.publisher as source_publisher,
+        snapshot.dataset_version, source.source_url, snapshot.retrieved_at,
+        source.methodology_url
+      from atlas_publication_source_snapshot_members as publication_source
+      join atlas_publications as publication
+        on publication.id = publication_source.publication_id
+        and publication.id = ${publicationId}::uuid
+        and publication.state = 'published'
+      join tract_neighborhood_contexts as context
+        on context.snapshot_id = publication_source.snapshot_id
+      join geographies as geography on geography.id = context.geography_id
+      join source_snapshots as snapshot on snapshot.id = context.snapshot_id
+        and snapshot.validation_status = 'valid'
+      join data_sources as source on source.id = snapshot.source_id
+      where publication_source.redistribution_decision in (
+        'public_derived_results',
+        'public_direct_display'
+      )
+        and geography.geography_type = 'tract'
+        and geography.state_fips = '55'
+        and geography.county_fips = '079'
+        and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
+      order by geography.geoid
+    `),
+    client.execute(sql`
+      select geography.geoid as geoid, neighborhood.source_neighborhood_id,
+        version.name, overlap.covered_area_share
+      from atlas_publication_source_snapshot_members as publication_source
+      join atlas_publications as publication
+        on publication.id = publication_source.publication_id
+        and publication.id = ${publicationId}::uuid
+        and publication.state = 'published'
+      join tract_neighborhood_overlaps as overlap
+        on overlap.snapshot_id = publication_source.snapshot_id
+      join geographies as geography on geography.id = overlap.geography_id
+      join neighborhood_versions as version
+        on version.id = overlap.neighborhood_version_id
+        and version.snapshot_id = overlap.snapshot_id
+      join neighborhoods as neighborhood on neighborhood.id = version.neighborhood_id
+      join source_snapshots as snapshot on snapshot.id = overlap.snapshot_id
+        and snapshot.validation_status = 'valid'
+      where publication_source.redistribution_decision in (
+        'public_derived_results',
+        'public_direct_display'
+      )
+        and geography.geography_type = 'tract'
+        and geography.state_fips = '55'
+        and geography.county_fips = '079'
+        and geography.vintage = ${MILWAUKEE_CANONICAL_GEOGRAPHY_VINTAGE}
+      order by geography.geoid, overlap.covered_area_share desc, lower(version.name),
+        neighborhood.source_neighborhood_id
+    `),
   ]);
 
   return buildTractEvidenceExport(selectedRun, {
     headers: headers.rows,
     equity: equity.rows,
     food: food.rows,
+    sources: sources.rows,
+    neighborhoodContexts: neighborhoodContexts.rows,
+    neighborhoodOverlaps: neighborhoodOverlaps.rows,
   }, {expectedTractCount: MILWAUKEE_CANONICAL_TRACT_COUNT});
 }

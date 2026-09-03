@@ -124,6 +124,7 @@ function data(overrides: {
   headers?: Array<Record<string, unknown>>;
   equity?: Array<Record<string, unknown>>;
   food?: Array<Record<string, unknown>>;
+  sources?: Array<Record<string, unknown>>;
 } = {}) {
   const geoids = Array.from({length: 302}, (_, index) => String(55_079_000_101 + index));
   const headers = overrides.headers ?? geoids.map((geoid) => header(geoid));
@@ -135,6 +136,7 @@ function data(overrides: {
     food: overrides.food ?? geoids.flatMap((geoid) => (
       foodMetricSlugs.map((slug) => foodMetric(slug, geoid))
     )),
+    sources: overrides.sources ?? [],
   };
 }
 
@@ -161,6 +163,52 @@ describe("buildTractEvidenceExport", () => {
     expect(result.publication.id).toBe(selectedRun.run.publication.id);
   });
 
+  it("carries only deterministic approved source versions", () => {
+    const result = buildTractEvidenceExport(selectedRun, data({sources: [
+      {source_publisher: "City of Milwaukee", source_name: "Neighborhood Reference", dataset_version: "2026-01"},
+      {source_publisher: "U.S. Census Bureau", source_name: "American Community Survey", dataset_version: "2024"},
+    ]}), {expectedTractCount: 302});
+
+    expect(result.sourceVersions).toEqual({
+      "City of Milwaukee — Neighborhood Reference": "2026-01",
+      "U.S. Census Bureau — American Community Survey": "2024",
+    });
+  });
+
+  it("uses the City neighborhood reference only when every public tract context is pinned", () => {
+    const fixture = data();
+    const neighborhoodContexts = fixture.headers.map((item) => ({
+      geoid: item.geoid,
+      city_reference_coverage: "1",
+      validation_status: "valid",
+      source_name: "Milwaukee Neighborhood Identification Project",
+      source_publisher: "City of Milwaukee Department of City Development",
+      dataset_version: "2007",
+      source_url: "https://example.test/neighborhoods",
+      retrieved_at: "2026-08-30T17:40:52.000Z",
+      methodology_url: "https://example.test/methodology",
+    }));
+    const neighborhoodOverlaps = fixture.headers.map((item) => ({
+      geoid: item.geoid,
+      source_neighborhood_id: 1,
+      name: "Example neighborhood",
+      covered_area_share: "1",
+    }));
+
+    const result = buildTractEvidenceExport(selectedRun, {
+      ...fixture,
+      neighborhoodContexts,
+      neighborhoodOverlaps,
+    }, {expectedTractCount: 302});
+
+    expect(result.rows[0]?.neighborhood).toMatchObject({
+      state: "available",
+      labelKind: "mostly_in",
+      cityReferenceCoverage: 1,
+      overlaps: [{name: "Example neighborhood", coveredAreaShare: 1}],
+    });
+  });
+
   it.each([
     ["wrong Food run", data({headers: [header("55079000101", {food_score_run_id: "11111111-1111-4111-8111-111111111111"}), ...data().headers.slice(1)]})],
     ["missing tract", data({headers: []})],
@@ -177,6 +225,10 @@ describe("buildTractEvidenceExport", () => {
       foodMetric("sram_snap_low_access_share_1mi", "55079000101", {component_food_score_run_id: "11111111-1111-4111-8111-111111111111"}),
       ...data().food.slice(1),
     ]})],
+    ["conflicting approved source versions", data({sources: [
+      {source_publisher: "City of Milwaukee", source_name: "Neighborhood Reference", dataset_version: "2025"},
+      {source_publisher: "City of Milwaukee", source_name: "Neighborhood Reference", dataset_version: "2026"},
+    ]})],
   ])("rejects %s", (_name, input) => {
     expect(() => buildTractEvidenceExport(selectedRun, input, {expectedTractCount: 302}))
       .toThrow(AtlasExportDataIntegrityError);
@@ -189,7 +241,10 @@ describe("loadTractEvidenceExport", () => {
     const execute = vi.fn()
       .mockResolvedValueOnce({rows: fixture.headers})
       .mockResolvedValueOnce({rows: fixture.equity})
-      .mockResolvedValueOnce({rows: fixture.food});
+      .mockResolvedValueOnce({rows: fixture.food})
+      .mockResolvedValueOnce({rows: fixture.sources})
+      .mockResolvedValueOnce({rows: []})
+      .mockResolvedValueOnce({rows: []});
 
     const result = await loadTractEvidenceExport(
       selectedRun,
@@ -198,11 +253,13 @@ describe("loadTractEvidenceExport", () => {
     );
 
     expect(result.rows).toHaveLength(302);
-    expect(execute).toHaveBeenCalledTimes(3);
+    expect(execute).toHaveBeenCalledTimes(6);
     const queries = JSON.stringify(execute.mock.calls);
     expect(queries).toContain("atlas_publication_score_members");
     expect(queries).toContain("atlas_publication_equity_component_members");
     expect(queries).toContain("atlas_publication_food_component_members");
+    expect(queries).toContain("atlas_publication_source_snapshot_members");
+    expect(queries).toContain("tract_neighborhood_contexts");
     expect(queries).not.toMatch(/order by.*published_at|latest/i);
   });
 });
