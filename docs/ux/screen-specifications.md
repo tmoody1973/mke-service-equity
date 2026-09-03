@@ -173,6 +173,22 @@ Allow deeper navigation into indicators, classifications, data quality, vintages
 
 Show dataset, publisher, vintage, status, definition, and links/methodology.
 
+## 7. Download data
+
+Route: `/data`.
+
+Start with a short explanation that the file covers all 302 canonical Milwaukee County Census
+tracts, rather than the map view. Before the download action, say that the file includes the
+published scores, measures, quality information, uncertainty, and release details; say plainly
+that it excludes people, map shapes, exact coordinates, site records, public-investment data, and
+ZIP-code guesses.
+
+The page explains three interpretation rules without requiring a map or tooltip: missing is not
+zero, margins of error show how much an estimate may vary, and neighborhood names describe tract
+area overlap rather than where every resident lives. A shared column dictionary uses stable field
+names with plain-language definitions. When no safe public file exists, show the reason and do not
+offer a download button. The primary navigation calls this page **Download data** at every width.
+
 ## Layer organization
 
 ### Conditions

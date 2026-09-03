@@ -171,7 +171,9 @@ For every substantive metric, the user must be able to determine:
 - quality state
 
 ### FR-11 Export
-MVP must support CSV export of published tract-level evidence including:
+**Implemented in MOO-769.** MVP supports a fixed-column CSV export of the one current governed
+public publication. The file is unavailable, rather than partial, when that release cannot be
+proved complete. It includes published tract-level evidence including:
 
 - GEOID
 - population
@@ -182,6 +184,14 @@ MVP must support CSV export of published tract-level evidence including:
 - Food Priority
 - methodology version
 - score run
+- quality state, missingness, margins of error, confidence ranges, and stored reliability
+- publication identity, output hashes, data vintages, and approved public source versions
+- City neighborhood overlap context only when the exact approved snapshot is pinned to that
+  publication; it never assigns a ZIP code or a single forced neighborhood
+
+The file contains all 302 canonical 2020 Milwaukee County Census tracts in stable GEOID order,
+not the current map view. It uses spreadsheet-formula neutralization and deliberately excludes
+geometry, coordinates, resource-level records, public investments, and personal information.
 
 ### FR-12 Shareable state
 Meaningful Atlas, tract, comparison, and opportunity states should use shareable URLs where technically practical.

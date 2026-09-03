@@ -92,3 +92,22 @@ test("meets the accessibility contract at the configured width", async ({page}, 
 
   expect(browserErrors).toEqual([]);
 });
+
+test("keeps the Download data page accessible without depending on the map", async ({page}) => {
+  const browserErrors = observeBrowserErrors(page);
+  await page.emulateMedia({reducedMotion: "reduce"});
+  await page.goto("/data");
+
+  await expect(page.getByRole("main")).toBeVisible();
+  await expect(page.getByRole("heading", {level: 1, name: "Download data"})).toBeVisible();
+  await expect(page.getByRole("heading", {name: "What each column means"})).toBeVisible();
+  expect(await page.locator("html").evaluate((element) => (
+    element.scrollWidth <= window.innerWidth
+  ))).toBe(true);
+
+  const accessibilityScan = await new AxeBuilder({page})
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(accessibilityScan.violations).toEqual([]);
+  expect(browserErrors).toEqual([]);
+});

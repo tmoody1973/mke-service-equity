@@ -257,3 +257,12 @@ does not calculate polygon relationships.
 
 This approval does not approve an address geocoder, a USPS ZIP boundary, or a street-reference
 publication source. Those contracts remain separately gated.
+
+### Public CSV attribution rule (MOO-769)
+
+The tract-evidence CSV may show this reference only when the exact validated snapshot is a member
+of the current governed publication and the publication record permits public derived results or
+direct display. Its exported source-version cell identifies the City publisher, source name, and
+snapshot dataset version. If that pin is absent, the file states that neighborhood context is not
+available; it does not reuse a configured development snapshot or infer a ZIP, street, or
+neighborhood label.

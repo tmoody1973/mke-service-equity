@@ -95,6 +95,23 @@ membership, or service jurisdiction. Sub-1% boundary slivers may be grouped for 
 auditable. Missing coverage is never converted into a nearest, centroid-selected, or ZIP-inferred
 neighborhood.
 
+## Public CSV quality boundary
+
+The tract-evidence CSV is available only for the exact current governed publication. It contains
+all 302 canonical tracts or no CSV at all; duplicate, missing, mismatched-run, or invalid source
+and neighborhood lineage fails the complete export. It does not substitute a validated preview or
+choose a newer source snapshot.
+
+Observed zero is written as `0`. Missing, suppressed, conflicting, and unreachable values have an
+empty numeric cell plus a separate state and quality cell. Stored margins of error, 90% confidence
+ranges, and reliability states remain separate from score and percentile fields. Blank therefore
+means unavailable—not zero and not a lower score.
+
+The neighborhood field is an area-overlap reference. A release without the approved pinned City
+snapshot writes an explicit unavailable state; a release with it retains only the deterministic
+overlap label, shares, source version, and limitation. Text cells are neutralized before CSV
+quoting so spreadsheet software cannot treat source text as a formula.
+
 ## Analyze exact-run quality boundary
 
 Compare and Opportunity use the Atlas exact-run selector. Before a response is available, the
