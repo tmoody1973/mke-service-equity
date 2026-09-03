@@ -82,9 +82,30 @@ neighborhood reference. It intentionally excludes the stale, non-public emergenc
 and one ACS snapshot not referenced by the validated candidate. All resource members are the
 exact FNS versions named by validated Food components and remain `internal_reproduction_only`.
 
-The expected current publication remains `null`. A production dry run and any later publication
-remain blocked until MOO-758 Gate 3 approval names this fingerprint, the exact candidate, a
-reviewer-approved approval ID, and the resulting dry-run hash.
+The expected current publication remains `null`. Publication remains blocked until MOO-758 Gate 3
+approval names this fingerprint, the exact candidate, a reviewer-approved approval ID, and the
+resulting dry-run hash.
+
+## Approved production dry run
+
+Tarik approved the MOO-758 production dry run on 2026-09-03 with approval ID
+`MOO-758-GATE3-DRY-RUN-2026-09-03`. The command ran through the dedicated
+`mke_atlas_publication_operator` role and completed read-only with no current publication before
+or after the check.
+
+| Evidence | Result |
+| --- | --- |
+| Candidate Food run | `97bd1cdf-bf96-573f-8fcf-92e8676925d4` |
+| Pinned Equity run | `502e2a04-b013-53cd-8b09-c9144862701a` |
+| Expected/current publication | `null` / `null` |
+| Manifest fingerprint | `5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a` |
+| Dry-run hash | `f9a6d63f729fcf0ccc4424be3bc6ee9197b061b95e5249871284f4645c9e0d0f` |
+| Reconciled members | 302 scores; 3,900 Equity components; 1,196 Food components; 16 source snapshots; 51 resource versions |
+
+The first command invocation failed before validation because its relative request paths resolved
+from the database package directory. It created no database write. The corrected repository-root
+invocation succeeded using the same exact request and manifest. This dry run does not publish a
+run, create a publication row, or deploy the web application.
 
 ## Remaining release gates
 
