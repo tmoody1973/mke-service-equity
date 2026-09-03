@@ -209,6 +209,81 @@ describe("buildTractEvidenceExport", () => {
     });
   });
 
+  it("keeps the fixed evidence families when an ineligible score has no published components", () => {
+    const unavailableGeoid = "55079000101";
+    const fixture = data();
+    const unavailableEquity = equityIndicatorSlugs.map((slug) => equityMetric(slug, unavailableGeoid, {
+      component_id: null,
+      component_score_run_id: null,
+      component_geography_id: null,
+      indicator_value_id: null,
+      value_geography_id: null,
+      indicator_value: null,
+      margin_of_error: null,
+      confidence_low: null,
+      confidence_high: null,
+      data_year: null,
+      value_quality_status: "missing",
+      value_quality_metadata: {},
+      indicator_percentile: null,
+      effective_weight: null,
+    }));
+    const unavailableFood = foodMetricSlugs.map((slug) => foodMetric(slug, unavailableGeoid, {
+      component_id: null,
+      component_food_score_run_id: null,
+      component_geography_id: null,
+      access_metric_value_id: null,
+      value_geography_id: null,
+      metric_value: null,
+      metric_state: "missing",
+      metric_quality_status: "missing",
+      metric_quality_metadata: {},
+      indicator_percentile: null,
+      effective_weight: null,
+    }));
+
+    const result = buildTractEvidenceExport(selectedRun, data({
+      headers: [header(unavailableGeoid, {
+        baseline_quality_status: "ineligible_zero_population",
+        demographic_score: null,
+        socioeconomic_score: null,
+        health_score: null,
+        composite_score: null,
+        equity_baseline_percentile: null,
+        equity_baseline_band: null,
+        food_quality_status: "ineligible_zero_population",
+        retail_access_score: null,
+        transportation_constraint_score: null,
+        raw_food_access_need: null,
+        food_access_need_percentile: null,
+        food_access_need_band: null,
+        priority: null,
+        food_exclusion_reasons: ["equity_baseline_ineligible_zero_population"],
+      }), ...fixture.headers.slice(1)],
+      equity: [...unavailableEquity, ...fixture.equity.filter((row) => row.geoid !== unavailableGeoid)],
+      food: [...unavailableFood, ...fixture.food.filter((row) => row.geoid !== unavailableGeoid)],
+    }), {expectedTractCount: 302});
+
+    expect(result.rows[0]).toMatchObject({
+      equityResults: {qualityStatus: "ineligible_zero_population", compositeScore: null},
+      foodResults: {qualityStatus: "ineligible_zero_population", foodEquityPriority: null},
+    });
+    expect(result.rows[0]?.equityIndicators).toHaveLength(13);
+    expect(result.rows[0]?.foodMetrics).toHaveLength(4);
+    expect(result.rows[0]?.equityIndicators.every((metric) => (
+      metric.measurement.state === "missing"
+      && metric.countyPercentile === null
+      && metric.effectiveWeight === null
+      && metric.contribution === null
+    ))).toBe(true);
+    expect(result.rows[0]?.foodMetrics.every((metric) => (
+      metric.measurement.state === "missing"
+      && metric.countyPercentile === null
+      && metric.effectiveWeight === null
+      && metric.contribution === null
+    ))).toBe(true);
+  });
+
   it.each([
     ["wrong Food run", data({headers: [header("55079000101", {food_score_run_id: "11111111-1111-4111-8111-111111111111"}), ...data().headers.slice(1)]})],
     ["missing tract", data({headers: []})],

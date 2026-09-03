@@ -60,7 +60,7 @@ export function reconcilePublicationManifest(
 ) {
   if (
     evidence.foodRun.id !== manifest.foodRun.id
-    || evidence.foodRun.status !== "validated"
+    || !["validated", "published"].includes(evidence.foodRun.status)
     || !evidence.foodRun.hasValidationResult
     || evidence.foodRun.outputHash !== manifest.foodRun.outputHash
     || evidence.foodRun.runFingerprint !== manifest.foodRun.runFingerprint

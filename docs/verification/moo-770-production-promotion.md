@@ -1,0 +1,153 @@
+# MOO-770 — Production schema, validated-data promotion, and governed publication
+
+## Scope
+
+- Date: 2026-09-03
+- Approval: explicit user approval for reviewed schema and controlled real-data promotion
+- Neon project: `wispy-glitter-41930798`
+- Source: `moo-753-food-equity` (`br-floral-morning-a51g4fpt`)
+- Target: `production` (`br-raspy-voice-a5443cft`)
+- Result: production contains the exact validated candidate and governed-publication schema; the
+  approved candidate was published as the current governed data release.
+
+This work prepared and then completed MOO-758 Gate 3 for the data release. No Vercel variable or
+Vercel deployment has been created, so the website has not yet been pointed at production.
+
+## Controlled operation
+
+The target was first confirmed to contain zero public application tables. Neon’s documented
+branch-restore control-plane operation then reset it from the approved source branch. Neon
+required the old target to be preserved because it had a child branch; the verified-empty prior
+state was retained as `moo-770-pre-promotion-empty`. This platform operation copied the complete
+source snapshot instead of using a SQL dump, row-by-row import, trigger bypass, or manual status
+change.
+
+The source snapshot had migrations `0000` through `0004`. Forward-only reviewed migrations
+`0005_governed_publication.sql` and `0006_publication_metadata_not_null.sql` were then applied
+to production. The target now reports seven applied migrations.
+
+## Exact verification evidence
+
+| Evidence | Production result |
+| --- | --- |
+| Canonical geographies | 302 |
+| Equity run | `502e2a04-b013-53cd-8b09-c9144862701a`, `validated` |
+| Equity output hash | `19069c257e8f51fb4370b1ec8d04c6f823bd85e133846cf504866404c2c4e946` |
+| Equity scores / components | 302 / 3,900 |
+| Food run | `97bd1cdf-bf96-573f-8fcf-92e8676925d4`, `validated` |
+| Food output hash | `dd53d60adf1755fff5d865f7ecfd4eba9459507b1c19c36a976b7152aa889096` |
+| Food scores / components | 302 / 1,196 |
+| Current `atlas_publications` | 0 |
+| Governed publication functions | `publish_atlas_release`, `withdraw_atlas_release` |
+
+Read-only comparison queries showed the same geography, run, score, and component counts in the
+approved source and production target before migrations. Final production queries confirmed the
+same two validated run IDs and output hashes, the governed tables/functions, and zero current
+publication rows.
+
+## Least-privilege roles
+
+Two non-admin production login roles were created. Their generated passwords were used only for
+the immediate permission proof and discarded; a fresh reader password must be set directly in
+the approved Vercel production secret at Gate 3, and the operator credential must remain outside
+Vercel.
+
+| Role | `SELECT` on analytical tables | Direct table insert | Controlled publish/withdraw execution |
+| --- | --- | --- | --- |
+| `mke_atlas_app_reader` | allowed | denied | denied |
+| `mke_atlas_publication_operator` | allowed for reconciliation | denied | allowed |
+
+Both roles have no superuser, database-creation, role-creation, replication, or bypass-RLS
+privilege. The reader has schema usage, database connect, and table-select grants only. The
+operator has those required reads plus explicit execute grants on the two security-definer
+functions; it has no general analytical table write grant.
+
+## Gate 3 manifest preparation
+
+A canonical local-only manifest was generated directly from the validated production candidate
+and checked by the strict contract serializer. Its fingerprint is
+`5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a`.
+
+| Manifest member family | Count |
+| --- | ---: |
+| Food/Equity score pairs | 302 |
+| Equity components | 3,900 |
+| Food components | 1,196 |
+| Approved source snapshots | 16 |
+| Directly referenced FNS resource versions | 51 |
+
+The source set contains the canonical Census tract snapshot, the seven exact ACS snapshots and
+CDC PLACES snapshot used by the baseline, the six Food scoring snapshots, and the approved City
+neighborhood reference. It intentionally excludes the stale, non-public emergency-food context
+and one ACS snapshot not referenced by the validated candidate. All resource members are the
+exact FNS versions named by validated Food components and remain `internal_reproduction_only`.
+
+The expected current publication remains `null`. Publication remains blocked until MOO-758 Gate 3
+approval names this fingerprint, the exact candidate, a reviewer-approved approval ID, and the
+resulting dry-run hash.
+
+## Approved production dry run
+
+Tarik approved the MOO-758 production dry run on 2026-09-03 with approval ID
+`MOO-758-GATE3-DRY-RUN-2026-09-03`. The command ran through the dedicated
+`mke_atlas_publication_operator` role and completed read-only with no current publication before
+or after the check.
+
+| Evidence | Result |
+| --- | --- |
+| Candidate Food run | `97bd1cdf-bf96-573f-8fcf-92e8676925d4` |
+| Pinned Equity run | `502e2a04-b013-53cd-8b09-c9144862701a` |
+| Expected/current publication | `null` / `null` |
+| Manifest fingerprint | `5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a` |
+| Dry-run hash | `f9a6d63f729fcf0ccc4424be3bc6ee9197b061b95e5249871284f4645c9e0d0f` |
+| Reconciled members | 302 scores; 3,900 Equity components; 1,196 Food components; 16 source snapshots; 51 resource versions |
+
+The first command invocation failed before validation because its relative request paths resolved
+from the database package directory. It created no database write. The corrected repository-root
+invocation succeeded using the same exact request and manifest. This dry run does not publish a
+run, create a publication row, or deploy the web application.
+
+## Final Gate 3 dry run and publication
+
+The earlier dry run used a distinct dry-run approval identity. Because the dry-run hash binds
+the approval ID and idempotency key as well as the data bundle, it could not be reused for the
+final approval identity. A final read-only dry run was therefore performed with the precise
+approval identity below. Tarik then explicitly confirmed that exact hash before publication.
+
+| Evidence | Result |
+| --- | --- |
+| Approval ID | `MOO-758-GATE3-PUBLISH-2026-09-03` |
+| Candidate Food / Equity runs | `97bd1cdf-bf96-573f-8fcf-92e8676925d4` / `502e2a04-b013-53cd-8b09-c9144862701a` |
+| Expected/current before publish | `null` / `null` |
+| Manifest fingerprint | `5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a` |
+| Confirmed final dry-run hash | `6e7009940e165e3ae9382c8bc0ac4a479bba0e9dd257b974bd1c3a5c595077a2` |
+| Publication ID | `7d1f3565-97b3-43d1-9be4-2c1c476bf4ee` |
+
+The first publish attempt was rejected before any write because it used the earlier dry-run
+identity. The controlled function required the exact final dry-run hash, so the mismatch was a
+safe stop rather than a partial publication. The second attempt used the approved final identity
+and created the publication above. It set the selected Food and Equity runs to `published` and
+made this the one current publication through the governed database function.
+
+## Post-publication reconciliation
+
+A read-only reconciliation then compared the live publication with the approved bundle. It
+completed successfully with current publication
+`7d1f3565-97b3-43d1-9be4-2c1c476bf4ee`, manifest fingerprint
+`5f325c2c79954f2efa857f82acd4d0a792b51202e455a9d72cf6a625cd66f32a`, and reconciliation
+dry hash `02d8dc039da9a781a1dceaaf6c8586f443997d1260ef2f247b347e69af1961ae`.
+
+It verified 302 score pairs, 3,900 Equity components, 1,196 Food components, 16 source
+snapshots, and 51 resource versions. An initial reconciliation check correctly stopped when it
+assumed Food must still be `validated`; publication intentionally changes that run to
+`published`. The check was corrected to accept either governed status and covered with focused
+tests before this successful read-only verification. No analytical value, source, score, or
+publication record was altered by reconciliation.
+
+## Remaining website-release gates
+
+1. Merge the reconciliation fix and this production evidence into `main`.
+2. Configure Vercel production with only the `mke_atlas_app_reader` database credential; the
+   publication-operator credential remains outside Vercel.
+3. Deploy the web application and verify that public pages read this published release, including
+   unavailable-data states, mobile layouts, and attribution links.
