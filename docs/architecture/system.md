@@ -138,6 +138,20 @@ Validated-preview responses are dynamic and excluded from shared public caches. 
 cache may key only on immutable publication identity plus normalized request identity.
 A deployment never publishes, supersedes, or mutates analytical data.
 
+## Public Data export boundary
+
+`/data` and `/api/exports/tract-evidence.csv` use the same public selector. The server reads only
+the exact governed publication, its score and component member records, and source snapshots whose
+publication decision permits public derived results or direct display. It builds all 302 canonical
+tract rows in a set-based database read, validates the fixed 13 Equity and 4 Food metric families,
+and rejects duplicate, missing, wrong-run, or inconsistent evidence before serializing a byte.
+
+The CSV serializer and database repository are server-only. It emits fixed headers, CRLF rows,
+stable JSON cells, and formula-neutralized text. The browser only presents download context and a
+shared column dictionary; it does not join records, infer source versions, calculate neighborhood
+overlap, or construct the CSV. A missing public publication, preview-only selection, failed
+integrity check, or operational fault returns a redacted unavailable state and no partial file.
+
 ## Deployment
 
 Code:

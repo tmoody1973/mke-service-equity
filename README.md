@@ -64,6 +64,28 @@ County midpoint—not causes or policy recommendations.
 The public app reads only a published score run. A guarded local development preview may read one
 exact validated run for review, but it cannot turn that run into published data.
 
+## Public data download
+
+The **Download data** item opens `/data`, where people can read what the file includes before
+downloading it. When a governed public release exists, the CSV contains one row for each of the
+302 canonical 2020 Milwaukee County Census tracts. It includes the published Equity and Food
+evidence, missing-value and uncertainty fields, City-neighborhood overlap context when that
+reference is pinned to the release, and release IDs, hashes, methodology versions, vintages, and
+approved source versions.
+
+The download never uses a map selection, browser calculation, preview run, or “latest” source.
+If the one public release cannot be proven complete and internally consistent, the page explains
+that no file is available and the endpoint returns no CSV. Empty numeric cells are accompanied by
+their data state; an empty value never means zero. The file deliberately excludes map geometry,
+coordinates, site-level records, public-investment data, ZIP-code guesses, and personal data.
+
+Local checks:
+
+```bash
+npm test --workspace @mke/web
+npm run test:e2e -- tests/e2e/data-export.spec.ts tests/e2e/final-product-qa.spec.ts tests/e2e/accessibility.spec.ts
+```
+
 Publication is a separate, server-only data-release operation. It binds one validated Food run to
 its exact Equity Baseline, analytical members, sources, resources, licensing decisions, approval,
 and audit record in one transaction. It never runs from the website or a Vercel deployment. With

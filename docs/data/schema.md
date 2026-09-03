@@ -251,6 +251,22 @@ current release, revalidate the candidate and complete membership, enforce redis
 decisions, change all states atomically, and write audit evidence. Public function execution is
 revoked; ordinary application code has no publication export.
 
+## Logical public tract-evidence export
+
+The public CSV is a logical view, not a new physical table. It begins with
+`atlas_publication_score_members` for the one current publication and joins only its exact Food
+score, pinned Equity score, published component/value members, and approved source snapshot
+members. The read requires every one of the 302 canonical 2020 Milwaukee County tracts to have
+all 13 approved Equity indicators and all 4 approved Food metrics in the fixed contract order.
+
+`atlas_publication_source_snapshot_members` supplies public source-version summaries only when
+its redistribution decision permits public derived results or direct display. The City
+neighborhood columns come from `tract_neighborhood_contexts` and
+`tract_neighborhood_overlaps` only when their snapshot is pinned by that same publication. The
+result preserves the reference's area-overlap limitation and leaves neighborhood context explicitly
+unavailable when no such pin exists. The export does not contain geometries, coordinates, or
+resource records.
+
 ## public_investments
 
 - id

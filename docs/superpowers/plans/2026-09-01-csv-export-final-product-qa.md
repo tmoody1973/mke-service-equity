@@ -30,6 +30,11 @@ blocking MOO-758 Gate 3.
 proceed offline. Task 8 still requires separate exact approval before any live Neon branch,
 fixture publication, external deployment, or production-adjacent action.
 
+**Implementation update (2026-09-02):** Offline Tasks 2–7 and Task 10 documentation are
+implemented and verified. The remaining work is the complete repository gate, review, and the
+separately approved live-proof path. No live database, publication, deployment, or production
+data action has occurred.
+
 ## Fixed execution decisions
 
 1. Work only in `.worktrees/moo-769` on `codex/moo-769-csv-export-final-qa`.
