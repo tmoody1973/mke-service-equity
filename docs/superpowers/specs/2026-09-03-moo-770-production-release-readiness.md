@@ -1,7 +1,7 @@
 # MOO-770 — Production release readiness design
 
-**Status:** Approved to prepare on 2026-09-03. This is not Gate 3 approval and does not authorize
-a production database mutation, publication, or deployment.
+**Status:** Production schema and validated-data promotion approved and completed on 2026-09-03.
+This is not MOO-758 Gate 3 approval and does not authorize a publication or deployment.
 
 ## Purpose
 
@@ -49,11 +49,12 @@ priority classification, source snapshots, or publication membership rules.
 1. Add tests for the real incomplete-score shape, then update the server-only export contract and
    UI copy to preserve explicit unavailable states.
 2. Complete repository, responsive, accessibility, and production-mode fail-closed verification.
-3. Prepare a reproducible, reviewed promotion procedure for the approved real data bundle. It must
-   apply reviewed schema migrations to production first, preserve all required source snapshots,
-   resources, geometries, neighborhoods, score members, and audit lineage, and establish distinct
-   production application-reader and publication-operator credentials. No ad-hoc table edits,
-   row copying, or status updates are allowed.
+3. Promote the approved real data bundle using a reproducible, reviewed procedure that preserves
+   all required source snapshots, resources, geometries, neighborhoods, scores, components, and
+   run lineage. The 2026-09-03 promotion used Neon’s branch-restore control-plane operation from
+   the exact approved source into the verified-empty production target; it did not use ad-hoc
+   table edits, row copying, or run-status updates. Apply forward-only reviewed schema migrations
+   after the snapshot restore, and record the sanitized verification evidence.
 4. Configure Vercel production server-only variables only after the production reader role and
    published-data target exist. `DATABASE_URL` is reader-only; no publication credential belongs
    in Vercel. Preview must remain isolated from production. `HEROUI_AUTH_TOKEN` stays build-only,
@@ -68,9 +69,9 @@ priority classification, source snapshots, or publication membership rules.
 
 ## Out of scope
 
-- Publishing the development run directly.
-- Production writes, migrations, credential creation, source acquisition, or Vercel deployment
-  before the MOO-758 Gate 3 package is approved.
+- Publishing the validated run directly.
+- Credential creation, source acquisition, Vercel configuration, or Vercel deployment before the
+  MOO-758 Gate 3 package is approved.
 - Recalculation, methodology changes, data imputation, or treating unavailable metrics as zero.
 - New product features, authentication, AI, ranking, or policy recommendations.
 

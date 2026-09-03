@@ -1,8 +1,8 @@
 # MOO-770 — Production release readiness plan
 
 **Branch:** `codex/moo-770-production-release`  
-**Gate:** preparation approved; MOO-758 Gate 3 remains required for any production mutation,
-publication, or deployment.
+**Gate:** production schema and validated-data promotion completed with explicit approval;
+MOO-758 Gate 3 remains required for publication, Vercel production credentials, and deployment.
 
 ## Task 1 — Preserve the real unavailable-data states
 
@@ -19,16 +19,18 @@ agree. Verify at 375, 430, 768, 1024, and 1440 px and through assistive-technolo
 
 ## Task 2 — Build a production-promotion runbook
 
-Document a reviewed, replayable procedure that:
+Document and execute a reviewed, replayable procedure that:
 
 - inventories and verifies source/resource/neighborhood lineage from the candidate;
-- applies reviewed migrations to the empty production database only after a production-specific
-  migration authorization;
-- promotes data through an approved controlled import/migration boundary rather than manual DML;
-- creates reader/operator role separation and proves the reader cannot publish;
+- promotes the exact approved source snapshot through Neon’s audited branch-restore boundary
+  rather than manual DML;
+- applies the forward-only reviewed migrations after restoration;
+- records reader/operator role separation as a remaining Gate 3 requirement;
 - records only IDs, counts, hashes, and outcomes—never credentials or connection strings.
 
-This task produces no production migration, data transfer, or credential change.
+The approved 2026-09-03 execution promoted the source snapshot into the verified-empty
+production target, preserved the former empty target under `moo-770-pre-promotion-empty`, and
+applied migrations `0005` and `0006`. It did not create credentials, publish, or deploy.
 
 ## Task 3 — Prepare Vercel production configuration
 
