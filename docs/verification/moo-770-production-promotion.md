@@ -45,6 +45,23 @@ approved source and production target before migrations. Final production querie
 same two validated run IDs and output hashes, the governed tables/functions, and zero current
 publication rows.
 
+## Least-privilege roles
+
+Two non-admin production login roles were created. Their generated passwords were used only for
+the immediate permission proof and discarded; a fresh reader password must be set directly in
+the approved Vercel production secret at Gate 3, and the operator credential must remain outside
+Vercel.
+
+| Role | `SELECT` on analytical tables | Direct table insert | Controlled publish/withdraw execution |
+| --- | --- | --- | --- |
+| `mke_atlas_app_reader` | allowed | denied | denied |
+| `mke_atlas_publication_operator` | allowed for reconciliation | denied | allowed |
+
+Both roles have no superuser, database-creation, role-creation, replication, or bypass-RLS
+privilege. The reader has schema usage, database connect, and table-select grants only. The
+operator has those required reads plus explicit execute grants on the two security-definer
+functions; it has no general analytical table write grant.
+
 ## Remaining release gates
 
 1. Create separate least-privilege production application-reader and publication-operator
